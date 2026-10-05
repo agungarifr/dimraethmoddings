@@ -440,45 +440,23 @@ opencode --version
 
 ### 10.2 Give it a configuration
 
-This repo ships a **redacted sample** config, `opencode.example.json`. Copy it and edit it:
+opencode needs a model provider. Either run:
 
 ```bat
-cd /d "D:\SteamLibrary\steamapps\common\Dimraeth\dimraethmoddings"
-copy opencode.example.json opencode.json
+opencode auth login
 ```
 
-Open `opencode.json` and set up your model provider. The sample uses an OpenAI-compatible provider
-named `midas`; you can keep it and set the API key as an **environment variable**, or replace the
-`provider` block with any provider opencode supports (OpenAI, Anthropic, a local model, …). Example
-of the important part:
+and follow the prompts, or create `opencode.json` in the game root and add your own provider (OpenAI,
+Anthropic, a local model, …). Config schema: <https://opencode.ai/docs/config>.
 
-```jsonc
-{
-  "$schema": "https://opencode.ai/config.json",
-  "provider": {
-    "midas": {
-      "npm": "@ai-sdk/openai-compatible",
-      "options": { "baseURL": "https://midas-stage.telkomdigital.id/v1", "apiKey": "{env:MIDAS_API_KEY}" }
-    }
-  },
-  "model": "midas/deepseek-v4-pro"
-}
-```
+> **Never commit `opencode.json` or an API key.** It is already in `.gitignore`. Keep the key in an
+> environment variable, not in the file.
 
-```powershell
-$env:MIDAS_API_KEY = "your-key-here"
-```
-
-> **Never commit `opencode.json` or an API key.** It is already in `.gitignore`. Use the environment
-> variable (`{env:...}`) rather than pasting the key into the file.
-
-The sample also configures two optional MCP helpers used by this project:
+This project can optionally use two MCP helpers — add them only if you want them:
 
 - **CodeGraph** (`.codegraph/`): a pre-built index of the mod source that answers "where is X / how
   does X work" in one call, including the game-class call paths.
 - **Memento**: persistent memory across sessions.
-
-They are convenient but optional — delete those blocks if you do not want them.
 
 ### 10.3 Start it in the game root
 
@@ -548,7 +526,6 @@ assets/                 Art / thumbnails / mod.pdf
 releases/               Published mod .zip packages
 *.md, changelog.txt     Top-level reports (Hell Mode, Nexus, forensic reports, etc.)
 AGENTS.md               Project agent/workflow notes (used by AI assistants)
-opencode.example.json   Redacted sample of the local AI agent config
 .gitignore
 README.md               ← you are here
 ```
@@ -607,9 +584,8 @@ dump to be useful.
 
 ## 15. Notes, secrets and licensing
 
-- **Secrets:** `opencode.json` is excluded because it can contain an API key. Copy
-  `opencode.example.json` → `opencode.json` and provide the key via an environment variable
-  (`{env:MIDAS_API_KEY}`). **Never** commit keys, tokens, or credentials.
+- **Secrets:** `opencode.json` is excluded because it can contain an API key. Provide the key via an
+  environment variable. **Never** commit keys, tokens, or credentials.
 - **Game-owned binaries are excluded:** `BepInEx/`, `dotnet/`, `MelonLoader/`, `cpp2il_*`,
   `CheatMenuDecompiled/`, `bin/`, `obj/`, and CodeGraph/graphify indexes are all in `.gitignore`.
   You regenerate them on each device.
