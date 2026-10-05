@@ -1,0 +1,236 @@
+using System.Collections.Generic;
+using Cpp2ILInjected;
+using TMPro;
+using UnityEngine;
+using UnityEngine.UI;
+
+[Token(Token = "0x2000327")]
+public class ProductionBuildUI : StorageView
+{
+	[Token(Token = "0x4001D2B")]
+	[FieldOffset(Offset = "0x1D0")]
+	private TextMeshProUGUI _buildingNameText;
+
+	[Token(Token = "0x4001D2C")]
+	[FieldOffset(Offset = "0x1D8")]
+	private TextMeshProUGUI _levelText;
+
+	[Token(Token = "0x4001D2D")]
+	[FieldOffset(Offset = "0x1E0")]
+	private Image _buildingIcon;
+
+	[Token(Token = "0x4001D2E")]
+	[FieldOffset(Offset = "0x1E8")]
+	private Toggle _activeToggle;
+
+	[Token(Token = "0x4001D2F")]
+	[FieldOffset(Offset = "0x1F0")]
+	private TextMeshProUGUI _activeLabel;
+
+	[Token(Token = "0x4001D30")]
+	[FieldOffset(Offset = "0x1F8")]
+	private TextMeshProUGUI _descriptionText;
+
+	[Token(Token = "0x4001D31")]
+	[FieldOffset(Offset = "0x200")]
+	private List<ProductionBuildView.RateRow> _rateRows;
+
+	[Token(Token = "0x4001D32")]
+	[FieldOffset(Offset = "0x208")]
+	private List<GameObject> _outputSlots;
+
+	[Token(Token = "0x4001D33")]
+	[FieldOffset(Offset = "0x210")]
+	private List<GameObject> _outputSlotBackgrounds;
+
+	[Token(Token = "0x4001D34")]
+	[FieldOffset(Offset = "0x218")]
+	private Button _collectAllButton;
+
+	[HideInInspector]
+	[Token(Token = "0x4001D35")]
+	[FieldOffset(Offset = "0x220")]
+	public ProductiveBuilding _building;
+
+	[Token(Token = "0x4001D36")]
+	[FieldOffset(Offset = "0x228")]
+	private bool _subscribedBuilding;
+
+	[Token(Token = "0x4001D37")]
+	[FieldOffset(Offset = "0x229")]
+	private bool _isBeingDestroyed;
+
+	[Token(Token = "0x17000433")]
+	public Toggle ActiveToggle
+	{
+		[Token(Token = "0x6001E02")]
+		[Address(RVA = "0x9C85E0", Offset = "0x9C75E0", Length = "0x8")]
+		get
+		{
+			return null;
+		}
+	}
+
+	[Token(Token = "0x17000434")]
+	public override bool AllowsDropFromContainer
+	{
+		[Token(Token = "0x6001E16")]
+		[Address(RVA = "0x6BBA80", Offset = "0x6BAA80", Length = "0x3")]
+		get
+		{
+			return false;
+		}
+	}
+
+	[Token(Token = "0x6001E03")]
+	[Address(RVA = "0x9C7570", Offset = "0x9C6570", Length = "0xB")]
+	private void Start()
+	{
+	}
+
+	[Token(Token = "0x6001E04")]
+	[Address(RVA = "0x9C5320", Offset = "0x9C4320", Length = "0x341")]
+	public void BindView(ProductionBuildView v)
+	{
+	}
+
+	[Token(Token = "0x6001E05")]
+	[Address(RVA = "0x9C6DE0", Offset = "0x9C5DE0", Length = "0x5AD")]
+	private void RepairHeaderRefs()
+	{
+	}
+
+	[Token(Token = "0x6001E06")]
+	[Address(RVA = "0x9C7390", Offset = "0x9C6390", Length = "0x3B")]
+	public void SetBuilding(ProductiveBuilding building)
+	{
+	}
+
+	[Token(Token = "0x6001E07")]
+	[Address(RVA = "0x9C5B80", Offset = "0x9C4B80", Length = "0x2EB")]
+	public void Open()
+	{
+	}
+
+	[Token(Token = "0x6001E08")]
+	[Address(RVA = "0x9C5670", Offset = "0x9C4670", Length = "0x7")]
+	public void Close()
+	{
+	}
+
+	[Token(Token = "0x6001E09")]
+	[Address(RVA = "0x9C5B30", Offset = "0x9C4B30", Length = "0xE")]
+	private void OnDestroy()
+	{
+	}
+
+	[Token(Token = "0x6001E0A")]
+	[Address(RVA = "0x9C7580", Offset = "0x9C6580", Length = "0x1BC")]
+	private void SubscribeBuilding()
+	{
+	}
+
+	[Token(Token = "0x6001E0B")]
+	[Address(RVA = "0x9C7CD0", Offset = "0x9C6CD0", Length = "0x1BC")]
+	private void UnsubscribeBuilding()
+	{
+	}
+
+	[Token(Token = "0x6001E0C")]
+	[Address(RVA = "0x9C5B40", Offset = "0x9C4B40", Length = "0x7")]
+	private void OnOutputAccessChanged(bool previous, bool current)
+	{
+	}
+
+	[Token(Token = "0x6001E0D")]
+	[Address(RVA = "0x9C6320", Offset = "0x9C5320", Length = "0xCC")]
+	private void RefreshAll()
+	{
+	}
+
+	[Token(Token = "0x6001E0E")]
+	[Address(RVA = "0x9C6230", Offset = "0x9C5230", Length = "0xA6")]
+	private void RefreshAccessSwitch()
+	{
+	}
+
+	[Token(Token = "0x6001E0F")]
+	[Address(RVA = "0x9C63F0", Offset = "0x9C53F0", Length = "0x498")]
+	private void RefreshHeader()
+	{
+	}
+
+	[Token(Token = "0x6001E10")]
+	[Address(RVA = "0x9C62E0", Offset = "0x9C52E0", Length = "0x34")]
+	private void RefreshActiveToggle()
+	{
+	}
+
+	[Token(Token = "0x6001E11")]
+	[Address(RVA = "0x9C50D0", Offset = "0x9C40D0", Length = "0x24F")]
+	private void ApplyActiveToggleVisual(bool active)
+	{
+	}
+
+	[Token(Token = "0x6001E12")]
+	[Address(RVA = "0x9C5A90", Offset = "0x9C4A90", Length = "0x9A")]
+	private void OnActiveToggleChanged(bool isOn)
+	{
+	}
+
+	[Token(Token = "0x6001E13")]
+	[Address(RVA = "0x9C6890", Offset = "0x9C5890", Length = "0x3F7")]
+	private void RefreshRates()
+	{
+	}
+
+	[Token(Token = "0x6001E14")]
+	[Address(RVA = "0x9C5680", Offset = "0x9C4680", Length = "0x40E")]
+	private static string FormatRate(ItemType item, int qty, float productionTime)
+	{
+		return null;
+	}
+
+	[Token(Token = "0x6001E15")]
+	[Address(RVA = "0x9C7E90", Offset = "0x9C6E90", Length = "0x6F8")]
+	private void WireOutputSlots()
+	{
+	}
+
+	[Token(Token = "0x6001E17")]
+	[Address(RVA = "0x9C5B50", Offset = "0x9C4B50", Length = "0x2A")]
+	private void OnOutputSlotRightClicked(int globalIndex)
+	{
+	}
+
+	[Token(Token = "0x6001E18")]
+	[Address(RVA = "0x9C6C90", Offset = "0x9C5C90", Length = "0x14A")]
+	protected override bool RefusesDeposit(InventoryEntry entry)
+	{
+		return false;
+	}
+
+	[Token(Token = "0x6001E19")]
+	[Address(RVA = "0x9C5E70", Offset = "0x9C4E70", Length = "0x3B2")]
+	public override void PopulateStorageView()
+	{
+	}
+
+	[Token(Token = "0x6001E1A")]
+	[Address(RVA = "0x9C7740", Offset = "0x9C6740", Length = "0x43D")]
+	public override void SwapContainerItems(int dragIndex, int dropIndex)
+	{
+	}
+
+	[Token(Token = "0x6001E1B")]
+	[Address(RVA = "0x9C73D0", Offset = "0x9C63D0", Length = "0x19D")]
+	private void SetOutputSlotBackground(int index, bool empty)
+	{
+	}
+
+	[Token(Token = "0x6001E1C")]
+	[Address(RVA = "0x9C8590", Offset = "0x9C7590", Length = "0x49")]
+	public ProductionBuildUI()
+	{
+	}
+}

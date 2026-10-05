@@ -1,0 +1,85 @@
+using Cpp2ILInjected;
+using TMPro;
+using UnityEngine;
+using UnityEngine.EventSystems;
+using UnityEngine.UI;
+
+[Token(Token = "0x2000EE3")]
+public class DifficultySlider : MonoBehaviour, IEndDragHandler, IEventSystemHandler, IPointerUpHandler, IPointerDownHandler
+{
+	[Token(Token = "0x4007291")]
+	[FieldOffset(Offset = "0x20")]
+	public TextMeshProUGUI[] difficultyLabels;
+
+	[Token(Token = "0x4007292")]
+	[FieldOffset(Offset = "0x28")]
+	public float MinFontSize;
+
+	[Token(Token = "0x4007293")]
+	[FieldOffset(Offset = "0x2C")]
+	public float MaxFontSize;
+
+	[Token(Token = "0x4007294")]
+	[FieldOffset(Offset = "0x30")]
+	public Color MinColor;
+
+	[Token(Token = "0x4007295")]
+	[FieldOffset(Offset = "0x40")]
+	public Color MaxColor;
+
+	[Token(Token = "0x4007296")]
+	[FieldOffset(Offset = "0x50")]
+	private Slider _difficultySlider;
+
+	[Token(Token = "0x4007297")]
+	[FieldOffset(Offset = "0x58")]
+	private float[] _sliderPositions;
+
+	[Token(Token = "0x6007A10")]
+	[Address(RVA = "0x11E9BA0", Offset = "0x11E8BA0", Length = "0x49")]
+	private void Awake()
+	{
+	}
+
+	[Token(Token = "0x6007A11")]
+	[Address(RVA = "0x11E9D20", Offset = "0x11E8D20", Length = "0x207")]
+	private void Start()
+	{
+	}
+
+	[Token(Token = "0x6007A12")]
+	[Address(RVA = "0x11E9F30", Offset = "0x11E8F30", Length = "0x32C")]
+	private void UpdateDifficultyText(float value)
+	{
+	}
+
+	[Token(Token = "0x6007A13")]
+	[Address(RVA = "0x11E9BF0", Offset = "0x11E8BF0", Length = "0x7")]
+	public void OnPointerDown(PointerEventData eventData)
+	{
+	}
+
+	[Token(Token = "0x6007A14")]
+	[Address(RVA = "0x11E9BF0", Offset = "0x11E8BF0", Length = "0x7")]
+	public void OnEndDrag(PointerEventData eventData)
+	{
+	}
+
+	[Token(Token = "0x6007A15")]
+	[Address(RVA = "0x11E9BF0", Offset = "0x11E8BF0", Length = "0x7")]
+	public void OnPointerUp(PointerEventData eventData)
+	{
+	}
+
+	[Token(Token = "0x6007A16")]
+	[Address(RVA = "0x11E9C00", Offset = "0x11E8C00", Length = "0x11E")]
+	private void SnapToClosestValue()
+	{
+	}
+
+	[Token(Token = "0x6007A17")]
+	[Address(RVA = "0x11EA260", Offset = "0x11E9260", Length = "0x3F")]
+	public DifficultySlider()
+	{
+	}
+}

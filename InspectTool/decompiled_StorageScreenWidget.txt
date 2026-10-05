@@ -1,0 +1,8 @@
+using System.Runtime.InteropServices;
+using Cpp2ILInjected;
+
+[StructLayout((LayoutKind)0, Size = 1)]
+[Token(Token = "0x2000404")]
+public readonly struct StorageScreenWidget : IUIWidget
+{
+}

@@ -1,0 +1,27 @@
+using System;
+using Cpp2ILInjected;
+
+[Token(Token = "0x2000408")]
+public static class StorageScreenBinding
+{
+	[Token(Token = "0x60026B7")]
+	[Address(RVA = "0xAA96B0", Offset = "0xAA86B0", Length = "0x511")]
+	public static IDisposable Bind(InventoryPaneView view, in StorageScreenArgs args, UIBindContext context)
+	{
+		return null;
+	}
+
+	[Token(Token = "0x60026B8")]
+	[Address(RVA = "0xAA9BD0", Offset = "0xAA8BD0", Length = "0xD9")]
+	private static StorageUIView ResolveChestView(StorageUIView[] views, StorageKind kind)
+	{
+		return null;
+	}
+
+	[Token(Token = "0x60026B9")]
+	[Address(RVA = "0xAA9CB0", Offset = "0xAA8CB0", Length = "0xD6")]
+	private static Player ResolvePlayer(UIBindContext context)
+	{
+		return null;
+	}
+}

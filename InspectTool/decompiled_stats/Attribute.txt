@@ -1,0 +1,11 @@
+public enum Attribute
+{
+	Memory,
+	Charisma,
+	Adventure,
+	Physique,
+	Intelligence,
+	Agility,
+	Strength,
+	Energy
+}

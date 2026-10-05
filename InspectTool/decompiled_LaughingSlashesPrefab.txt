@@ -1,0 +1,736 @@
+using System;
+using System.Collections;
+using System.Collections.Generic;
+using System.Diagnostics;
+using System.Runtime.CompilerServices;
+using Cpp2ILInjected;
+using UnityEngine;
+using UnityEngine.AI;
+
+[Token(Token = "0x20006DC")]
+public class LaughingSlashesPrefab : AreaOfEffect
+{
+	[CompilerGenerated]
+	[Token(Token = "0x20006DD")]
+	private sealed class <DamageOverTimeRoutine>d__55 : IEnumerator<object>, IEnumerator, IDisposable
+	{
+		[Token(Token = "0x40032D1")]
+		[FieldOffset(Offset = "0x10")]
+		private int <>1__state;
+
+		[Token(Token = "0x40032D2")]
+		[FieldOffset(Offset = "0x18")]
+		private object <>2__current;
+
+		[Token(Token = "0x40032D3")]
+		[FieldOffset(Offset = "0x20")]
+		public LaughingSlashesPrefab <>4__this;
+
+		[Token(Token = "0x40032D4")]
+		[FieldOffset(Offset = "0x28")]
+		public ObjectsCommon target;
+
+		[Token(Token = "0x170006E5")]
+		object IEnumerator<object>.Current
+		{
+			[DebuggerHidden]
+			[Token(Token = "0x6003B8B")]
+			[Address(RVA = "0x6B1E50", Offset = "0x6B0E50", Length = "0x5")]
+			get
+			{
+				return null;
+			}
+		}
+
+		[Token(Token = "0x170006E6")]
+		object IEnumerator.Current
+		{
+			[DebuggerHidden]
+			[Token(Token = "0x6003B8D")]
+			[Address(RVA = "0x6B1E50", Offset = "0x6B0E50", Length = "0x5")]
+			get
+			{
+				return null;
+			}
+		}
+
+		[DebuggerHidden]
+		[Token(Token = "0x6003B88")]
+		[Address(RVA = "0x6B1EA0", Offset = "0x6B0EA0", Length = "0x24")]
+		public <DamageOverTimeRoutine>d__55(int <>1__state)
+		{
+		}
+
+		[DebuggerHidden]
+		[Token(Token = "0x6003B89")]
+		[Address(RVA = "0x6AAC60", Offset = "0x6A9C60", Length = "0x3")]
+		void IDisposable.Dispose()
+		{
+		}
+
+		[Token(Token = "0x6003B8A")]
+		[Address(RVA = "0xBF3990", Offset = "0xBF2990", Length = "0x13B")]
+		private bool MoveNext()
+		{
+			return false;
+		}
+
+		bool IEnumerator.MoveNext()
+		{
+			//ILSpy generated this explicit interface implementation from .override directive in MoveNext
+			return this.MoveNext();
+		}
+
+		[DebuggerHidden]
+		[Token(Token = "0x6003B8C")]
+		[Address(RVA = "0xBF3AD0", Offset = "0xBF2AD0", Length = "0x3E")]
+		void IEnumerator.Reset()
+		{
+		}
+	}
+
+	[CompilerGenerated]
+	[Token(Token = "0x20006DE")]
+	private sealed class <DashRoutine>d__42 : IEnumerator<object>, IEnumerator, IDisposable
+	{
+		[Token(Token = "0x40032D5")]
+		[FieldOffset(Offset = "0x10")]
+		private int <>1__state;
+
+		[Token(Token = "0x40032D6")]
+		[FieldOffset(Offset = "0x18")]
+		private object <>2__current;
+
+		[Token(Token = "0x40032D7")]
+		[FieldOffset(Offset = "0x20")]
+		public LaughingSlashesPrefab <>4__this;
+
+		[Token(Token = "0x40032D8")]
+		[FieldOffset(Offset = "0x28")]
+		private Vector3 <start>5__2;
+
+		[Token(Token = "0x40032D9")]
+		[FieldOffset(Offset = "0x34")]
+		private Vector3 <end>5__3;
+
+		[Token(Token = "0x40032DA")]
+		[FieldOffset(Offset = "0x40")]
+		private Vector3 <previousPosition>5__4;
+
+		[Token(Token = "0x40032DB")]
+		[FieldOffset(Offset = "0x4C")]
+		private bool <stoppedByBoundary>5__5;
+
+		[Token(Token = "0x170006E7")]
+		object IEnumerator<object>.Current
+		{
+			[DebuggerHidden]
+			[Token(Token = "0x6003B91")]
+			[Address(RVA = "0x6B1E50", Offset = "0x6B0E50", Length = "0x5")]
+			get
+			{
+				return null;
+			}
+		}
+
+		[Token(Token = "0x170006E8")]
+		object IEnumerator.Current
+		{
+			[DebuggerHidden]
+			[Token(Token = "0x6003B93")]
+			[Address(RVA = "0x6B1E50", Offset = "0x6B0E50", Length = "0x5")]
+			get
+			{
+				return null;
+			}
+		}
+
+		[DebuggerHidden]
+		[Token(Token = "0x6003B8E")]
+		[Address(RVA = "0x6B1EA0", Offset = "0x6B0EA0", Length = "0x24")]
+		public <DashRoutine>d__42(int <>1__state)
+		{
+		}
+
+		[DebuggerHidden]
+		[Token(Token = "0x6003B8F")]
+		[Address(RVA = "0x6AAC60", Offset = "0x6A9C60", Length = "0x3")]
+		void IDisposable.Dispose()
+		{
+		}
+
+		[Token(Token = "0x6003B90")]
+		[Address(RVA = "0xBF3F00", Offset = "0xBF2F00", Length = "0x4F3")]
+		private bool MoveNext()
+		{
+			return false;
+		}
+
+		bool IEnumerator.MoveNext()
+		{
+			//ILSpy generated this explicit interface implementation from .override directive in MoveNext
+			return this.MoveNext();
+		}
+
+		[DebuggerHidden]
+		[Token(Token = "0x6003B92")]
+		[Address(RVA = "0xBF4400", Offset = "0xBF3400", Length = "0x3E")]
+		void IEnumerator.Reset()
+		{
+		}
+	}
+
+	[CompilerGenerated]
+	[Token(Token = "0x20006DF")]
+	private sealed class <DashSequence>d__41 : IEnumerator<object>, IEnumerator, IDisposable
+	{
+		[Token(Token = "0x40032DC")]
+		[FieldOffset(Offset = "0x10")]
+		private int <>1__state;
+
+		[Token(Token = "0x40032DD")]
+		[FieldOffset(Offset = "0x18")]
+		private object <>2__current;
+
+		[Token(Token = "0x40032DE")]
+		[FieldOffset(Offset = "0x20")]
+		public LaughingSlashesPrefab <>4__this;
+
+		[Token(Token = "0x170006E9")]
+		object IEnumerator<object>.Current
+		{
+			[DebuggerHidden]
+			[Token(Token = "0x6003B97")]
+			[Address(RVA = "0x6B1E50", Offset = "0x6B0E50", Length = "0x5")]
+			get
+			{
+				return null;
+			}
+		}
+
+		[Token(Token = "0x170006EA")]
+		object IEnumerator.Current
+		{
+			[DebuggerHidden]
+			[Token(Token = "0x6003B99")]
+			[Address(RVA = "0x6B1E50", Offset = "0x6B0E50", Length = "0x5")]
+			get
+			{
+				return null;
+			}
+		}
+
+		[DebuggerHidden]
+		[Token(Token = "0x6003B94")]
+		[Address(RVA = "0x6B1EA0", Offset = "0x6B0EA0", Length = "0x24")]
+		public <DashSequence>d__41(int <>1__state)
+		{
+		}
+
+		[DebuggerHidden]
+		[Token(Token = "0x6003B95")]
+		[Address(RVA = "0x6AAC60", Offset = "0x6A9C60", Length = "0x3")]
+		void IDisposable.Dispose()
+		{
+		}
+
+		[Token(Token = "0x6003B96")]
+		[Address(RVA = "0xBF4440", Offset = "0xBF3440", Length = "0x1A3")]
+		private bool MoveNext()
+		{
+			return false;
+		}
+
+		bool IEnumerator.MoveNext()
+		{
+			//ILSpy generated this explicit interface implementation from .override directive in MoveNext
+			return this.MoveNext();
+		}
+
+		[DebuggerHidden]
+		[Token(Token = "0x6003B98")]
+		[Address(RVA = "0xBF45F0", Offset = "0xBF35F0", Length = "0x3E")]
+		void IEnumerator.Reset()
+		{
+		}
+	}
+
+	[CompilerGenerated]
+	[Token(Token = "0x20006E0")]
+	private sealed class <SlashVfxRoutine>d__65 : IEnumerator<object>, IEnumerator, IDisposable
+	{
+		[Token(Token = "0x40032DF")]
+		[FieldOffset(Offset = "0x10")]
+		private int <>1__state;
+
+		[Token(Token = "0x40032E0")]
+		[FieldOffset(Offset = "0x18")]
+		private object <>2__current;
+
+		[Token(Token = "0x40032E1")]
+		[FieldOffset(Offset = "0x20")]
+		public LaughingSlashesPrefab <>4__this;
+
+		[Token(Token = "0x40032E2")]
+		[FieldOffset(Offset = "0x28")]
+		private bool <useFirst>5__2;
+
+		[Token(Token = "0x40032E3")]
+		[FieldOffset(Offset = "0x30")]
+		private WaitForSeconds <wait>5__3;
+
+		[Token(Token = "0x40032E4")]
+		[FieldOffset(Offset = "0x38")]
+		private float <vfxStartTime>5__4;
+
+		[Token(Token = "0x40032E5")]
+		[FieldOffset(Offset = "0x3C")]
+		private float <maxVfxTime>5__5;
+
+		[Token(Token = "0x170006EB")]
+		object IEnumerator<object>.Current
+		{
+			[DebuggerHidden]
+			[Token(Token = "0x6003B9D")]
+			[Address(RVA = "0x6B1E50", Offset = "0x6B0E50", Length = "0x5")]
+			get
+			{
+				return null;
+			}
+		}
+
+		[Token(Token = "0x170006EC")]
+		object IEnumerator.Current
+		{
+			[DebuggerHidden]
+			[Token(Token = "0x6003B9F")]
+			[Address(RVA = "0x6B1E50", Offset = "0x6B0E50", Length = "0x5")]
+			get
+			{
+				return null;
+			}
+		}
+
+		[DebuggerHidden]
+		[Token(Token = "0x6003B9A")]
+		[Address(RVA = "0x6B1EA0", Offset = "0x6B0EA0", Length = "0x24")]
+		public <SlashVfxRoutine>d__65(int <>1__state)
+		{
+		}
+
+		[DebuggerHidden]
+		[Token(Token = "0x6003B9B")]
+		[Address(RVA = "0x6AAC60", Offset = "0x6A9C60", Length = "0x3")]
+		void IDisposable.Dispose()
+		{
+		}
+
+		[Token(Token = "0x6003B9C")]
+		[Address(RVA = "0xBF6770", Offset = "0xBF5770", Length = "0x174")]
+		private bool MoveNext()
+		{
+			return false;
+		}
+
+		bool IEnumerator.MoveNext()
+		{
+			//ILSpy generated this explicit interface implementation from .override directive in MoveNext
+			return this.MoveNext();
+		}
+
+		[DebuggerHidden]
+		[Token(Token = "0x6003B9E")]
+		[Address(RVA = "0xBF68F0", Offset = "0xBF58F0", Length = "0x3E")]
+		void IEnumerator.Reset()
+		{
+		}
+	}
+
+	[SerializeField]
+	[Token(Token = "0x40032A9")]
+	[FieldOffset(Offset = "0x2E8")]
+	private float _dashDelay;
+
+	[SerializeField]
+	[Token(Token = "0x40032AA")]
+	[FieldOffset(Offset = "0x2EC")]
+	private float _dashSpeed;
+
+	[SerializeField]
+	[Token(Token = "0x40032AB")]
+	[FieldOffset(Offset = "0x2F0")]
+	private float _dashOvershootDistance;
+
+	[SerializeField]
+	[Token(Token = "0x40032AC")]
+	[FieldOffset(Offset = "0x2F4")]
+	private float _postHitSlideDistance;
+
+	[SerializeField]
+	[Token(Token = "0x40032AD")]
+	[FieldOffset(Offset = "0x2F8")]
+	private float _slowdownDuration;
+
+	[SerializeField]
+	[Token(Token = "0x40032AE")]
+	[FieldOffset(Offset = "0x2FC")]
+	private float _damageInterval;
+
+	[SerializeField]
+	[Token(Token = "0x40032AF")]
+	[FieldOffset(Offset = "0x300")]
+	private float _damagePerTick;
+
+	[SerializeField]
+	[Token(Token = "0x40032B0")]
+	[FieldOffset(Offset = "0x304")]
+	private float _collisionStunDuration;
+
+	[SerializeField]
+	[Token(Token = "0x40032B1")]
+	[FieldOffset(Offset = "0x308")]
+	private GameObject _slashVfxPrefabA;
+
+	[SerializeField]
+	[Token(Token = "0x40032B2")]
+	[FieldOffset(Offset = "0x310")]
+	private GameObject _slashVfxPrefabB;
+
+	[SerializeField]
+	[Token(Token = "0x40032B3")]
+	[FieldOffset(Offset = "0x318")]
+	private float _slashVfxInterval;
+
+	[Token(Token = "0x40032B4")]
+	private const float MinPhaseDuration = 0.05f;
+
+	[Token(Token = "0x40032B5")]
+	[FieldOffset(Offset = "0x320")]
+	private readonly Dictionary<ObjectsCommon, Coroutine> _damageCoroutines;
+
+	[Token(Token = "0x40032B6")]
+	[FieldOffset(Offset = "0x328")]
+	private readonly HashSet<ObjectsCommon> _activeDamageTargets;
+
+	[Token(Token = "0x40032B7")]
+	[FieldOffset(Offset = "0x330")]
+	private WaitForSeconds _damageTickDelay;
+
+	[Token(Token = "0x40032B8")]
+	[FieldOffset(Offset = "0x338")]
+	private WaitForSeconds _slashVfxDelay;
+
+	[Token(Token = "0x40032B9")]
+	[FieldOffset(Offset = "0x340")]
+	private Coroutine _dashRoutine;
+
+	[Token(Token = "0x40032BA")]
+	[FieldOffset(Offset = "0x348")]
+	private Coroutine _slashVfxRoutine;
+
+	[Token(Token = "0x40032BB")]
+	[FieldOffset(Offset = "0x350")]
+	private NavMeshAgent _ownerAgent;
+
+	[Token(Token = "0x40032BC")]
+	[FieldOffset(Offset = "0x358")]
+	private bool _agentWasActive;
+
+	[Token(Token = "0x40032BD")]
+	[FieldOffset(Offset = "0x359")]
+	private bool _agentWasStopped;
+
+	[Token(Token = "0x40032BE")]
+	[FieldOffset(Offset = "0x35C")]
+	private Vector2 _dashDirection;
+
+	[Token(Token = "0x40032BF")]
+	[FieldOffset(Offset = "0x364")]
+	private Vector3 _overshootPosition;
+
+	[Token(Token = "0x40032C0")]
+	[FieldOffset(Offset = "0x370")]
+	private Vector3 _phaseStartPosition;
+
+	[Token(Token = "0x40032C1")]
+	[FieldOffset(Offset = "0x37C")]
+	private Vector3 _phaseEndPosition;
+
+	[Token(Token = "0x40032C2")]
+	[FieldOffset(Offset = "0x388")]
+	private float _phaseDuration;
+
+	[Token(Token = "0x40032C3")]
+	[FieldOffset(Offset = "0x38C")]
+	private float _phaseElapsed;
+
+	[Token(Token = "0x40032C4")]
+	[FieldOffset(Offset = "0x390")]
+	private float _dashDuration;
+
+	[Token(Token = "0x40032C5")]
+	[FieldOffset(Offset = "0x394")]
+	private float _ownerStartZ;
+
+	[Token(Token = "0x40032C6")]
+	[FieldOffset(Offset = "0x398")]
+	private bool _dashActive;
+
+	[Token(Token = "0x40032C7")]
+	[FieldOffset(Offset = "0x399")]
+	private bool _dashFinished;
+
+	[Token(Token = "0x40032C8")]
+	[FieldOffset(Offset = "0x39A")]
+	private bool _slowdownQueued;
+
+	[Token(Token = "0x40032C9")]
+	[FieldOffset(Offset = "0x39B")]
+	private bool _slowdownActive;
+
+	[Token(Token = "0x40032CA")]
+	[FieldOffset(Offset = "0x39C")]
+	private bool _movementRestored;
+
+	[Token(Token = "0x40032CB")]
+	[FieldOffset(Offset = "0x39D")]
+	private bool _collisionResolved;
+
+	[Token(Token = "0x40032CC")]
+	[FieldOffset(Offset = "0x39E")]
+	private bool _hasMovementAuthority;
+
+	[Token(Token = "0x40032CD")]
+	[FieldOffset(Offset = "0x3A0")]
+	private GameObject _slashVfxInstanceA;
+
+	[Token(Token = "0x40032CE")]
+	[FieldOffset(Offset = "0x3A8")]
+	private GameObject _slashVfxInstanceB;
+
+	[SerializeField]
+	[Token(Token = "0x40032CF")]
+	[FieldOffset(Offset = "0x3B0")]
+	private GameObject _placeholderAnticipationIcon;
+
+	[SerializeField]
+	[Token(Token = "0x40032D0")]
+	[FieldOffset(Offset = "0x3B8")]
+	private GameObject anticipation_vfx;
+
+	[Token(Token = "0x6003B66")]
+	[Address(RVA = "0xBB4160", Offset = "0xBB3160", Length = "0x869")]
+	protected override void OnStart()
+	{
+	}
+
+	[IteratorStateMachine(typeof(<DashSequence>d__41))]
+	[Token(Token = "0x6003B67")]
+	[Address(RVA = "0xBB3F70", Offset = "0xBB2F70", Length = "0x6D")]
+	private IEnumerator DashSequence()
+	{
+		return null;
+	}
+
+	[IteratorStateMachine(typeof(<DashRoutine>d__42))]
+	[Token(Token = "0x6003B68")]
+	[Address(RVA = "0xBB3F00", Offset = "0xBB2F00", Length = "0x6D")]
+	private IEnumerator DashRoutine()
+	{
+		return null;
+	}
+
+	[Token(Token = "0x6003B69")]
+	[Address(RVA = "0xBB2FC0", Offset = "0xBB1FC0", Length = "0x10A")]
+	private void BroadcastDashEnded()
+	{
+	}
+
+	[Token(Token = "0x6003B6A")]
+	[Address(RVA = "0xBB4020", Offset = "0xBB3020", Length = "0x18")]
+	public void EndDashFromOwner()
+	{
+	}
+
+	[Token(Token = "0x6003B6B")]
+	[Address(RVA = "0xBB2D60", Offset = "0xBB1D60", Length = "0x226")]
+	protected override void AreaOfEffectStrike(ObjectsCommon target)
+	{
+	}
+
+	[Token(Token = "0x6003B6C")]
+	[Address(RVA = "0xBB2B00", Offset = "0xBB1B00", Length = "0x11F")]
+	protected override void AreaOfEffectDeStrike(ObjectsCommon target)
+	{
+	}
+
+	[Token(Token = "0x6003B6D")]
+	[Address(RVA = "0xBB4040", Offset = "0xBB3040", Length = "0x33")]
+	protected override void HandleBeforeSpellDestroyed()
+	{
+	}
+
+	[Token(Token = "0x6003B6E")]
+	[Address(RVA = "0xBB2F90", Offset = "0xBB1F90", Length = "0x23")]
+	private void BeginSlowdown()
+	{
+	}
+
+	[Token(Token = "0x6003B6F")]
+	[Address(RVA = "0xBB4E00", Offset = "0xBB3E00", Length = "0x192")]
+	private void StartSlowdownPhase()
+	{
+	}
+
+	[Token(Token = "0x6003B70")]
+	[Address(RVA = "0xBB4080", Offset = "0xBB3080", Length = "0xCB")]
+	private void MoveOwnerTo(Vector3 position)
+	{
+	}
+
+	[Token(Token = "0x6003B71")]
+	[Address(RVA = "0xBB49D0", Offset = "0xBB39D0", Length = "0x11B")]
+	private void PrepareOwnerForDash()
+	{
+	}
+
+	[Token(Token = "0x6003B72")]
+	[Address(RVA = "0xBB3A50", Offset = "0xBB2A50", Length = "0x112")]
+	private void CleanupMovementState()
+	{
+	}
+
+	[Token(Token = "0x6003B73")]
+	[Address(RVA = "0xBB4BC0", Offset = "0xBB3BC0", Length = "0x10E")]
+	private void StartDamageOverTime(ObjectsCommon target)
+	{
+	}
+
+	[Token(Token = "0x6003B74")]
+	[Address(RVA = "0xBB4FA0", Offset = "0xBB3FA0", Length = "0xA0")]
+	private void StopDamageOverTime(ObjectsCommon target)
+	{
+	}
+
+	[IteratorStateMachine(typeof(<DamageOverTimeRoutine>d__55))]
+	[Token(Token = "0x6003B75")]
+	[Address(RVA = "0xBB3E70", Offset = "0xBB2E70", Length = "0x8A")]
+	private IEnumerator DamageOverTimeRoutine(ObjectsCommon target)
+	{
+		return null;
+	}
+
+	[Token(Token = "0x6003B76")]
+	[Address(RVA = "0xBB38B0", Offset = "0xBB28B0", Length = "0x19C")]
+	private void CleanupDamageCoroutines()
+	{
+	}
+
+	[Token(Token = "0x6003B77")]
+	[Address(RVA = "0xBB3FE0", Offset = "0xBB2FE0", Length = "0x39")]
+	private static float EaseOut(float t)
+	{
+		return 0f;
+	}
+
+	[Token(Token = "0x6003B78")]
+	[Address(RVA = "0xBB2C20", Offset = "0xBB1C20", Length = "0x134")]
+	protected override void AreaOfEffectStrikeSpell(BaseSpell baseSpell)
+	{
+	}
+
+	[Token(Token = "0x6003B79")]
+	[Address(RVA = "0xBB5260", Offset = "0xBB4260", Length = "0x238")]
+	private void TryResolveHeadOnCollision(LaughingSlashesPrefab otherPrefab)
+	{
+	}
+
+	[Token(Token = "0x6003B7A")]
+	[Address(RVA = "0xBB2A60", Offset = "0xBB1A60", Length = "0x98")]
+	private void ApplyCollisionStun()
+	{
+	}
+
+	[Token(Token = "0x6003B7B")]
+	[Address(RVA = "0xBB30D0", Offset = "0xBB20D0", Length = "0x204")]
+	private void CancelDashDueToCollision()
+	{
+	}
+
+	[Token(Token = "0x6003B7C")]
+	[Address(RVA = "0xBB4AF0", Offset = "0xBB3AF0", Length = "0x5B")]
+	private void SetupSlashVfx()
+	{
+	}
+
+	[Token(Token = "0x6003B7D")]
+	[Address(RVA = "0xBB3B70", Offset = "0xBB2B70", Length = "0x2FF")]
+	private GameObject CreateSlashVfxInstance(GameObject prefab)
+	{
+		return null;
+	}
+
+	[Token(Token = "0x6003B7E")]
+	[Address(RVA = "0xBB4CD0", Offset = "0xBB3CD0", Length = "0x120")]
+	private void StartSlashVfxSequence()
+	{
+	}
+
+	[IteratorStateMachine(typeof(<SlashVfxRoutine>d__65))]
+	[Token(Token = "0x6003B7F")]
+	[Address(RVA = "0xBB4B50", Offset = "0xBB3B50", Length = "0x6D")]
+	private IEnumerator SlashVfxRoutine()
+	{
+		return null;
+	}
+
+	[Token(Token = "0x6003B80")]
+	[Address(RVA = "0xBB5050", Offset = "0xBB4050", Length = "0x109")]
+	private void StopSlashVfxSequence()
+	{
+	}
+
+	[Token(Token = "0x6003B81")]
+	[Address(RVA = "0xBB5160", Offset = "0xBB4160", Length = "0xF9")]
+	private void ToggleSlashVfx(bool? showFirst)
+	{
+	}
+
+	[Token(Token = "0x6003B82")]
+	[Address(RVA = "0xBB4150", Offset = "0xBB3150", Length = "0x7")]
+	private new void OnDestroy()
+	{
+	}
+
+	[Token(Token = "0x6003B83")]
+	[Address(RVA = "0xBB32E0", Offset = "0xBB22E0", Length = "0x5C9")]
+	private bool CheckForBoundaryHit(Vector3 fromPosition, Vector2 moveDirection, float moveDistance)
+	{
+		return false;
+	}
+
+	[Token(Token = "0x6003B84")]
+	[Address(RVA = "0xBB54D0", Offset = "0xBB44D0", Length = "0x123")]
+	public LaughingSlashesPrefab()
+	{
+	}
+
+	[Token(Token = "0x6003B85")]
+	[Address(RVA = "0x6D0CF0", Offset = "0x6CFCF0", Length = "0x7")]
+	protected override void __initializeVariables()
+	{
+	}
+
+	[Token(Token = "0x6003B86")]
+	[Address(RVA = "0x6D0CF0", Offset = "0x6CFCF0", Length = "0x7")]
+	protected override void __initializeRpcs()
+	{
+	}
+
+	[Token(Token = "0x6003B87")]
+	[Address(RVA = "0xBB54A0", Offset = "0xBB44A0", Length = "0x2C")]
+	protected internal override string __getTypeName()
+	{
+		return null;
+	}
+}

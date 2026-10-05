@@ -1,0 +1,247 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Dimraeth anti-cheat — architecture graph</title>
+<!--
+  Self-contained visualization for modding/docs/anticheat/ (no external dependencies).
+  Click any node to open its documentation file. Two views: defense pipeline (timeline)
+  and relationship map (who talks to whom).
+-->
+<style>
+  :root {
+    --perimeter:#4a90d9; --detector:#8e6fc7; --data:#8a93a3;
+    --outcome:#d9534f; --telemetry:#e08a2e; --qa:#5aa469;
+  }
+  * { box-sizing: border-box; }
+  body { margin:0; font-family:"Segoe UI", system-ui, sans-serif; background:#12151c; color:#dfe4ec; }
+  header { padding:14px 22px 8px; display:flex; gap:16px; align-items:baseline; flex-wrap:wrap; }
+  header h1 { font-size:18px; margin:0; font-weight:600; }
+  header .sub { font-size:12.5px; color:#98a2b3; }
+  .tabs { padding:4px 22px 10px; display:flex; gap:8px; }
+  .tabs button {
+    background:#1e2430; color:#c6cede; border:1px solid #303a4c; border-radius:6px;
+    padding:7px 14px; font-size:13px; cursor:pointer;
+  }
+  .tabs button.active { background:#2b3650; color:#fff; border-color:#4a5c80; }
+  #stage { padding:0 14px 8px; overflow:auto; }
+  svg { display:block; margin:0 auto; background:#171b24; border:1px solid #262e3d; border-radius:10px; width:100%; max-width:1240px; height:auto; }
+  .node rect { stroke-width:1.4; rx:8; cursor:pointer; transition:filter .12s; }
+  .node:hover rect { filter:brightness(1.35); }
+  .node text { pointer-events:none; font-size:12.5px; fill:#f2f5fa; }
+  .node .meta { font-size:10.5px; fill:#aab4c5; }
+  .edge { stroke:#5b677d; stroke-width:1.6; fill:none; marker-end:url(#arrow); }
+  .edge.hot { stroke:#d9534f; }
+  .edge.dim { stroke:#3d4657; stroke-dasharray:4 4; }
+  .elabel { font-size:10.5px; fill:#93a0b5; }
+  .lane { fill:#1d222d; stroke:#2a3242; rx:10; }
+  .laneTitle { font-size:11.5px; fill:#7d8aa0; letter-spacing:.06em; }
+  .legend { padding:6px 22px 18px; display:flex; gap:18px; flex-wrap:wrap; font-size:12px; color:#98a2b3; }
+  .legend span::before { content:""; display:inline-block; width:11px; height:11px; border-radius:3px; margin-right:6px; vertical-align:-1px; background:var(--c); }
+</style>
+</head>
+<body>
+<header>
+  <h1>Dimraeth — anti-cheat architecture</h1>
+  <span class="sub">click a node to open its doc &middot; hover for details &middot; source: modding/docs/anticheat/</span>
+</header>
+<div class="tabs">
+  <button id="tab-pipe" class="active" onclick="show('pipe')">1 &middot; Defense pipeline (connect &rarr; kick)</button>
+  <button id="tab-rel" onclick="show('rel')">2 &middot; Relationship map (who talks to whom)</button>
+</div>
+<div id="stage">
+  <svg id="svg-pipe" width="1240" height="880" viewBox="0 0 1240 880"></svg>
+  <svg id="svg-rel" width="1240" height="880" viewBox="0 0 1240 880" style="display:none"></svg>
+</div>
+<div class="legend">
+  <span style="--c:var(--perimeter)">Perimeter (network authority)</span>
+  <span style="--c:var(--detector)">Detector / validator</span>
+  <span style="--c:var(--data)">Data &amp; storage</span>
+  <span style="--c:var(--outcome)">Enforcement outcome</span>
+  <span style="--c:var(--telemetry)">Telemetry</span>
+  <span style="--c:var(--qa)">QA tooling</span>
+</div>
+
+<script>
+const C = { perimeter:'#4a90d9', detector:'#8e6fc7', data:'#8a93a3', outcome:'#d9534f', telemetry:'#e08a2e', qa:'#5aa469' };
+
+// Generic renderer: nodes {id,x,y,w,h,label,meta,color,doc,tip}, edges {a,b,label,style,from:'r|l|t|b',to:'r|l|t|b'}
+function anchor(n, side) {
+  if (side === 'l') return [n.x,        n.y + n.h/2];
+  if (side === 't') return [n.x + n.w/2, n.y];
+  if (side === 'b') return [n.x + n.w/2, n.y + n.h];
+  return               [n.x + n.w,   n.y + n.h/2];        // 'r'
+}
+function draw(svg, nodes, edges, lanes) {
+  const ns = 'http://www.w3.org/2000/svg';
+  svg.innerHTML = `<defs>
+    <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="#5b677d"/></marker>
+    <marker id="arrow-hot" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="#d9534f"/></marker>
+  </defs>`;
+  const add = (tag, attrs, parent) => { const e = document.createElementNS(ns, tag);
+    for (const k in attrs) e.setAttribute(k, attrs[k]); (parent || svg).appendChild(e); return e; };
+
+  (lanes || []).forEach(l => {
+    add('rect', { class:'lane', x:l.x, y:l.y, width:l.w, height:l.h });
+    add('text', { class:'laneTitle', x:l.x + 12, y:l.y + 20 }).textContent = l.title;
+  });
+
+  edges.forEach(e => {
+    const a = nodes.find(n => n.id === e.a), b = nodes.find(n => n.id === e.b);
+    const [x1, y1] = anchor(a, e.from || 'r'), [x2, y2] = anchor(b, e.to || 'l');
+    const mx = (x1 + x2) / 2;
+    const d = (e.from === 'b' || e.from === 't')
+      ? `M ${x1} ${y1} C ${x1} ${(y1+y2)/2}, ${x2} ${(y1+y2)/2}, ${x2} ${y2}`
+      : `M ${x1} ${y1} C ${mx} ${y1}, ${mx} ${y2}, ${x2} ${y2}`;
+    add('path', { class: 'edge' + (e.style ? ' ' + e.style : ''), d,
+                  'marker-end': e.style === 'hot' ? 'url(#arrow-hot)' : 'url(#arrow)' });
+    if (e.label) add('text', { class:'elabel', x:(x1+x2)/2, y:(y1+y2)/2 - 5, 'text-anchor':'middle' }).textContent = e.label;
+  });
+
+  nodes.forEach(n => {
+    const g = add('g', { class:'node' });
+    // [2026-09-29 14:10] Fixed: rect/text were appended to the SVG root instead of the node's <g>
+    // (add() defaults to svg when parent is omitted), so .node:hover styling and the click-to-open-doc
+    // handler never fired. Old calls kept in comments per repo rule:
+    // add('rect', { x:n.x, y:n.y, width:n.w, height:n.h, fill:'#222a3a', stroke:C[n.color] });
+    add('rect', { x:n.x, y:n.y, width:n.w, height:n.h, fill:'#222a3a', stroke:C[n.color] }, g);
+    // const t = add('text', { x:n.x + n.w/2, y:n.y + (n.meta ? n.h/2 - 3 : n.h/2 + 4), 'text-anchor':'middle' });
+    const t = add('text', { x:n.x + n.w/2, y:n.y + (n.meta ? n.h/2 - 3 : n.h/2 + 4), 'text-anchor':'middle' }, g);
+    n.label.split('\n').forEach((line, i) => {
+      const ts = document.createElementNS(ns, 'tspan');
+      ts.setAttribute('x', n.x + n.w/2); if (i) ts.setAttribute('dy', 14);
+      ts.textContent = line; t.appendChild(ts);
+    });
+    // add('text', { class:'meta', x:n.x + n.w/2, y:n.y + n.h - 8, 'text-anchor':'middle' }).textContent = n.meta;
+    if (n.meta) add('text', { class:'meta', x:n.x + n.w/2, y:n.y + n.h - 8, 'text-anchor':'middle' }, g).textContent = n.meta;
+    const tip = document.createElementNS(ns, 'title'); tip.textContent = n.tip || n.label; g.appendChild(tip);
+    g.addEventListener('click', () => { if (n.doc) window.open(n.doc, '_blank'); });
+  });
+}
+
+/* ---------------- VIEW 1 — defense pipeline ---------------- */
+const P = {
+  nodes: [
+    // stage column
+    { id:'s1', x:40,  y:70,  w:170, h:56, color:'data', label:'CONNECT',        meta:'lobby + approval', doc:'07-ban-system.md', tip:'Connection approval + Steam lobby join' },
+    { id:'s2', x:40,  y:180, w:170, h:56, color:'data', label:'JOIN / SPAWN',   meta:'multiplayer entry', doc:'05-character-plausibility.md', tip:'A character joining the session is validated' },
+    { id:'s3', x:40,  y:290, w:170, h:56, color:'data', label:'LOAD SAVE',      meta:'PlayerData + identity', doc:'06-save-codec-identity.md', tip:'Save decrypt + identity tag reconcile' },
+    { id:'s4', x:40,  y:400, w:170, h:56, color:'data', label:'LOAD GEAR / EQUIP', meta:'inv / storage / equip', doc:'02-gear-legality.md', tip:'Gear legality sweep runs 3 places: inventory load, storage load, equip refresh' },
+    { id:'s5', x:40,  y:510, w:170, h:56, color:'data', label:'PLAY',           meta:'read / write / sync', doc:'11-obfuscated-network-values.md', tip:'Runtime state lives in ObfuscatedNetworkInt/Float' },
+    { id:'s6', x:40,  y:620, w:170, h:56, color:'data', label:'SAVE / QUIT',    meta:'validators re-run', doc:'03-player-anticheat.md', tip:'SaveGame re-runs all validators; blocked after cheat flag' },
+
+    // mechanism column
+    { id:'m1', x:340, y:70,  w:280, h:56, color:'detector', label:'BanListManager [07]', meta:'IsBanned at approval + lobby', doc:'07-ban-system.md', tip:'Encrypted .jrsf ban list; "You are banned from this server"' },
+    { id:'m2', x:340, y:180, w:280, h:56, color:'detector', label:'CharacterPlausibility [05]', meta:'flat caps on level / skill / attrs', doc:'05-character-plausibility.md', tip:'RejectsJoiningCharacter -> "Server rejected modified character file"' },
+    { id:'m3', x:340, y:278, w:280, h:50, color:'detector', label:'SaveCodec [06]', meta:'AES-CBC + HMAC-SHA256 envelope', doc:'06-save-codec-identity.md', tip:'Magic, version, salt, nonce, IV, cipher, 32B MAC' },
+    { id:'m4', x:340, y:336, w:280, h:50, color:'detector', label:'IdentityIntegrity [04]', meta:'HMAC tag over identity fields', doc:'04-character-identity-integrity.md', tip:'Reconcile brute-forces fields; fail-open when unrecoverable' },
+    { id:'m5', x:340, y:400, w:280, h:56, color:'detector', label:'GearLegality [02]', meta:'Inspect: rarity/level/stars/stat ceilings', doc:'02-gear-legality.md', tip:'Caps: Rarity<=4, Level<=12, Stars<=2, <=6 secondaries; value ceiling formula' },
+    { id:'m6', x:340, y:500, w:280, h:50, color:'detector', label:'ObfuscatedNetwork* [11]', meta:'integrity hash on every value', doc:'11-obfuscated-network-values.md', tip:'XOR shadow + Murmur-fmix hash; key rotates every 64 reads' },
+    { id:'m7', x:340, y:558, w:280, h:50, color:'detector', label:'Player anti-cheat [03]', meta:'XP/rune HMAC + speedhack + loops', doc:'03-player-anticheat.md', tip:'PeriodicAntiCheatCheck 5s/1s, PeriodicRuneIntegrityCheck 10s/30s' },
+    { id:'m8', x:340, y:620, w:280, h:56, color:'detector', label:'SaveGame gate [03]', meta:'_saveBlockedDueToCheat', doc:'03-player-anticheat.md', tip:'SaveGame refuses to persist after a cheat flag' },
+
+    // outcome column
+    { id:'o1', x:760, y:70,  w:230, h:56, color:'outcome', label:'DENY / KICK',      meta:'"You are banned…"', doc:'07-ban-system.md', tip:'ApproveConnection deny, Steam lobby kick' },
+    { id:'o2', x:760, y:180, w:230, h:56, color:'outcome', label:'HIDE / REJECT',    meta:'char hidden, join refused', doc:'05-character-plausibility.md', tip:'FilterImplausible hides (never deletes) tampered characters' },
+    { id:'o3', x:760, y:303, w:230, h:56, color:'outcome', label:'REPAIR FIELDS',    meta:'fail-open if unrecoverable', doc:'04-character-identity-integrity.md', tip:'"restored {0} {1}" / "no legal identity reproduces this tag"' },
+    { id:'o4', x:760, y:400, w:230, h:56, color:'outcome', label:'DESTROY GEAR',     meta:'[GearLegality] Destroyed…', doc:'02-gear-legality.md', tip:'Contraband replaced with Rune.Empty + logged' },
+    { id:'o5', x:760, y:510, w:230, h:56, color:'outcome', label:'AUTO-FIX \u2192 SAVE-BLOCK\n\u2192 KICK (0.5s)', meta:'escalation ladder', doc:'03-player-anticheat.md', tip:'Escalation ladder: TryRepairOverGrantedSkillPoints -> _saveBlockedDueToCheat -> KickForCheat' },
+    { id:'o6', x:760, y:620, w:230, h:56, color:'outcome', label:'SAVE REFUSED',     meta:'validators re-run', doc:'03-player-anticheat.md', tip:'BlockSaveDueToCheatClientRpc sets the flag on the owner' },
+
+    // telemetry + QA
+    { id:'t1', x:1060, y:330, w:150, h:74, color:'telemetry', label:'Cheat telemetry [09]', meta:'Supabase flag', doc:'09-telemetry-cheat-events.md', tip:'cheat_attempted event + PATCH game_sessions {"cheating":true}' },
+    { id:'q1', x:340,  y:750, w:280, h:56, color:'qa', label:'QACheat / QARune [08]', meta:'anti-cheat self-tests', doc:'08-cheat-codes-qa.md', tip:'QARune spawns contraband to trip the sweep; QACheat tampers obfuscated values on purpose. Key-sequence cheats are inert in this build.' },
+  ],
+  edges: [
+    { a:'s1', b:'m1', label:'approval' }, { a:'m1', b:'o1', label:'IsBanned', style:'hot' },
+    { a:'s2', b:'m2' },                  { a:'m2', b:'o2', style:'hot' },
+    { a:'s3', b:'m3', label:'decrypt' }, { a:'m3', b:'m4', from:'b', to:'t' }, { a:'m4', b:'o3' },
+    { a:'s4', b:'m5' },                  { a:'m5', b:'o4', style:'hot' },
+    { a:'s5', b:'m6', label:'read/write' }, { a:'m6', b:'m7', from:'b', to:'t', label:'violation' },
+    { a:'m7', b:'o5', style:'hot' },     { a:'s6', b:'m8' }, { a:'m8', b:'o6', style:'hot' },
+    { a:'o5', b:'o6', from:'b', to:'t' },
+    { a:'o4', b:'t1', from:'r', to:'l', label:'destroyed' },
+    { a:'o5', b:'t1', from:'r', to:'b', style:'hot', label:'cheat_attempted' },
+    { a:'q1', b:'m5', from:'t', to:'b', label:'contraband', style:'dim' },
+    { a:'q1', b:'m6', from:'t', to:'b', label:'tamper test', style:'dim' },
+  ],
+  lanes: [
+    { x:24,  y:44,  w:202, h:656, title:'WHEN' },
+    { x:324, y:44,  w:312, h:656, title:'MECHANISM' },
+    { x:744, y:44,  w:262, h:656, title:'ENFORCEMENT' },
+    { x:1044,y:304, w:182, h:126, title:'REPORT' },
+    { x:324, y:724, w:312, h:86,  title:'QA' },
+  ],
+};
+
+/* ---------------- VIEW 2 — relationship map ---------------- */
+const R = {
+  nodes: [
+    { id:'c', x:30, y:330, w:170, h:90, color:'outcome', label:'CHEATER\n(modified client)', meta:'memory / save / RPC forgery', doc:'10-network-authority-surface.md', tip:'Any connected client may call ~315 ServerRpcs (RequireOwnership=false)' },
+
+    { id:'rpc', x:280, y:120, w:220, h:70, color:'perimeter', label:'ServerRpc perimeter [10]', meta:'~315 any-client / ~78 owner-only', doc:'10-network-authority-surface.md', tip:'Bank guarded (account+affordability) but AddSimpleItemToInventoryServerRpc has NO validation' },
+    { id:'add', x:280, y:215, w:220, h:64, color:'perimeter', label:'AddSimpleItemToInventory\nServerRpc', meta:'no validation (verified)', doc:'10-network-authority-surface.md', tip:'Wide open: any client can mint items; backstop is the post-hoc sweep' },
+
+    { id:'gold', x:580, y:70,  w:210, h:64, color:'data', label:'Gold / vitals / XP', meta:'ObfuscatedNetworkInt/Float [11]', doc:'11-obfuscated-network-values.md', tip:'XOR shadow + integrity hash + key rotation' },
+    { id:'runes',x:580, y:160, w:210, h:64, color:'data', label:'Runes & gear', meta:'Rune structs', doc:'02-gear-legality.md', tip:'Rarity/Level/Stars/UUID/stat arrays' },
+    { id:'saves',x:580, y:250, w:210, h:64, color:'data', label:'Save files .jrsf', meta:'SaveCodec envelope [06]', doc:'06-save-codec-identity.md', tip:'JSON -> GZip -> AES-CBC + HMAC-SHA256' },
+    { id:'ident',x:580, y:340, w:210, h:64, color:'data', label:'Identity tag [04]', meta:'44-char Base64 HMAC', doc:'04-character-identity-integrity.md', tip:'Canonical v1: |name=|hash=|race=|cls=' },
+    { id:'netd', x:580, y:430, w:210, h:64, color:'data', label:'NetworkPlayerData', meta:'join payload', doc:'05-character-plausibility.md', tip:'Level / skill points / attribute points summed and capped' },
+
+    { id:'pac', x:880, y:70,  w:210, h:64, color:'detector', label:'Player anti-cheat [03]', meta:'HMAC loops + speedhack', doc:'03-player-anticheat.md', tip:'KickForCheat -> DisconnectAfterDelay(0.5f)' },
+    { id:'gl',  x:880, y:160, w:210, h:64, color:'detector', label:'GearLegality [02]', meta:'Inspect / Purge*', doc:'02-gear-legality.md', tip:'Fails open for stats missing from RuneManager tables' },
+    { id:'cii', x:880, y:250, w:210, h:64, color:'detector', label:'IdentityIntegrity [04]', meta:'Stamp / Reconcile', doc:'04-character-identity-integrity.md', tip:'Brute-force field repair against the HMAC tag' },
+    { id:'cp',  x:880, y:430, w:210, h:64, color:'detector', label:'Plausibility [05]', meta:'Filter / Reject', doc:'05-character-plausibility.md', tip:'Hides tampered characters; rejects joins' },
+    { id:'bl',  x:880, y:520, w:210, h:64, color:'detector', label:'Ban system [07]', meta:'IsBanned / BanPlayer', doc:'07-ban-system.md', tip:'Host-driven; no network-reachable mutation' },
+
+    { id:'qa',  x:280, y:560, w:220, h:70, color:'qa', label:'QACheat / QARune [08]', meta:'deliberate tamper tests', doc:'08-cheat-codes-qa.md', tip:'Spawns contraband (Rarity 5, Stars 4, Lv 32, 10x stats) to trip the sweep' },
+    { id:'host',x:30,  y:560, w:170, h:70, color:'perimeter', label:'HOST', meta:'ban / kick UI', doc:'07-ban-system.md', tip:'SettingsUI / ServerList -> BanListManager' },
+
+    { id:'gam', x:1120, y:250, w:110, h:110, color:'telemetry', label:'Cheat\ntelemetry [09]', meta:'', doc:'09-telemetry-cheat-events.md', tip:'GameAnalyticsManager: OnCheatDetected -> cheat_attempted + session flag' },
+    { id:'sb',  x:880, y:650, w:210, h:64, color:'telemetry', label:'Supabase [09]', meta:'analytics_events / game_sessions', doc:'09-telemetry-cheat-events.md', tip:'Client-side gates + anon key: flags can be suppressed or forged' },
+  ],
+  edges: [
+    { a:'c', b:'rpc', label:'forged intents' },
+    { a:'c', b:'add', label:'"give me items"' },
+    { a:'c', b:'gold', from:'t', to:'l', label:'memory edit', style:'dim' },
+    { a:'c', b:'saves', from:'t', to:'l', label:'save edit', style:'dim' },
+    { a:'rpc', b:'gold', label:'mutates' }, { a:'rpc', b:'runes' }, { a:'rpc', b:'netd' },
+    { a:'add', b:'runes', label:'mints', style:'hot' },
+    { a:'gold', b:'pac', label:'integrity + HMAC' },
+    { a:'runes', b:'gl', label:'Inspect' }, { a:'runes', b:'pac', label:'rune HMAC' },
+    { a:'saves', b:'cii', label:'Reconcile' }, { a:'saves', b:'cp' },
+    { a:'ident', b:'cii', from:'t', to:'b' },
+    { a:'netd', b:'cp', label:'caps' },
+    { a:'host', b:'bl', label:'BanPlayer' },
+    { a:'bl', b:'c', from:'l', to:'b', label:'deny / kick', style:'hot' },
+    { a:'qa', b:'runes', label:'contraband', style:'dim' },
+    { a:'qa', b:'gold', label:'tamper', style:'dim' },
+    { a:'pac', b:'gam', from:'r', to:'t', label:'violation' },
+    { a:'gl', b:'gam', from:'r', to:'l', label:'destroyed' },
+    { a:'cii', b:'gam', from:'r', to:'l', label:'repaired' },
+    { a:'gam', b:'sb', from:'b', to:'r', label:'cheat_attempted' },
+  ],
+  lanes: [
+    { x:14,  y:304, w:202, h:122, title:'SOURCE' },
+    { x:264, y:94,  w:252, h:230, title:'PERIMETER (doc 10)' },
+    { x:564, y:44,  w:242, h:476, title:'SHARED STATE' },
+    { x:864, y:44,  w:242, h:566, title:'DETECTORS' },
+    { x:1104,y:224, w:126, h:162, title:'REPORT' },
+    { x:14,  y:534, w:502, h:122, title:'OPERATORS & QA' },
+  ],
+};
+
+draw(document.getElementById('svg-pipe'), P.nodes, P.edges, P.lanes);
+draw(document.getElementById('svg-rel'),  R.nodes, R.edges, R.lanes);
+
+function show(v) {
+  document.getElementById('svg-pipe').style.display = v === 'pipe' ? 'block' : 'none';
+  document.getElementById('svg-rel').style.display  = v === 'rel'  ? 'block' : 'none';
+  document.getElementById('tab-pipe').classList.toggle('active', v === 'pipe');
+  document.getElementById('tab-rel').classList.toggle('active',  v === 'rel');
+}
+</script>
+</body>
+</html>

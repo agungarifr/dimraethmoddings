@@ -1,0 +1,253 @@
+using Cpp2ILInjected;
+using UnityEngine;
+
+[Token(Token = "0x200048F")]
+public class DaytimeShadow : MonoBehaviour, IEnvironmentTick
+{
+	[Token(Token = "0x40027DA")]
+	[FieldOffset(Offset = "0x20")]
+	private GameObject _shadow;
+
+	[Token(Token = "0x40027DB")]
+	[FieldOffset(Offset = "0x28")]
+	private SpriteRenderer _shadowRenderer;
+
+	[Token(Token = "0x40027DC")]
+	[FieldOffset(Offset = "0x30")]
+	private SpriteRenderer _shadowRenderer2;
+
+	[Token(Token = "0x40027DD")]
+	[FieldOffset(Offset = "0x38")]
+	private SpriteRenderer _parentRenderer;
+
+	[Token(Token = "0x40027DE")]
+	[FieldOffset(Offset = "0x40")]
+	private Player _player;
+
+	[Token(Token = "0x40027DF")]
+	[FieldOffset(Offset = "0x48")]
+	private Sprite _lastShadowSourceSprite;
+
+	[Token(Token = "0x40027E0")]
+	[FieldOffset(Offset = "0x50")]
+	public bool RotateShadow;
+
+	[Tooltip("Fallback for hosts the sun-tracking silhouette doesn't suit: StaticRotation freezes it at StaticShadowAngle, Disabled leaves only the Shadow2 circle.")]
+	[Token(Token = "0x40027E1")]
+	[FieldOffset(Offset = "0x54")]
+	public DaytimeShadowMode Mode;
+
+	[Tooltip("Fixed Z angle of the silhouette in StaticRotation mode (degrees).")]
+	[Token(Token = "0x40027E2")]
+	[FieldOffset(Offset = "0x58")]
+	public float StaticShadowAngle;
+
+	[Tooltip("Shear mode only: scales how much of the sprite's height is treated as height above ground. 1 = full (upright humanoids). Long/wide monsters (wolves, deer) want ~0.25-0.4 so the shadow hugs the ground under the body instead of climbing through it — their sprite height mostly encodes body depth, not height.")]
+	[Token(Token = "0x40027E3")]
+	[FieldOffset(Offset = "0x5C")]
+	public float ShadowHeightScale;
+
+	[HideInInspector]
+	[Token(Token = "0x40027E4")]
+	[FieldOffset(Offset = "0x60")]
+	private string shadowMaterialPath;
+
+	[HideInInspector]
+	[Token(Token = "0x40027E5")]
+	[FieldOffset(Offset = "0x68")]
+	private float _shadowAlphaDay;
+
+	[Token(Token = "0x40027E6")]
+	[FieldOffset(Offset = "0x6C")]
+	private float _counter;
+
+	[Token(Token = "0x40027E7")]
+	[FieldOffset(Offset = "0x70")]
+	private float _timeToCheck;
+
+	[Token(Token = "0x40027E8")]
+	[FieldOffset(Offset = "0x74")]
+	private bool _isCharacter;
+
+	[Token(Token = "0x40027E9")]
+	[FieldOffset(Offset = "0x75")]
+	private bool _isNPC;
+
+	[Token(Token = "0x40027EA")]
+	[FieldOffset(Offset = "0x76")]
+	private bool shadowVisible;
+
+	[Token(Token = "0x40027EB")]
+	private static MaterialPropertyBlock _shearBlock;
+
+	[Token(Token = "0x40027EC")]
+	private static readonly int FootYId;
+
+	[Token(Token = "0x40027ED")]
+	private static readonly int ShearOnId;
+
+	[Token(Token = "0x40027EE")]
+	private static readonly int HeightScaleId;
+
+	[Token(Token = "0x40027EF")]
+	private static readonly int ShearEnabledId;
+
+	[Token(Token = "0x40027F0")]
+	private static readonly int SkewXId;
+
+	[Token(Token = "0x40027F1")]
+	private static readonly int FlattenYId;
+
+	[Token(Token = "0x40027F2")]
+	private static int _lastShearMinute;
+
+	[Token(Token = "0x40027F3")]
+	private static bool _lastShearEnabled;
+
+	[Token(Token = "0x40027F4")]
+	[FieldOffset(Offset = "0x78")]
+	private ICommonInterface _sceneEntity;
+
+	[Token(Token = "0x40027F5")]
+	[FieldOffset(Offset = "0x80")]
+	private EnvironmentNPCScheduling _envScheduling;
+
+	[Token(Token = "0x40027F6")]
+	[FieldOffset(Offset = "0x88")]
+	private bool _placedSceneResolved;
+
+	[Token(Token = "0x40027F7")]
+	[FieldOffset(Offset = "0x89")]
+	private bool _placedSceneKnown;
+
+	[Token(Token = "0x40027F8")]
+	[FieldOffset(Offset = "0x8C")]
+	private Areas.Scene _placedScene;
+
+	[RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.SubsystemRegistration)]
+	[Token(Token = "0x6002A23")]
+	[Address(RVA = "0xAE49B0", Offset = "0xAE39B0", Length = "0x7F")]
+	private static void ResetShearGlobals()
+	{
+	}
+
+	[Token(Token = "0x6002A24")]
+	[Address(RVA = "0xAE30D0", Offset = "0xAE20D0", Length = "0x4A5")]
+	private void Awake()
+	{
+	}
+
+	[Token(Token = "0x6002A25")]
+	[Address(RVA = "0xAE2E50", Offset = "0xAE1E50", Length = "0x27B")]
+	private void ApplyShearProperties()
+	{
+	}
+
+	[Token(Token = "0x6002A26")]
+	[Address(RVA = "0xAE5060", Offset = "0xAE4060", Length = "0x93")]
+	private static bool ShearEnabled()
+	{
+		return false;
+	}
+
+	[Token(Token = "0x6002A27")]
+	[Address(RVA = "0xAE5220", Offset = "0xAE4220", Length = "0x282")]
+	private static void UpdateShearGlobals(GameTime time)
+	{
+	}
+
+	[Token(Token = "0x6002A28")]
+	[Address(RVA = "0xAE4980", Offset = "0xAE3980", Length = "0x2D")]
+	private void OnEnable()
+	{
+	}
+
+	[Token(Token = "0x6002A29")]
+	[Address(RVA = "0xAE4940", Offset = "0xAE3940", Length = "0x3E")]
+	private void OnDisable()
+	{
+	}
+
+	[Token(Token = "0x6002A2A")]
+	[Address(RVA = "0xAE4490", Offset = "0xAE3490", Length = "0x251")]
+	public void EnvironmentTick()
+	{
+	}
+
+	[Token(Token = "0x6002A2B")]
+	[Address(RVA = "0xAE37A0", Offset = "0xAE27A0", Length = "0x457")]
+	private void CheckVisibility()
+	{
+	}
+
+	[Token(Token = "0x6002A2C")]
+	[Address(RVA = "0xAE46F0", Offset = "0xAE36F0", Length = "0x24B")]
+	private bool IsIndoors()
+	{
+		return false;
+	}
+
+	[Token(Token = "0x6002A2D")]
+	[Address(RVA = "0xAE4320", Offset = "0xAE3320", Length = "0x162")]
+	private void EnableShadow()
+	{
+	}
+
+	[Token(Token = "0x6002A2E")]
+	[Address(RVA = "0xAE4250", Offset = "0xAE3250", Length = "0xC6")]
+	private void DisableShadow(bool keepCircle = false)
+	{
+	}
+
+	[Token(Token = "0x6002A2F")]
+	[Address(RVA = "0xAE5100", Offset = "0xAE4100", Length = "0x11F")]
+	private void UpdateShadowSettings(GameTime newTime = null)
+	{
+	}
+
+	[Token(Token = "0x6002A30")]
+	[Address(RVA = "0xAE4A30", Offset = "0xAE3A30", Length = "0x62C")]
+	private void SetShadowValues(GameTime newTime)
+	{
+	}
+
+	[Token(Token = "0x6002A31")]
+	[Address(RVA = "0xAE3C00", Offset = "0xAE2C00", Length = "0x1CA")]
+	private static float CompensateLength(float length, float zAngleDeg)
+	{
+		return 0f;
+	}
+
+	[Token(Token = "0x6002A32")]
+	[Address(RVA = "0xAE35F0", Offset = "0xAE25F0", Length = "0x170")]
+	private float CalculateShadowAlpha(GameTime time)
+	{
+		return 0f;
+	}
+
+	[Token(Token = "0x6002A33")]
+	[Address(RVA = "0xAE3580", Offset = "0xAE2580", Length = "0x6C")]
+	private static float CalculateLightDirection(int hour, int minute)
+	{
+		return 0f;
+	}
+
+	[Token(Token = "0x6002A34")]
+	[Address(RVA = "0xAE3770", Offset = "0xAE2770", Length = "0x21")]
+	private float CalculateSunAngle(int hour, int minute)
+	{
+		return 0f;
+	}
+
+	[Token(Token = "0x6002A35")]
+	[Address(RVA = "0xAE3DD0", Offset = "0xAE2DD0", Length = "0x478")]
+	public void CreateShadow()
+	{
+	}
+
+	[Token(Token = "0x6002A36")]
+	[Address(RVA = "0xAE55F0", Offset = "0xAE45F0", Length = "0x64")]
+	public DaytimeShadow()
+	{
+	}
+}

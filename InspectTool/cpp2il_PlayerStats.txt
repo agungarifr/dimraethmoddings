@@ -1,0 +1,709 @@
+using System;
+using System.Collections;
+using System.Collections.Generic;
+using TMPro;
+using Unity.Netcode;
+using UnityEngine;
+
+public class PlayerStats : NetworkBehaviour
+{
+	private class StatRowInfo
+	{
+		public StatType StatType;
+
+		public GameObject RowGameObject;
+
+		public TMP_Text ValueText;
+
+		public TMP_Text LabelText;
+
+		public StatRowUI DynamicRow;
+
+		public bool IsHeader;
+
+		public CollapsiblePanel SectionPanel;
+
+		public GameObject HeaderHighlight;
+	}
+
+	private sealed class <RebuildLayoutDelayed>d__123 : IEnumerator<object>, IEnumerator, IDisposable
+	{
+		private int <>1__state;
+
+		private object <>2__current;
+
+		public PlayerStats <>4__this;
+
+		object IEnumerator<object>.Current => null;
+
+		object IEnumerator.Current => null;
+
+		public <RebuildLayoutDelayed>d__123(int <>1__state)
+		{
+		}
+
+		void IDisposable.Dispose()
+		{
+		}
+
+		private bool MoveNext()
+		{
+			return false;
+		}
+
+		bool IEnumerator.MoveNext()
+		{
+			//ILSpy generated this explicit interface implementation from .override directive in MoveNext
+			return this.MoveNext();
+		}
+
+		void IEnumerator.Reset()
+		{
+		}
+	}
+
+	private sealed class <ResetUIAfterDelay>d__147 : IEnumerator<object>, IEnumerator, IDisposable
+	{
+		private int <>1__state;
+
+		private object <>2__current;
+
+		public float delaySeconds;
+
+		public PlayerStats <>4__this;
+
+		public int serverSkillPoints;
+
+		public int serverXP;
+
+		public int serverAccumXP;
+
+		public int serverLevel;
+
+		object IEnumerator<object>.Current => null;
+
+		object IEnumerator.Current => null;
+
+		public <ResetUIAfterDelay>d__147(int <>1__state)
+		{
+		}
+
+		void IDisposable.Dispose()
+		{
+		}
+
+		private bool MoveNext()
+		{
+			return false;
+		}
+
+		bool IEnumerator.MoveNext()
+		{
+			//ILSpy generated this explicit interface implementation from .override directive in MoveNext
+			return this.MoveNext();
+		}
+
+		void IEnumerator.Reset()
+		{
+		}
+	}
+
+	private Player _player;
+
+	private PlayerUpgradeUI _upgrade;
+
+	public TMP_Text Name;
+
+	public TMP_Text Race;
+
+	public TMP_Text Class;
+
+	public TMP_Text Archetype;
+
+	public TMP_Text Gold;
+
+	public TMP_Text Level;
+
+	public TMP_Text XP;
+
+	public TMP_Text NextLevelXP;
+
+	public TMP_Text Encumbrance;
+
+	public TMP_Text Health;
+
+	public TMP_Text Concentration;
+
+	public TMP_Text Stamina;
+
+	public TMP_Text Speed;
+
+	public TMP_Text AttackSpeed;
+
+	public TMP_Text SpellHaste;
+
+	public TMP_Text CriticalChance;
+
+	public TMP_Text CriticalDamage;
+
+	public TMP_Text HealthBonus;
+
+	public TMP_Text ConcentrationBonus;
+
+	public TMP_Text StaminaBonus;
+
+	public TMP_Text SpeedBonus;
+
+	public TMP_Text AttackSpeedBonus;
+
+	public TMP_Text SpellHasteBonus;
+
+	public TMP_Text HealthRegen;
+
+	public TMP_Text StaminaRegen;
+
+	public TMP_Text ConcentrationRegen;
+
+	public TMP_Text HPPercent;
+
+	public TMP_Text ConcentrationPercent;
+
+	public TMP_Text StaminaPercent;
+
+	public TMP_Text ArmorPercent;
+
+	public TMP_Text ResistancePercent;
+
+	public TMP_Text PhysicalDamagePercent;
+
+	public TMP_Text MagicDamagePercent;
+
+	public TMP_Text PhysicalPiercing;
+
+	public TMP_Text MagicPiercing;
+
+	public TMP_Text FirePiercing;
+
+	public TMP_Text IcePiercing;
+
+	public TMP_Text ElectricityPiercing;
+
+	public TMP_Text DecayPiercing;
+
+	public TMP_Text EtherPiercing;
+
+	public TMP_Text StrikePiercing;
+
+	public TMP_Text ThrustPiercing;
+
+	public TMP_Text BluntPiercing;
+
+	public TMP_Text PhysicalDamage;
+
+	public TMP_Text MagicDamage;
+
+	public TMP_Text FireDamage;
+
+	public TMP_Text IceDamage;
+
+	public TMP_Text ElectricityDamage;
+
+	public TMP_Text DecayDamage;
+
+	public TMP_Text EtherDamage;
+
+	public TMP_Text StrikeDamage;
+
+	public TMP_Text ThrustDamage;
+
+	public TMP_Text BluntDamage;
+
+	public TMP_Text FireResistance;
+
+	public TMP_Text IceResistance;
+
+	public TMP_Text DecayResistance;
+
+	public TMP_Text ElectricResistance;
+
+	public TMP_Text EtherResistance;
+
+	public TMP_Text StrikeArmor;
+
+	public TMP_Text ThrustArmor;
+
+	public TMP_Text BluntArmor;
+
+	public TMP_Text Memory;
+
+	public TMP_Text Charisma;
+
+	public TMP_Text Adventure;
+
+	public TMP_Text Physique;
+
+	public TMP_Text Intelligence;
+
+	public TMP_Text Agility;
+
+	public TMP_Text Strength;
+
+	public TMP_Text Energy;
+
+	public TMP_Text Total;
+
+	private Attributes <StartingAttributes>k__BackingField;
+
+	private StatTooltipDatabase _statTooltipDatabase;
+
+	private GameObject _statTooltip;
+
+	private TMP_Text _tooltipTitle;
+
+	private TMP_Text _tooltipDescription;
+
+	private List<List<StatRowInfo>> _statColumns;
+
+	private int _currentColumn;
+
+	private int _currentRow;
+
+	private bool _wasInCharacterMenuState;
+
+	private bool _tooltipVisible;
+
+	private bool _columnsBuilt;
+
+	private float _lastStatNavTime;
+
+	private const float STAT_NAV_COOLDOWN = 0.2f;
+
+	private const int CONTROLLER_SELECT_CHILD_INDEX = 0;
+
+	private StatRowInfo _lastHoveredRow;
+
+	private Action<StatType> m_StatRowActivated;
+
+	private RectTransform <ControllerSelectionRow>k__BackingField;
+
+	private Action<RectTransform> m_ControllerSelectionChanged;
+
+	private Transform _attributeStatsLeftColumn;
+
+	private Transform _attributeStatsRightColumn;
+
+	[NonSerialized]
+	private GameObject _advPanelRoot;
+
+	private bool _useDynamicStats;
+
+	private List<StatRowUI> _dynamicStatRows;
+
+	private List<GameObject> _dynamicHeaders;
+
+	private bool _dynamicStatsPopulated;
+
+	public Attributes StartingAttributes
+	{
+		get
+		{
+			return <StartingAttributes>k__BackingField;
+		}
+		set
+		{
+			<StartingAttributes>k__BackingField = value;
+		}
+	}
+
+	public RectTransform ControllerSelectionRow
+	{
+		get
+		{
+			return <ControllerSelectionRow>k__BackingField;
+		}
+		private set
+		{
+			<ControllerSelectionRow>k__BackingField = value;
+		}
+	}
+
+	public bool IsPanelShown => false;
+
+	public event Action<StatType> StatRowActivated
+	{
+		add
+		{
+		}
+		remove
+		{
+		}
+	}
+
+	public event Action<RectTransform> ControllerSelectionChanged
+	{
+		add
+		{
+		}
+		remove
+		{
+		}
+	}
+
+	public void BindView(AdvancedStatsView v)
+	{
+	}
+
+	public void SetPanelActive(bool active)
+	{
+	}
+
+	private void Awake()
+	{
+	}
+
+	public void Update()
+	{
+	}
+
+	private void UpdateLeftPage()
+	{
+	}
+
+	private void UpdateCharacterInfo()
+	{
+	}
+
+	private void UpdateCoreStats()
+	{
+	}
+
+	private void UpdateBonusText(TMP_Text bonusText, float bonus)
+	{
+	}
+
+	private static float SnapToHalf(float value)
+	{
+		return 0f;
+	}
+
+	private void UpdateBonusTextPercent(TMP_Text bonusText, float bonusPercent)
+	{
+	}
+
+	private void UpdateBonusTextFloat(TMP_Text bonusText, float bonus, int decimals = 2)
+	{
+	}
+
+	private void UpdateAttributeStats()
+	{
+	}
+
+	private void PopulateDynamicStats()
+	{
+	}
+
+	private IEnumerator RebuildLayoutDelayed()
+	{
+		return null;
+	}
+
+	private void PopulateAttributeStats(GameObject headerPrefab, GameObject statRowPrefab)
+	{
+	}
+
+	private Transform FindStatsContainer(Transform header)
+	{
+		return null;
+	}
+
+	private Transform FindChildRecursive(Transform parent, string name)
+	{
+		return null;
+	}
+
+	private void ClearDynamicStats()
+	{
+	}
+
+	private void EnsureContentSizeFitter(Transform container)
+	{
+	}
+
+	private void EnsureLayoutGroupSettings(Transform container)
+	{
+	}
+
+	private void ClearContainerChildren(Transform container)
+	{
+	}
+
+	private void UpdateDynamicStats()
+	{
+	}
+
+	private void UpdateRightPage()
+	{
+	}
+
+	private void UpdateAttributesRightPage()
+	{
+	}
+
+	public void RespecServerRpc()
+	{
+	}
+
+	private void GrantFirstReachLevelRewards()
+	{
+	}
+
+	private void RewindLevels(int xpToRemove)
+	{
+	}
+
+	public void ApplyUpgradeSequenceServerRpc(string[] attributes)
+	{
+	}
+
+	private void UpgradeSequenceCompleteClientRpc(int count, int skillPoints)
+	{
+	}
+
+	private void ApplyUpgradeAttributeInternal(string attributeString)
+	{
+	}
+
+	private void RespecClientRpc(int skillPoints)
+	{
+	}
+
+	public void GrantEncumbranceBonusServerRpc(int amount)
+	{
+	}
+
+	public void UpgradeAttributeServerRpc(string attributeString)
+	{
+	}
+
+	public static int XPRequiredForLevelUp(int currentLevel)
+	{
+		return 0;
+	}
+
+	public static void CheckLevelAchievements(int level)
+	{
+	}
+
+	private void UpgradeLevelClientRpc()
+	{
+	}
+
+	private void UpgradeAttributeClientRpc(Attribute attribute, int serverXP, int serverAccumXP, int serverLevel, int serverSkillPoints)
+	{
+	}
+
+	private IEnumerator ResetUIAfterDelay(float delaySeconds, int serverXP, int serverAccumXP, int serverLevel, int serverSkillPoints)
+	{
+		return null;
+	}
+
+	private Attribute GetCurrentAttributeValue(string attribute)
+	{
+		return default(Attribute);
+	}
+
+	private void IncrementAttribute(string attribute)
+	{
+	}
+
+	private float GetTotalBonus(Runes.Stat stat)
+	{
+		return 0f;
+	}
+
+	private bool IsControllerMode()
+	{
+		return false;
+	}
+
+	private void BuildStatColumns()
+	{
+	}
+
+	private void BuildDynamicStatColumns()
+	{
+	}
+
+	private bool IsChildOf(Transform child, Transform parent)
+	{
+		return false;
+	}
+
+	private void BuildStaticMiddleAndRightColumns()
+	{
+	}
+
+	private void AddStatRowIfValid(List<StatRowInfo> column, TMP_Text valueText, StatType statType, bool hasHorizontalLayout = false)
+	{
+	}
+
+	private void DisableAttributeTooltipClientsOnStatRows()
+	{
+	}
+
+	private TMP_Text FindLabelInRow(Transform rowTransform, TMP_Text valueText)
+	{
+		return null;
+	}
+
+	private void HandleControllerNavigation()
+	{
+	}
+
+	public void ToggleControllerTooltips()
+	{
+	}
+
+	public void NavigateStatColumns(Vector2 dir)
+	{
+	}
+
+	public void ActivateHighlighted()
+	{
+	}
+
+	private static bool IsEntryNavigable(StatRowInfo entry)
+	{
+		return false;
+	}
+
+	private static int NearestNavigableRow(List<StatRowInfo> column, int start)
+	{
+		return 0;
+	}
+
+	private void NavigateVertical(int direction)
+	{
+	}
+
+	private void NavigateHorizontal(int direction)
+	{
+	}
+
+	private void SetControllerSelection(int column, int row)
+	{
+	}
+
+	private void ScrollRowIntoView(int column, int row)
+	{
+	}
+
+	private void SetStatRowSelected(int column, int row, bool selected)
+	{
+	}
+
+	private static void SetHighlightActive(GameObject highlight, bool selected)
+	{
+	}
+
+	private void OnDynamicStatRowClicked(StatRowUI row)
+	{
+	}
+
+	private void ClearControllerSelection()
+	{
+	}
+
+	private void PublishControllerSelectionRow(RectTransform row)
+	{
+	}
+
+	private RectTransform ResolveControllerSelectionRow()
+	{
+		return null;
+	}
+
+	private void ShowTooltipForSelectedStat()
+	{
+	}
+
+	private void PositionTooltipAboveRow(GameObject row)
+	{
+	}
+
+	private void HideStatTooltip()
+	{
+	}
+
+	private void HandleMouseHover()
+	{
+	}
+
+	private int GetColumnForRow(StatRowInfo row)
+	{
+		return 0;
+	}
+
+	private int GetRowIndex(StatRowInfo row)
+	{
+		return 0;
+	}
+
+	public void OnStatRowPointerEnter(StatType statType)
+	{
+	}
+
+	private bool TrySelectStatRow(StatType statType, bool showTooltip)
+	{
+		return false;
+	}
+
+	public void OnStatRowPointerExit()
+	{
+	}
+
+	protected override void __initializeVariables()
+	{
+	}
+
+	protected override void __initializeRpcs()
+	{
+	}
+
+	private static void __rpc_handler_1685101181(NetworkBehaviour target, FastBufferReader reader, __RpcParams rpcParams)
+	{
+	}
+
+	private static void __rpc_handler_1417564886(NetworkBehaviour target, FastBufferReader reader, __RpcParams rpcParams)
+	{
+	}
+
+	private static void __rpc_handler_3221299867(NetworkBehaviour target, FastBufferReader reader, __RpcParams rpcParams)
+	{
+	}
+
+	private static void __rpc_handler_203217217(NetworkBehaviour target, FastBufferReader reader, __RpcParams rpcParams)
+	{
+	}
+
+	private static void __rpc_handler_2409944467(NetworkBehaviour target, FastBufferReader reader, __RpcParams rpcParams)
+	{
+	}
+
+	private static void __rpc_handler_2310852175(NetworkBehaviour target, FastBufferReader reader, __RpcParams rpcParams)
+	{
+	}
+
+	private static void __rpc_handler_2119957900(NetworkBehaviour target, FastBufferReader reader, __RpcParams rpcParams)
+	{
+	}
+
+	private static void __rpc_handler_39614002(NetworkBehaviour target, FastBufferReader reader, __RpcParams rpcParams)
+	{
+	}
+
+	protected internal override string __getTypeName()
+	{
+		return null;
+	}
+}

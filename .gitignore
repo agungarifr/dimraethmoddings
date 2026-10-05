@@ -1,0 +1,28 @@
+# ---- Build outputs ----
+[Bb]in/
+[Oo]bj/
+*.user
+*.suo
+.vs/
+
+# ---- Runtimes / SDKs (re-download on the new device) ----
+dotnet-sdk/
+dotnet/
+MelonLoader/
+BepInEx/
+
+# ---- Generated analysis indexes ----
+graphify-out/
+.codegraph/
+
+# ---- Decompiled game dumps (large, regenerable) ----
+cpp2il_cs_out/
+cpp2il_isil_out/
+DecompilerTool/
+CheatMenuDecompiled/
+
+# ---- Old snapshot backups ----
+Backup_*/
+
+# ---- Local secrets / machine-specific agent config ----
+opencode.json

@@ -1,0 +1,3243 @@
+using System;
+using System.Collections;
+using System.Collections.Generic;
+using System.Diagnostics;
+using System.Runtime.CompilerServices;
+using Cpp2ILInjected;
+using FMODUnity;
+using Unity.Collections;
+using Unity.Netcode;
+using UnityEngine;
+
+[Token(Token = "0x2000BA8")]
+public class SceneHandler : NetworkBehaviour
+{
+	[Token(Token = "0x2000BA9")]
+	public delegate void SceneHandlerChangeDelegate(SceneHandler handler);
+
+	[Token(Token = "0x2000BAA")]
+	private class ActiveConversation
+	{
+		[Token(Token = "0x40058EE")]
+		[FieldOffset(Offset = "0x10")]
+		public List<ulong> Participants;
+
+		[Token(Token = "0x40058EF")]
+		[FieldOffset(Offset = "0x18")]
+		public NetworkObject Npc;
+
+		[Token(Token = "0x40058F0")]
+		[FieldOffset(Offset = "0x20")]
+		public bool Closing;
+
+		[Token(Token = "0x40058F1")]
+		[FieldOffset(Offset = "0x28")]
+		public readonly Dictionary<ulong, float> PendingJoins;
+
+		[Token(Token = "0x6005F4C")]
+		[Address(RVA = "0xF4F1A0", Offset = "0xF4E1A0", Length = "0x77")]
+		public ActiveConversation()
+		{
+		}
+	}
+
+	[CompilerGenerated]
+	[Token(Token = "0x2000BAC")]
+	private sealed class <>c__DisplayClass133_0
+	{
+		[Token(Token = "0x40058F6")]
+		[FieldOffset(Offset = "0x10")]
+		public InGameEvent eventName;
+
+		[Token(Token = "0x6005F52")]
+		[Address(RVA = "0x6B2110", Offset = "0x6B1110", Length = "0x7")]
+		public <>c__DisplayClass133_0()
+		{
+		}
+
+		[Token(Token = "0x6005F53")]
+		[Address(RVA = "0x956E70", Offset = "0x955E70", Length = "0x1C")]
+		internal bool <DeactivateEventCoroutine>b__0(EventData e)
+		{
+			return false;
+		}
+	}
+
+	[CompilerGenerated]
+	[Token(Token = "0x2000BAE")]
+	private sealed class <>c__DisplayClass137_0
+	{
+		[Token(Token = "0x40058F9")]
+		[FieldOffset(Offset = "0x10")]
+		public InGameEvent eventName;
+
+		[Token(Token = "0x6005F56")]
+		[Address(RVA = "0x6B2110", Offset = "0x6B1110", Length = "0x7")]
+		public <>c__DisplayClass137_0()
+		{
+		}
+
+		[Token(Token = "0x6005F57")]
+		[Address(RVA = "0x956E70", Offset = "0x955E70", Length = "0x1C")]
+		internal bool <ActivateEventCoroutine>b__0(EventData e)
+		{
+			return false;
+		}
+	}
+
+	[CompilerGenerated]
+	[Token(Token = "0x2000BB6")]
+	private sealed class <>c__DisplayClass161_0
+	{
+		[Token(Token = "0x4005901")]
+		[FieldOffset(Offset = "0x10")]
+		public bool preloadDone;
+
+		[Token(Token = "0x6005F67")]
+		[Address(RVA = "0x6B2110", Offset = "0x6B1110", Length = "0x7")]
+		public <>c__DisplayClass161_0()
+		{
+		}
+
+		[Token(Token = "0x6005F68")]
+		[Address(RVA = "0x7C8780", Offset = "0x7C7780", Length = "0x5")]
+		internal void <SpawnMonstersCoroutine>b__0()
+		{
+		}
+	}
+
+	[CompilerGenerated]
+	[Token(Token = "0x2000BB9")]
+	private sealed class <>c__DisplayClass168_0
+	{
+		[Token(Token = "0x4005904")]
+		[FieldOffset(Offset = "0x10")]
+		public SceneHandler <>4__this;
+
+		[Token(Token = "0x4005905")]
+		[FieldOffset(Offset = "0x18")]
+		public int i;
+
+		[Token(Token = "0x4005906")]
+		[FieldOffset(Offset = "0x20")]
+		public Func<DungeonChestRespawns, bool> <>9__0;
+
+		[Token(Token = "0x6005F6D")]
+		[Address(RVA = "0x6B2110", Offset = "0x6B1110", Length = "0x7")]
+		public <>c__DisplayClass168_0()
+		{
+		}
+
+		[Token(Token = "0x6005F6E")]
+		[Address(RVA = "0xF645B0", Offset = "0xF635B0", Length = "0x7C")]
+		internal bool <SpawnInteractClientsCoroutine>b__0(DungeonChestRespawns c)
+		{
+			return false;
+		}
+	}
+
+	[CompilerGenerated]
+	[Token(Token = "0x2000BBE")]
+	private sealed class <ActivateAutoAggroForMonster>d__136 : IEnumerator<object>, IEnumerator, IDisposable
+	{
+		[Token(Token = "0x400590E")]
+		[FieldOffset(Offset = "0x10")]
+		private int <>1__state;
+
+		[Token(Token = "0x400590F")]
+		[FieldOffset(Offset = "0x18")]
+		private object <>2__current;
+
+		[Token(Token = "0x4005910")]
+		[FieldOffset(Offset = "0x20")]
+		public InGameEvent eventName;
+
+		[Token(Token = "0x4005911")]
+		[FieldOffset(Offset = "0x28")]
+		public Monster monsterComponent;
+
+		[Token(Token = "0x17000A18")]
+		object IEnumerator<object>.Current
+		{
+			[DebuggerHidden]
+			[Token(Token = "0x6005F7C")]
+			[Address(RVA = "0x6B1E50", Offset = "0x6B0E50", Length = "0x5")]
+			get
+			{
+				return null;
+			}
+		}
+
+		[Token(Token = "0x17000A19")]
+		object IEnumerator.Current
+		{
+			[DebuggerHidden]
+			[Token(Token = "0x6005F7E")]
+			[Address(RVA = "0x6B1E50", Offset = "0x6B0E50", Length = "0x5")]
+			get
+			{
+				return null;
+			}
+		}
+
+		[DebuggerHidden]
+		[Token(Token = "0x6005F79")]
+		[Address(RVA = "0x6B1EA0", Offset = "0x6B0EA0", Length = "0x24")]
+		public <ActivateAutoAggroForMonster>d__136(int <>1__state)
+		{
+		}
+
+		[DebuggerHidden]
+		[Token(Token = "0x6005F7A")]
+		[Address(RVA = "0x6AAC60", Offset = "0x6A9C60", Length = "0x3")]
+		void IDisposable.Dispose()
+		{
+		}
+
+		[Token(Token = "0x6005F7B")]
+		[Address(RVA = "0xF59610", Offset = "0xF58610", Length = "0x5C9")]
+		private bool MoveNext()
+		{
+			return false;
+		}
+
+		bool IEnumerator.MoveNext()
+		{
+			//ILSpy generated this explicit interface implementation from .override directive in MoveNext
+			return this.MoveNext();
+		}
+
+		[DebuggerHidden]
+		[Token(Token = "0x6005F7D")]
+		[Address(RVA = "0xF59BE0", Offset = "0xF58BE0", Length = "0x3E")]
+		void IEnumerator.Reset()
+		{
+		}
+	}
+
+	[CompilerGenerated]
+	[Token(Token = "0x2000BBF")]
+	private sealed class <ActivateEventCoroutine>d__137 : IEnumerator<object>, IEnumerator, IDisposable
+	{
+		[Token(Token = "0x4005912")]
+		[FieldOffset(Offset = "0x10")]
+		private int <>1__state;
+
+		[Token(Token = "0x4005913")]
+		[FieldOffset(Offset = "0x18")]
+		private object <>2__current;
+
+		[Token(Token = "0x4005914")]
+		[FieldOffset(Offset = "0x20")]
+		public InGameEvent eventName;
+
+		[Token(Token = "0x4005915")]
+		[FieldOffset(Offset = "0x28")]
+		public SceneHandler <>4__this;
+
+		[Token(Token = "0x4005916")]
+		[FieldOffset(Offset = "0x30")]
+		private <>c__DisplayClass137_0 <>8__1;
+
+		[Token(Token = "0x4005917")]
+		[FieldOffset(Offset = "0x38")]
+		private EventData <eventData>5__2;
+
+		[Token(Token = "0x4005918")]
+		[FieldOffset(Offset = "0x40")]
+		private float <monsterSpawnInterval>5__3;
+
+		[Token(Token = "0x4005919")]
+		[FieldOffset(Offset = "0x48")]
+		private List<MonsterSpawn>.Enumerator <>7__wrap3;
+
+		[Token(Token = "0x400591A")]
+		[FieldOffset(Offset = "0x60")]
+		private List<NPCSpawn>.Enumerator <>7__wrap4;
+
+		[Token(Token = "0x400591B")]
+		[FieldOffset(Offset = "0x78")]
+		private List<StorageSpawn>.Enumerator <>7__wrap5;
+
+		[Token(Token = "0x400591C")]
+		[FieldOffset(Offset = "0x90")]
+		private List<HarvestSpawn>.Enumerator <>7__wrap6;
+
+		[Token(Token = "0x400591D")]
+		[FieldOffset(Offset = "0xA8")]
+		private List<DestructibleSpawn>.Enumerator <>7__wrap7;
+
+		[Token(Token = "0x400591E")]
+		[FieldOffset(Offset = "0xC0")]
+		private List<InteractClientSpawn>.Enumerator <>7__wrap8;
+
+		[Token(Token = "0x400591F")]
+		[FieldOffset(Offset = "0xD8")]
+		private List<PokerTableSpawn>.Enumerator <>7__wrap9;
+
+		[Token(Token = "0x17000A1A")]
+		object IEnumerator<object>.Current
+		{
+			[DebuggerHidden]
+			[Token(Token = "0x6005F89")]
+			[Address(RVA = "0x6B1E50", Offset = "0x6B0E50", Length = "0x5")]
+			get
+			{
+				return null;
+			}
+		}
+
+		[Token(Token = "0x17000A1B")]
+		object IEnumerator.Current
+		{
+			[DebuggerHidden]
+			[Token(Token = "0x6005F8B")]
+			[Address(RVA = "0x6B1E50", Offset = "0x6B0E50", Length = "0x5")]
+			get
+			{
+				return null;
+			}
+		}
+
+		[DebuggerHidden]
+		[Token(Token = "0x6005F7F")]
+		[Address(RVA = "0x6B1EA0", Offset = "0x6B0EA0", Length = "0x24")]
+		public <ActivateEventCoroutine>d__137(int <>1__state)
+		{
+		}
+
+		[DebuggerHidden]
+		[Token(Token = "0x6005F80")]
+		[Address(RVA = "0xF5C8F0", Offset = "0xF5B8F0", Length = "0x36C")]
+		void IDisposable.Dispose()
+		{
+		}
+
+		[Token(Token = "0x6005F81")]
+		[Address(RVA = "0xF59C20", Offset = "0xF58C20", Length = "0x4B8")]
+		private bool MoveNext()
+		{
+			return false;
+		}
+
+		bool IEnumerator.MoveNext()
+		{
+			//ILSpy generated this explicit interface implementation from .override directive in MoveNext
+			return this.MoveNext();
+		}
+
+		[Token(Token = "0x6005F82")]
+		[Address(RVA = "0xF5CCA0", Offset = "0xF5BCA0", Length = "0x41")]
+		private void <>m__Finally1()
+		{
+		}
+
+		[Token(Token = "0x6005F83")]
+		[Address(RVA = "0xF5CCF0", Offset = "0xF5BCF0", Length = "0x41")]
+		private void <>m__Finally2()
+		{
+		}
+
+		[Token(Token = "0x6005F84")]
+		[Address(RVA = "0xF5CD40", Offset = "0xF5BD40", Length = "0x41")]
+		private void <>m__Finally3()
+		{
+		}
+
+		[Token(Token = "0x6005F85")]
+		[Address(RVA = "0xF5CD90", Offset = "0xF5BD90", Length = "0x44")]
+		private void <>m__Finally4()
+		{
+		}
+
+		[Token(Token = "0x6005F86")]
+		[Address(RVA = "0xF5CDE0", Offset = "0xF5BDE0", Length = "0x44")]
+		private void <>m__Finally5()
+		{
+		}
+
+		[Token(Token = "0x6005F87")]
+		[Address(RVA = "0xF5CE30", Offset = "0xF5BE30", Length = "0x44")]
+		private void <>m__Finally6()
+		{
+		}
+
+		[Token(Token = "0x6005F88")]
+		[Address(RVA = "0xF5CE80", Offset = "0xF5BE80", Length = "0x44")]
+		private void <>m__Finally7()
+		{
+		}
+
+		[DebuggerHidden]
+		[Token(Token = "0x6005F8A")]
+		[Address(RVA = "0xF5C8B0", Offset = "0xF5B8B0", Length = "0x3E")]
+		void IEnumerator.Reset()
+		{
+		}
+	}
+
+	[CompilerGenerated]
+	[Token(Token = "0x2000BC0")]
+	private sealed class <AggroAfterDelay>d__112 : IEnumerator<object>, IEnumerator, IDisposable
+	{
+		[Token(Token = "0x4005920")]
+		[FieldOffset(Offset = "0x10")]
+		private int <>1__state;
+
+		[Token(Token = "0x4005921")]
+		[FieldOffset(Offset = "0x18")]
+		private object <>2__current;
+
+		[Token(Token = "0x4005922")]
+		[FieldOffset(Offset = "0x20")]
+		public float delay;
+
+		[Token(Token = "0x4005923")]
+		[FieldOffset(Offset = "0x28")]
+		public SceneHandler <>4__this;
+
+		[Token(Token = "0x4005924")]
+		[FieldOffset(Offset = "0x30")]
+		public Monster monster;
+
+		[Token(Token = "0x4005925")]
+		[FieldOffset(Offset = "0x38")]
+		public float postAggroRange;
+
+		[Token(Token = "0x17000A1C")]
+		object IEnumerator<object>.Current
+		{
+			[DebuggerHidden]
+			[Token(Token = "0x6005F8F")]
+			[Address(RVA = "0x6B1E50", Offset = "0x6B0E50", Length = "0x5")]
+			get
+			{
+				return null;
+			}
+		}
+
+		[Token(Token = "0x17000A1D")]
+		object IEnumerator.Current
+		{
+			[DebuggerHidden]
+			[Token(Token = "0x6005F91")]
+			[Address(RVA = "0x6B1E50", Offset = "0x6B0E50", Length = "0x5")]
+			get
+			{
+				return null;
+			}
+		}
+
+		[DebuggerHidden]
+		[Token(Token = "0x6005F8C")]
+		[Address(RVA = "0x6B1EA0", Offset = "0x6B0EA0", Length = "0x24")]
+		public <AggroAfterDelay>d__112(int <>1__state)
+		{
+		}
+
+		[DebuggerHidden]
+		[Token(Token = "0x6005F8D")]
+		[Address(RVA = "0x6AAC60", Offset = "0x6A9C60", Length = "0x3")]
+		void IDisposable.Dispose()
+		{
+		}
+
+		[Token(Token = "0x6005F8E")]
+		[Address(RVA = "0xF5CED0", Offset = "0xF5BED0", Length = "0xC6")]
+		private bool MoveNext()
+		{
+			return false;
+		}
+
+		bool IEnumerator.MoveNext()
+		{
+			//ILSpy generated this explicit interface implementation from .override directive in MoveNext
+			return this.MoveNext();
+		}
+
+		[DebuggerHidden]
+		[Token(Token = "0x6005F90")]
+		[Address(RVA = "0xF5CFA0", Offset = "0xF5BFA0", Length = "0x3E")]
+		void IEnumerator.Reset()
+		{
+		}
+	}
+
+	[CompilerGenerated]
+	[Token(Token = "0x2000BC1")]
+	private sealed class <ClientFadeNpcVisualsCoroutine>d__142 : IEnumerator<object>, IEnumerator, IDisposable
+	{
+		[Token(Token = "0x4005926")]
+		[FieldOffset(Offset = "0x10")]
+		private int <>1__state;
+
+		[Token(Token = "0x4005927")]
+		[FieldOffset(Offset = "0x18")]
+		private object <>2__current;
+
+		[Token(Token = "0x4005928")]
+		[FieldOffset(Offset = "0x20")]
+		public NetworkObject npcNetObj;
+
+		[Token(Token = "0x4005929")]
+		[FieldOffset(Offset = "0x28")]
+		public SceneHandler <>4__this;
+
+		[Token(Token = "0x400592A")]
+		[FieldOffset(Offset = "0x30")]
+		public float durationSeconds;
+
+		[Token(Token = "0x400592B")]
+		[FieldOffset(Offset = "0x38")]
+		private ulong <id>5__2;
+
+		[Token(Token = "0x400592C")]
+		[FieldOffset(Offset = "0x40")]
+		private SpriteRenderer[] <renderers>5__3;
+
+		[Token(Token = "0x400592D")]
+		[FieldOffset(Offset = "0x48")]
+		private Color[] <originals>5__4;
+
+		[Token(Token = "0x400592E")]
+		[FieldOffset(Offset = "0x50")]
+		private float <t>5__5;
+
+		[Token(Token = "0x17000A1E")]
+		object IEnumerator<object>.Current
+		{
+			[DebuggerHidden]
+			[Token(Token = "0x6005F95")]
+			[Address(RVA = "0x6B1E50", Offset = "0x6B0E50", Length = "0x5")]
+			get
+			{
+				return null;
+			}
+		}
+
+		[Token(Token = "0x17000A1F")]
+		object IEnumerator.Current
+		{
+			[DebuggerHidden]
+			[Token(Token = "0x6005F97")]
+			[Address(RVA = "0x6B1E50", Offset = "0x6B0E50", Length = "0x5")]
+			get
+			{
+				return null;
+			}
+		}
+
+		[DebuggerHidden]
+		[Token(Token = "0x6005F92")]
+		[Address(RVA = "0x6B1EA0", Offset = "0x6B0EA0", Length = "0x24")]
+		public <ClientFadeNpcVisualsCoroutine>d__142(int <>1__state)
+		{
+		}
+
+		[DebuggerHidden]
+		[Token(Token = "0x6005F93")]
+		[Address(RVA = "0x6AAC60", Offset = "0x6A9C60", Length = "0x3")]
+		void IDisposable.Dispose()
+		{
+		}
+
+		[Token(Token = "0x6005F94")]
+		[Address(RVA = "0xF5CFE0", Offset = "0xF5BFE0", Length = "0x59A")]
+		private bool MoveNext()
+		{
+			return false;
+		}
+
+		bool IEnumerator.MoveNext()
+		{
+			//ILSpy generated this explicit interface implementation from .override directive in MoveNext
+			return this.MoveNext();
+		}
+
+		[DebuggerHidden]
+		[Token(Token = "0x6005F96")]
+		[Address(RVA = "0xF5D580", Offset = "0xF5C580", Length = "0x3E")]
+		void IEnumerator.Reset()
+		{
+		}
+	}
+
+	[CompilerGenerated]
+	[Token(Token = "0x2000BC2")]
+	private sealed class <ConversationEncounter>d__107 : IEnumerator<object>, IEnumerator, IDisposable
+	{
+		[Token(Token = "0x400592F")]
+		[FieldOffset(Offset = "0x10")]
+		private int <>1__state;
+
+		[Token(Token = "0x4005930")]
+		[FieldOffset(Offset = "0x18")]
+		private object <>2__current;
+
+		[Token(Token = "0x4005931")]
+		[FieldOffset(Offset = "0x20")]
+		public List<ulong> participants;
+
+		[Token(Token = "0x4005932")]
+		[FieldOffset(Offset = "0x28")]
+		public NetworkObject npcObj;
+
+		[Token(Token = "0x4005933")]
+		[FieldOffset(Offset = "0x30")]
+		public string id;
+
+		[Token(Token = "0x4005934")]
+		[FieldOffset(Offset = "0x38")]
+		public SceneHandler <>4__this;
+
+		[Token(Token = "0x4005935")]
+		[FieldOffset(Offset = "0x40")]
+		public MonsterCutsceneSettings settings;
+
+		[Token(Token = "0x4005936")]
+		[FieldOffset(Offset = "0x708")]
+		public NetworkObject monsterObj;
+
+		[Token(Token = "0x4005937")]
+		[FieldOffset(Offset = "0x710")]
+		private ActiveConversation <live>5__2;
+
+		[Token(Token = "0x4005938")]
+		[FieldOffset(Offset = "0x718")]
+		private HashSet<ulong> <entered>5__3;
+
+		[Token(Token = "0x4005939")]
+		[FieldOffset(Offset = "0x720")]
+		private float <closeTimer>5__4;
+
+		[Token(Token = "0x400593A")]
+		[FieldOffset(Offset = "0x724")]
+		private bool <closing>5__5;
+
+		[Token(Token = "0x400593B")]
+		[FieldOffset(Offset = "0x728")]
+		private float <elapsed>5__6;
+
+		[Token(Token = "0x400593C")]
+		[FieldOffset(Offset = "0x72C")]
+		private float <nextStallWarning>5__7;
+
+		[Token(Token = "0x17000A20")]
+		object IEnumerator<object>.Current
+		{
+			[DebuggerHidden]
+			[Token(Token = "0x6005F9B")]
+			[Address(RVA = "0x6B1E50", Offset = "0x6B0E50", Length = "0x5")]
+			get
+			{
+				return null;
+			}
+		}
+
+		[Token(Token = "0x17000A21")]
+		object IEnumerator.Current
+		{
+			[DebuggerHidden]
+			[Token(Token = "0x6005F9D")]
+			[Address(RVA = "0x6B1E50", Offset = "0x6B0E50", Length = "0x5")]
+			get
+			{
+				return null;
+			}
+		}
+
+		[DebuggerHidden]
+		[Token(Token = "0x6005F98")]
+		[Address(RVA = "0x6B1EA0", Offset = "0x6B0EA0", Length = "0x24")]
+		public <ConversationEncounter>d__107(int <>1__state)
+		{
+		}
+
+		[DebuggerHidden]
+		[Token(Token = "0x6005F99")]
+		[Address(RVA = "0x6AAC60", Offset = "0x6A9C60", Length = "0x3")]
+		void IDisposable.Dispose()
+		{
+		}
+
+		[Token(Token = "0x6005F9A")]
+		[Address(RVA = "0xF5D5C0", Offset = "0xF5C5C0", Length = "0xA3E")]
+		private bool MoveNext()
+		{
+			return false;
+		}
+
+		bool IEnumerator.MoveNext()
+		{
+			//ILSpy generated this explicit interface implementation from .override directive in MoveNext
+			return this.MoveNext();
+		}
+
+		[DebuggerHidden]
+		[Token(Token = "0x6005F9C")]
+		[Address(RVA = "0xF5E000", Offset = "0xF5D000", Length = "0x3E")]
+		void IEnumerator.Reset()
+		{
+		}
+	}
+
+	[CompilerGenerated]
+	[Token(Token = "0x2000BC3")]
+	private sealed class <DeactivateEventCoroutine>d__133 : IEnumerator<object>, IEnumerator, IDisposable
+	{
+		[Token(Token = "0x400593D")]
+		[FieldOffset(Offset = "0x10")]
+		private int <>1__state;
+
+		[Token(Token = "0x400593E")]
+		[FieldOffset(Offset = "0x18")]
+		private object <>2__current;
+
+		[Token(Token = "0x400593F")]
+		[FieldOffset(Offset = "0x20")]
+		public InGameEvent eventName;
+
+		[Token(Token = "0x4005940")]
+		[FieldOffset(Offset = "0x24")]
+		public bool expired;
+
+		[Token(Token = "0x4005941")]
+		[FieldOffset(Offset = "0x28")]
+		public SceneHandler <>4__this;
+
+		[Token(Token = "0x4005942")]
+		[FieldOffset(Offset = "0x30")]
+		private <>c__DisplayClass133_0 <>8__1;
+
+		[Token(Token = "0x4005943")]
+		[FieldOffset(Offset = "0x38")]
+		private EventDefinition <eventDefinition>5__2;
+
+		[Token(Token = "0x17000A22")]
+		object IEnumerator<object>.Current
+		{
+			[DebuggerHidden]
+			[Token(Token = "0x6005FA1")]
+			[Address(RVA = "0x6B1E50", Offset = "0x6B0E50", Length = "0x5")]
+			get
+			{
+				return null;
+			}
+		}
+
+		[Token(Token = "0x17000A23")]
+		object IEnumerator.Current
+		{
+			[DebuggerHidden]
+			[Token(Token = "0x6005FA3")]
+			[Address(RVA = "0x6B1E50", Offset = "0x6B0E50", Length = "0x5")]
+			get
+			{
+				return null;
+			}
+		}
+
+		[DebuggerHidden]
+		[Token(Token = "0x6005F9E")]
+		[Address(RVA = "0x6B1EA0", Offset = "0x6B0EA0", Length = "0x24")]
+		public <DeactivateEventCoroutine>d__133(int <>1__state)
+		{
+		}
+
+		[DebuggerHidden]
+		[Token(Token = "0x6005F9F")]
+		[Address(RVA = "0x6AAC60", Offset = "0x6A9C60", Length = "0x3")]
+		void IDisposable.Dispose()
+		{
+		}
+
+		[Token(Token = "0x6005FA0")]
+		[Address(RVA = "0xF5E040", Offset = "0xF5D040", Length = "0xEFE")]
+		private bool MoveNext()
+		{
+			return false;
+		}
+
+		bool IEnumerator.MoveNext()
+		{
+			//ILSpy generated this explicit interface implementation from .override directive in MoveNext
+			return this.MoveNext();
+		}
+
+		[DebuggerHidden]
+		[Token(Token = "0x6005FA2")]
+		[Address(RVA = "0xF5EF40", Offset = "0xF5DF40", Length = "0x3E")]
+		void IEnumerator.Reset()
+		{
+		}
+	}
+
+	[CompilerGenerated]
+	[Token(Token = "0x2000BC4")]
+	private sealed class <DeferredDespawnNPCWhenClearCoroutine>d__140 : IEnumerator<object>, IEnumerator, IDisposable
+	{
+		[Token(Token = "0x4005944")]
+		[FieldOffset(Offset = "0x10")]
+		private int <>1__state;
+
+		[Token(Token = "0x4005945")]
+		[FieldOffset(Offset = "0x18")]
+		private object <>2__current;
+
+		[Token(Token = "0x4005946")]
+		[FieldOffset(Offset = "0x20")]
+		public NetworkObject npcNetObj;
+
+		[Token(Token = "0x4005947")]
+		[FieldOffset(Offset = "0x28")]
+		public InGameEvent eventName;
+
+		[Token(Token = "0x4005948")]
+		[FieldOffset(Offset = "0x30")]
+		public SceneHandler <>4__this;
+
+		[Token(Token = "0x4005949")]
+		[FieldOffset(Offset = "0x38")]
+		private WaitForSeconds <wait>5__2;
+
+		[Token(Token = "0x400594A")]
+		[FieldOffset(Offset = "0x40")]
+		private float <maxWait>5__3;
+
+		[Token(Token = "0x400594B")]
+		[FieldOffset(Offset = "0x44")]
+		private float <elapsed>5__4;
+
+		[Token(Token = "0x400594C")]
+		[FieldOffset(Offset = "0x48")]
+		private ulong <npcId>5__5;
+
+		[Token(Token = "0x17000A24")]
+		object IEnumerator<object>.Current
+		{
+			[DebuggerHidden]
+			[Token(Token = "0x6005FA7")]
+			[Address(RVA = "0x6B1E50", Offset = "0x6B0E50", Length = "0x5")]
+			get
+			{
+				return null;
+			}
+		}
+
+		[Token(Token = "0x17000A25")]
+		object IEnumerator.Current
+		{
+			[DebuggerHidden]
+			[Token(Token = "0x6005FA9")]
+			[Address(RVA = "0x6B1E50", Offset = "0x6B0E50", Length = "0x5")]
+			get
+			{
+				return null;
+			}
+		}
+
+		[DebuggerHidden]
+		[Token(Token = "0x6005FA4")]
+		[Address(RVA = "0x6B1EA0", Offset = "0x6B0EA0", Length = "0x24")]
+		public <DeferredDespawnNPCWhenClearCoroutine>d__140(int <>1__state)
+		{
+		}
+
+		[DebuggerHidden]
+		[Token(Token = "0x6005FA5")]
+		[Address(RVA = "0x6AAC60", Offset = "0x6A9C60", Length = "0x3")]
+		void IDisposable.Dispose()
+		{
+		}
+
+		[Token(Token = "0x6005FA6")]
+		[Address(RVA = "0xF5EF80", Offset = "0xF5DF80", Length = "0x508")]
+		private bool MoveNext()
+		{
+			return false;
+		}
+
+		bool IEnumerator.MoveNext()
+		{
+			//ILSpy generated this explicit interface implementation from .override directive in MoveNext
+			return this.MoveNext();
+		}
+
+		[DebuggerHidden]
+		[Token(Token = "0x6005FA8")]
+		[Address(RVA = "0xF5F490", Offset = "0xF5E490", Length = "0x3E")]
+		void IEnumerator.Reset()
+		{
+		}
+	}
+
+	[CompilerGenerated]
+	[Token(Token = "0x2000BC5")]
+	private sealed class <DespawnAllGradually>d__156 : IEnumerator<object>, IEnumerator, IDisposable
+	{
+		[Token(Token = "0x400594D")]
+		[FieldOffset(Offset = "0x10")]
+		private int <>1__state;
+
+		[Token(Token = "0x400594E")]
+		[FieldOffset(Offset = "0x18")]
+		private object <>2__current;
+
+		[Token(Token = "0x400594F")]
+		[FieldOffset(Offset = "0x20")]
+		public SceneHandler <>4__this;
+
+		[Token(Token = "0x4005950")]
+		[FieldOffset(Offset = "0x28")]
+		private int <count>5__2;
+
+		[Token(Token = "0x4005951")]
+		[FieldOffset(Offset = "0x30")]
+		private List<List<NetworkObject>>.Enumerator <>7__wrap2;
+
+		[Token(Token = "0x4005952")]
+		[FieldOffset(Offset = "0x48")]
+		private List<NetworkObject> <list>5__4;
+
+		[Token(Token = "0x17000A26")]
+		object IEnumerator<object>.Current
+		{
+			[DebuggerHidden]
+			[Token(Token = "0x6005FAE")]
+			[Address(RVA = "0x6B1E50", Offset = "0x6B0E50", Length = "0x5")]
+			get
+			{
+				return null;
+			}
+		}
+
+		[Token(Token = "0x17000A27")]
+		object IEnumerator.Current
+		{
+			[DebuggerHidden]
+			[Token(Token = "0x6005FB0")]
+			[Address(RVA = "0x6B1E50", Offset = "0x6B0E50", Length = "0x5")]
+			get
+			{
+				return null;
+			}
+		}
+
+		[DebuggerHidden]
+		[Token(Token = "0x6005FAA")]
+		[Address(RVA = "0x6B1EA0", Offset = "0x6B0EA0", Length = "0x24")]
+		public <DespawnAllGradually>d__156(int <>1__state)
+		{
+		}
+
+		[DebuggerHidden]
+		[Token(Token = "0x6005FAB")]
+		[Address(RVA = "0xF5FE40", Offset = "0xF5EE40", Length = "0x83")]
+		void IDisposable.Dispose()
+		{
+		}
+
+		[Token(Token = "0x6005FAC")]
+		[Address(RVA = "0xF5F4D0", Offset = "0xF5E4D0", Length = "0x922")]
+		private bool MoveNext()
+		{
+			return false;
+		}
+
+		bool IEnumerator.MoveNext()
+		{
+			//ILSpy generated this explicit interface implementation from .override directive in MoveNext
+			return this.MoveNext();
+		}
+
+		[Token(Token = "0x6005FAD")]
+		[Address(RVA = "0xF5FED0", Offset = "0xF5EED0", Length = "0x41")]
+		private void <>m__Finally1()
+		{
+		}
+
+		[DebuggerHidden]
+		[Token(Token = "0x6005FAF")]
+		[Address(RVA = "0xF5FE00", Offset = "0xF5EE00", Length = "0x3E")]
+		void IEnumerator.Reset()
+		{
+		}
+	}
+
+	[CompilerGenerated]
+	[Token(Token = "0x2000BC6")]
+	private sealed class <DespawnEventMonsterAfterCorpse>d__73 : IEnumerator<object>, IEnumerator, IDisposable
+	{
+		[Token(Token = "0x4005953")]
+		[FieldOffset(Offset = "0x10")]
+		private int <>1__state;
+
+		[Token(Token = "0x4005954")]
+		[FieldOffset(Offset = "0x18")]
+		private object <>2__current;
+
+		[Token(Token = "0x4005955")]
+		[FieldOffset(Offset = "0x20")]
+		public Monster monster;
+
+		[Token(Token = "0x4005956")]
+		[FieldOffset(Offset = "0x28")]
+		public SceneHandler <>4__this;
+
+		[Token(Token = "0x17000A28")]
+		object IEnumerator<object>.Current
+		{
+			[DebuggerHidden]
+			[Token(Token = "0x6005FB4")]
+			[Address(RVA = "0x6B1E50", Offset = "0x6B0E50", Length = "0x5")]
+			get
+			{
+				return null;
+			}
+		}
+
+		[Token(Token = "0x17000A29")]
+		object IEnumerator.Current
+		{
+			[DebuggerHidden]
+			[Token(Token = "0x6005FB6")]
+			[Address(RVA = "0x6B1E50", Offset = "0x6B0E50", Length = "0x5")]
+			get
+			{
+				return null;
+			}
+		}
+
+		[DebuggerHidden]
+		[Token(Token = "0x6005FB1")]
+		[Address(RVA = "0x6B1EA0", Offset = "0x6B0EA0", Length = "0x24")]
+		public <DespawnEventMonsterAfterCorpse>d__73(int <>1__state)
+		{
+		}
+
+		[DebuggerHidden]
+		[Token(Token = "0x6005FB2")]
+		[Address(RVA = "0x6AAC60", Offset = "0x6A9C60", Length = "0x3")]
+		void IDisposable.Dispose()
+		{
+		}
+
+		[Token(Token = "0x6005FB3")]
+		[Address(RVA = "0xF5FF20", Offset = "0xF5EF20", Length = "0x2F0")]
+		private bool MoveNext()
+		{
+			return false;
+		}
+
+		bool IEnumerator.MoveNext()
+		{
+			//ILSpy generated this explicit interface implementation from .override directive in MoveNext
+			return this.MoveNext();
+		}
+
+		[DebuggerHidden]
+		[Token(Token = "0x6005FB5")]
+		[Address(RVA = "0xF60220", Offset = "0xF5F220", Length = "0x3E")]
+		void IEnumerator.Reset()
+		{
+		}
+	}
+
+	[CompilerGenerated]
+	[Token(Token = "0x2000BC7")]
+	private sealed class <GetMapDataAssets>d__95 : IEnumerable<MapDataAsset>, IEnumerable, IEnumerator<MapDataAsset>, IEnumerator, IDisposable
+	{
+		[Token(Token = "0x4005957")]
+		[FieldOffset(Offset = "0x10")]
+		private int <>1__state;
+
+		[Token(Token = "0x4005958")]
+		[FieldOffset(Offset = "0x18")]
+		private MapDataAsset <>2__current;
+
+		[Token(Token = "0x4005959")]
+		[FieldOffset(Offset = "0x20")]
+		private int <>l__initialThreadId;
+
+		[Token(Token = "0x17000A2A")]
+		MapDataAsset IEnumerator<MapDataAsset>.Current
+		{
+			[DebuggerHidden]
+			[Token(Token = "0x6005FBA")]
+			[Address(RVA = "0x6B1E50", Offset = "0x6B0E50", Length = "0x5")]
+			get
+			{
+				return null;
+			}
+		}
+
+		[Token(Token = "0x17000A2B")]
+		object IEnumerator.Current
+		{
+			[DebuggerHidden]
+			[Token(Token = "0x6005FBC")]
+			[Address(RVA = "0x6B1E50", Offset = "0x6B0E50", Length = "0x5")]
+			get
+			{
+				return null;
+			}
+		}
+
+		[DebuggerHidden]
+		[Token(Token = "0x6005FB7")]
+		[Address(RVA = "0x6D4300", Offset = "0x6D3300", Length = "0x2E")]
+		public <GetMapDataAssets>d__95(int <>1__state)
+		{
+		}
+
+		[DebuggerHidden]
+		[Token(Token = "0x6005FB8")]
+		[Address(RVA = "0x6AAC60", Offset = "0x6A9C60", Length = "0x3")]
+		void IDisposable.Dispose()
+		{
+		}
+
+		[Token(Token = "0x6005FB9")]
+		[Address(RVA = "0xF60260", Offset = "0xF5F260", Length = "0x10")]
+		private bool MoveNext()
+		{
+			return false;
+		}
+
+		bool IEnumerator.MoveNext()
+		{
+			//ILSpy generated this explicit interface implementation from .override directive in MoveNext
+			return this.MoveNext();
+		}
+
+		[DebuggerHidden]
+		[Token(Token = "0x6005FBB")]
+		[Address(RVA = "0xF60300", Offset = "0xF5F300", Length = "0x3E")]
+		void IEnumerator.Reset()
+		{
+		}
+
+		[DebuggerHidden]
+		[Token(Token = "0x6005FBD")]
+		[Address(RVA = "0xF60270", Offset = "0xF5F270", Length = "0x8B")]
+		IEnumerator<MapDataAsset> IEnumerable<MapDataAsset>.GetEnumerator()
+		{
+			return null;
+		}
+
+		[DebuggerHidden]
+		[Token(Token = "0x6005FBE")]
+		[Address(RVA = "0xF60270", Offset = "0xF5F270", Length = "0x8B")]
+		IEnumerator IEnumerable.GetEnumerator()
+		{
+			return null;
+		}
+	}
+
+	[CompilerGenerated]
+	[Token(Token = "0x2000BC8")]
+	private sealed class <PlayMonsterAnimationAfter>d__119 : IEnumerator<object>, IEnumerator, IDisposable
+	{
+		[Token(Token = "0x400595A")]
+		[FieldOffset(Offset = "0x10")]
+		private int <>1__state;
+
+		[Token(Token = "0x400595B")]
+		[FieldOffset(Offset = "0x18")]
+		private object <>2__current;
+
+		[Token(Token = "0x400595C")]
+		[FieldOffset(Offset = "0x20")]
+		public float delay;
+
+		[Token(Token = "0x400595D")]
+		[FieldOffset(Offset = "0x28")]
+		public Monster monster;
+
+		[Token(Token = "0x400595E")]
+		[FieldOffset(Offset = "0x30")]
+		public string stateName;
+
+		[Token(Token = "0x17000A2C")]
+		object IEnumerator<object>.Current
+		{
+			[DebuggerHidden]
+			[Token(Token = "0x6005FC2")]
+			[Address(RVA = "0x6B1E50", Offset = "0x6B0E50", Length = "0x5")]
+			get
+			{
+				return null;
+			}
+		}
+
+		[Token(Token = "0x17000A2D")]
+		object IEnumerator.Current
+		{
+			[DebuggerHidden]
+			[Token(Token = "0x6005FC4")]
+			[Address(RVA = "0x6B1E50", Offset = "0x6B0E50", Length = "0x5")]
+			get
+			{
+				return null;
+			}
+		}
+
+		[DebuggerHidden]
+		[Token(Token = "0x6005FBF")]
+		[Address(RVA = "0x6B1EA0", Offset = "0x6B0EA0", Length = "0x24")]
+		public <PlayMonsterAnimationAfter>d__119(int <>1__state)
+		{
+		}
+
+		[DebuggerHidden]
+		[Token(Token = "0x6005FC0")]
+		[Address(RVA = "0x6AAC60", Offset = "0x6A9C60", Length = "0x3")]
+		void IDisposable.Dispose()
+		{
+		}
+
+		[Token(Token = "0x6005FC1")]
+		[Address(RVA = "0xF60340", Offset = "0xF5F340", Length = "0x345")]
+		private bool MoveNext()
+		{
+			return false;
+		}
+
+		bool IEnumerator.MoveNext()
+		{
+			//ILSpy generated this explicit interface implementation from .override directive in MoveNext
+			return this.MoveNext();
+		}
+
+		[DebuggerHidden]
+		[Token(Token = "0x6005FC3")]
+		[Address(RVA = "0xF60690", Offset = "0xF5F690", Length = "0x3E")]
+		void IEnumerator.Reset()
+		{
+		}
+	}
+
+	[CompilerGenerated]
+	[Token(Token = "0x2000BC9")]
+	private sealed class <SpawnDestructiblesCoroutine>d__167 : IEnumerator<object>, IEnumerator, IDisposable
+	{
+		[Token(Token = "0x400595F")]
+		[FieldOffset(Offset = "0x10")]
+		private int <>1__state;
+
+		[Token(Token = "0x4005960")]
+		[FieldOffset(Offset = "0x18")]
+		private object <>2__current;
+
+		[Token(Token = "0x4005961")]
+		[FieldOffset(Offset = "0x20")]
+		public SceneHandler <>4__this;
+
+		[Token(Token = "0x4005962")]
+		[FieldOffset(Offset = "0x28")]
+		private List<DestructibleSpawn> <destructiblesToSpawn>5__2;
+
+		[Token(Token = "0x4005963")]
+		[FieldOffset(Offset = "0x30")]
+		private int <totalDestructibles>5__3;
+
+		[Token(Token = "0x4005964")]
+		[FieldOffset(Offset = "0x34")]
+		private int <i>5__4;
+
+		[Token(Token = "0x17000A2E")]
+		object IEnumerator<object>.Current
+		{
+			[DebuggerHidden]
+			[Token(Token = "0x6005FC8")]
+			[Address(RVA = "0x6B1E50", Offset = "0x6B0E50", Length = "0x5")]
+			get
+			{
+				return null;
+			}
+		}
+
+		[Token(Token = "0x17000A2F")]
+		object IEnumerator.Current
+		{
+			[DebuggerHidden]
+			[Token(Token = "0x6005FCA")]
+			[Address(RVA = "0x6B1E50", Offset = "0x6B0E50", Length = "0x5")]
+			get
+			{
+				return null;
+			}
+		}
+
+		[DebuggerHidden]
+		[Token(Token = "0x6005FC5")]
+		[Address(RVA = "0x6B1EA0", Offset = "0x6B0EA0", Length = "0x24")]
+		public <SpawnDestructiblesCoroutine>d__167(int <>1__state)
+		{
+		}
+
+		[DebuggerHidden]
+		[Token(Token = "0x6005FC6")]
+		[Address(RVA = "0x6AAC60", Offset = "0x6A9C60", Length = "0x3")]
+		void IDisposable.Dispose()
+		{
+		}
+
+		[Token(Token = "0x6005FC7")]
+		[Address(RVA = "0xF606D0", Offset = "0xF5F6D0", Length = "0x299")]
+		private bool MoveNext()
+		{
+			return false;
+		}
+
+		bool IEnumerator.MoveNext()
+		{
+			//ILSpy generated this explicit interface implementation from .override directive in MoveNext
+			return this.MoveNext();
+		}
+
+		[DebuggerHidden]
+		[Token(Token = "0x6005FC9")]
+		[Address(RVA = "0xF60970", Offset = "0xF5F970", Length = "0x3E")]
+		void IEnumerator.Reset()
+		{
+		}
+	}
+
+	[CompilerGenerated]
+	[Token(Token = "0x2000BCA")]
+	private sealed class <SpawnEventMonsterWithVFX>d__143 : IEnumerator<object>, IEnumerator, IDisposable
+	{
+		[Token(Token = "0x4005965")]
+		[FieldOffset(Offset = "0x10")]
+		private int <>1__state;
+
+		[Token(Token = "0x4005966")]
+		[FieldOffset(Offset = "0x18")]
+		private object <>2__current;
+
+		[Token(Token = "0x4005967")]
+		[FieldOffset(Offset = "0x20")]
+		public MonsterSpawn eventMonster;
+
+		[Token(Token = "0x4005968")]
+		[FieldOffset(Offset = "0x28")]
+		public SceneHandler <>4__this;
+
+		[Token(Token = "0x4005969")]
+		[FieldOffset(Offset = "0x30")]
+		public InGameEvent eventName;
+
+		[Token(Token = "0x400596A")]
+		[FieldOffset(Offset = "0x34")]
+		private Vector3 <spawnPosition>5__2;
+
+		[Token(Token = "0x17000A30")]
+		object IEnumerator<object>.Current
+		{
+			[DebuggerHidden]
+			[Token(Token = "0x6005FCE")]
+			[Address(RVA = "0x6B1E50", Offset = "0x6B0E50", Length = "0x5")]
+			get
+			{
+				return null;
+			}
+		}
+
+		[Token(Token = "0x17000A31")]
+		object IEnumerator.Current
+		{
+			[DebuggerHidden]
+			[Token(Token = "0x6005FD0")]
+			[Address(RVA = "0x6B1E50", Offset = "0x6B0E50", Length = "0x5")]
+			get
+			{
+				return null;
+			}
+		}
+
+		[DebuggerHidden]
+		[Token(Token = "0x6005FCB")]
+		[Address(RVA = "0x6B1EA0", Offset = "0x6B0EA0", Length = "0x24")]
+		public <SpawnEventMonsterWithVFX>d__143(int <>1__state)
+		{
+		}
+
+		[DebuggerHidden]
+		[Token(Token = "0x6005FCC")]
+		[Address(RVA = "0x6AAC60", Offset = "0x6A9C60", Length = "0x3")]
+		void IDisposable.Dispose()
+		{
+		}
+
+		[Token(Token = "0x6005FCD")]
+		[Address(RVA = "0xF609B0", Offset = "0xF5F9B0", Length = "0x597")]
+		private bool MoveNext()
+		{
+			return false;
+		}
+
+		bool IEnumerator.MoveNext()
+		{
+			//ILSpy generated this explicit interface implementation from .override directive in MoveNext
+			return this.MoveNext();
+		}
+
+		[DebuggerHidden]
+		[Token(Token = "0x6005FCF")]
+		[Address(RVA = "0xF60F50", Offset = "0xF5FF50", Length = "0x3E")]
+		void IEnumerator.Reset()
+		{
+		}
+	}
+
+	[CompilerGenerated]
+	[Token(Token = "0x2000BCB")]
+	private sealed class <SpawnFacilityClientsCoroutine>d__169 : IEnumerator<object>, IEnumerator, IDisposable
+	{
+		[Token(Token = "0x400596B")]
+		[FieldOffset(Offset = "0x10")]
+		private int <>1__state;
+
+		[Token(Token = "0x400596C")]
+		[FieldOffset(Offset = "0x18")]
+		private object <>2__current;
+
+		[Token(Token = "0x400596D")]
+		[FieldOffset(Offset = "0x20")]
+		public SceneHandler <>4__this;
+
+		[Token(Token = "0x400596E")]
+		[FieldOffset(Offset = "0x28")]
+		private int <i>5__2;
+
+		[Token(Token = "0x17000A32")]
+		object IEnumerator<object>.Current
+		{
+			[DebuggerHidden]
+			[Token(Token = "0x6005FD4")]
+			[Address(RVA = "0x6B1E50", Offset = "0x6B0E50", Length = "0x5")]
+			get
+			{
+				return null;
+			}
+		}
+
+		[Token(Token = "0x17000A33")]
+		object IEnumerator.Current
+		{
+			[DebuggerHidden]
+			[Token(Token = "0x6005FD6")]
+			[Address(RVA = "0x6B1E50", Offset = "0x6B0E50", Length = "0x5")]
+			get
+			{
+				return null;
+			}
+		}
+
+		[DebuggerHidden]
+		[Token(Token = "0x6005FD1")]
+		[Address(RVA = "0x6B1EA0", Offset = "0x6B0EA0", Length = "0x24")]
+		public <SpawnFacilityClientsCoroutine>d__169(int <>1__state)
+		{
+		}
+
+		[DebuggerHidden]
+		[Token(Token = "0x6005FD2")]
+		[Address(RVA = "0x6AAC60", Offset = "0x6A9C60", Length = "0x3")]
+		void IDisposable.Dispose()
+		{
+		}
+
+		[Token(Token = "0x6005FD3")]
+		[Address(RVA = "0xF60F90", Offset = "0xF5FF90", Length = "0x47A")]
+		private bool MoveNext()
+		{
+			return false;
+		}
+
+		bool IEnumerator.MoveNext()
+		{
+			//ILSpy generated this explicit interface implementation from .override directive in MoveNext
+			return this.MoveNext();
+		}
+
+		[DebuggerHidden]
+		[Token(Token = "0x6005FD5")]
+		[Address(RVA = "0xF61410", Offset = "0xF60410", Length = "0x3E")]
+		void IEnumerator.Reset()
+		{
+		}
+	}
+
+	[CompilerGenerated]
+	[Token(Token = "0x2000BCC")]
+	private sealed class <SpawnHarvestsCoroutine>d__166 : IEnumerator<object>, IEnumerator, IDisposable
+	{
+		[Token(Token = "0x400596F")]
+		[FieldOffset(Offset = "0x10")]
+		private int <>1__state;
+
+		[Token(Token = "0x4005970")]
+		[FieldOffset(Offset = "0x18")]
+		private object <>2__current;
+
+		[Token(Token = "0x4005971")]
+		[FieldOffset(Offset = "0x20")]
+		public SceneHandler <>4__this;
+
+		[Token(Token = "0x4005972")]
+		[FieldOffset(Offset = "0x28")]
+		private List<HarvestSpawn> <harvestsToSpawn>5__2;
+
+		[Token(Token = "0x4005973")]
+		[FieldOffset(Offset = "0x30")]
+		private int <totalHarvests>5__3;
+
+		[Token(Token = "0x4005974")]
+		[FieldOffset(Offset = "0x34")]
+		private int <i>5__4;
+
+		[Token(Token = "0x17000A34")]
+		object IEnumerator<object>.Current
+		{
+			[DebuggerHidden]
+			[Token(Token = "0x6005FDA")]
+			[Address(RVA = "0x6B1E50", Offset = "0x6B0E50", Length = "0x5")]
+			get
+			{
+				return null;
+			}
+		}
+
+		[Token(Token = "0x17000A35")]
+		object IEnumerator.Current
+		{
+			[DebuggerHidden]
+			[Token(Token = "0x6005FDC")]
+			[Address(RVA = "0x6B1E50", Offset = "0x6B0E50", Length = "0x5")]
+			get
+			{
+				return null;
+			}
+		}
+
+		[DebuggerHidden]
+		[Token(Token = "0x6005FD7")]
+		[Address(RVA = "0x6B1EA0", Offset = "0x6B0EA0", Length = "0x24")]
+		public <SpawnHarvestsCoroutine>d__166(int <>1__state)
+		{
+		}
+
+		[DebuggerHidden]
+		[Token(Token = "0x6005FD8")]
+		[Address(RVA = "0x6AAC60", Offset = "0x6A9C60", Length = "0x3")]
+		void IDisposable.Dispose()
+		{
+		}
+
+		[Token(Token = "0x6005FD9")]
+		[Address(RVA = "0xF61450", Offset = "0xF60450", Length = "0x299")]
+		private bool MoveNext()
+		{
+			return false;
+		}
+
+		bool IEnumerator.MoveNext()
+		{
+			//ILSpy generated this explicit interface implementation from .override directive in MoveNext
+			return this.MoveNext();
+		}
+
+		[DebuggerHidden]
+		[Token(Token = "0x6005FDB")]
+		[Address(RVA = "0xF616F0", Offset = "0xF606F0", Length = "0x3E")]
+		void IEnumerator.Reset()
+		{
+		}
+	}
+
+	[CompilerGenerated]
+	[Token(Token = "0x2000BCD")]
+	private sealed class <SpawnInteractClientsCoroutine>d__168 : IEnumerator<object>, IEnumerator, IDisposable
+	{
+		[Token(Token = "0x4005975")]
+		[FieldOffset(Offset = "0x10")]
+		private int <>1__state;
+
+		[Token(Token = "0x4005976")]
+		[FieldOffset(Offset = "0x18")]
+		private object <>2__current;
+
+		[Token(Token = "0x4005977")]
+		[FieldOffset(Offset = "0x20")]
+		public SceneHandler <>4__this;
+
+		[Token(Token = "0x4005978")]
+		[FieldOffset(Offset = "0x28")]
+		private <>c__DisplayClass168_0 <>8__1;
+
+		[Token(Token = "0x4005979")]
+		[FieldOffset(Offset = "0x30")]
+		private int <totalInteractClients>5__2;
+
+		[Token(Token = "0x17000A36")]
+		object IEnumerator<object>.Current
+		{
+			[DebuggerHidden]
+			[Token(Token = "0x6005FE0")]
+			[Address(RVA = "0x6B1E50", Offset = "0x6B0E50", Length = "0x5")]
+			get
+			{
+				return null;
+			}
+		}
+
+		[Token(Token = "0x17000A37")]
+		object IEnumerator.Current
+		{
+			[DebuggerHidden]
+			[Token(Token = "0x6005FE2")]
+			[Address(RVA = "0x6B1E50", Offset = "0x6B0E50", Length = "0x5")]
+			get
+			{
+				return null;
+			}
+		}
+
+		[DebuggerHidden]
+		[Token(Token = "0x6005FDD")]
+		[Address(RVA = "0x6B1EA0", Offset = "0x6B0EA0", Length = "0x24")]
+		public <SpawnInteractClientsCoroutine>d__168(int <>1__state)
+		{
+		}
+
+		[DebuggerHidden]
+		[Token(Token = "0x6005FDE")]
+		[Address(RVA = "0x6AAC60", Offset = "0x6A9C60", Length = "0x3")]
+		void IDisposable.Dispose()
+		{
+		}
+
+		[Token(Token = "0x6005FDF")]
+		[Address(RVA = "0xF61730", Offset = "0xF60730", Length = "0x7C8")]
+		private bool MoveNext()
+		{
+			return false;
+		}
+
+		bool IEnumerator.MoveNext()
+		{
+			//ILSpy generated this explicit interface implementation from .override directive in MoveNext
+			return this.MoveNext();
+		}
+
+		[DebuggerHidden]
+		[Token(Token = "0x6005FE1")]
+		[Address(RVA = "0xF61F00", Offset = "0xF60F00", Length = "0x3E")]
+		void IEnumerator.Reset()
+		{
+		}
+	}
+
+	[CompilerGenerated]
+	[Token(Token = "0x2000BCE")]
+	private sealed class <SpawnMonstersCoroutine>d__161 : IEnumerator<object>, IEnumerator, IDisposable
+	{
+		[Token(Token = "0x400597A")]
+		[FieldOffset(Offset = "0x10")]
+		private int <>1__state;
+
+		[Token(Token = "0x400597B")]
+		[FieldOffset(Offset = "0x18")]
+		private object <>2__current;
+
+		[Token(Token = "0x400597C")]
+		[FieldOffset(Offset = "0x20")]
+		public SceneHandler <>4__this;
+
+		[Token(Token = "0x400597D")]
+		[FieldOffset(Offset = "0x28")]
+		private <>c__DisplayClass161_0 <>8__1;
+
+		[Token(Token = "0x400597E")]
+		[FieldOffset(Offset = "0x30")]
+		private int <totalMonsters>5__2;
+
+		[Token(Token = "0x400597F")]
+		[FieldOffset(Offset = "0x34")]
+		private int <i>5__3;
+
+		[Token(Token = "0x17000A38")]
+		object IEnumerator<object>.Current
+		{
+			[DebuggerHidden]
+			[Token(Token = "0x6005FE6")]
+			[Address(RVA = "0x6B1E50", Offset = "0x6B0E50", Length = "0x5")]
+			get
+			{
+				return null;
+			}
+		}
+
+		[Token(Token = "0x17000A39")]
+		object IEnumerator.Current
+		{
+			[DebuggerHidden]
+			[Token(Token = "0x6005FE8")]
+			[Address(RVA = "0x6B1E50", Offset = "0x6B0E50", Length = "0x5")]
+			get
+			{
+				return null;
+			}
+		}
+
+		[DebuggerHidden]
+		[Token(Token = "0x6005FE3")]
+		[Address(RVA = "0x6B1EA0", Offset = "0x6B0EA0", Length = "0x24")]
+		public <SpawnMonstersCoroutine>d__161(int <>1__state)
+		{
+		}
+
+		[DebuggerHidden]
+		[Token(Token = "0x6005FE4")]
+		[Address(RVA = "0x6AAC60", Offset = "0x6A9C60", Length = "0x3")]
+		void IDisposable.Dispose()
+		{
+		}
+
+		[Token(Token = "0x6005FE5")]
+		[Address(RVA = "0xF61F40", Offset = "0xF60F40", Length = "0x3FE")]
+		private bool MoveNext()
+		{
+			return false;
+		}
+
+		bool IEnumerator.MoveNext()
+		{
+			//ILSpy generated this explicit interface implementation from .override directive in MoveNext
+			return this.MoveNext();
+		}
+
+		[DebuggerHidden]
+		[Token(Token = "0x6005FE7")]
+		[Address(RVA = "0xF62340", Offset = "0xF61340", Length = "0x3E")]
+		void IEnumerator.Reset()
+		{
+		}
+	}
+
+	[CompilerGenerated]
+	[Token(Token = "0x2000BCF")]
+	private sealed class <SpawnNPCsCoroutine>d__162 : IEnumerator<object>, IEnumerator, IDisposable
+	{
+		[Token(Token = "0x4005980")]
+		[FieldOffset(Offset = "0x10")]
+		private int <>1__state;
+
+		[Token(Token = "0x4005981")]
+		[FieldOffset(Offset = "0x18")]
+		private object <>2__current;
+
+		[Token(Token = "0x4005982")]
+		[FieldOffset(Offset = "0x20")]
+		public SceneHandler <>4__this;
+
+		[Token(Token = "0x4005983")]
+		[FieldOffset(Offset = "0x28")]
+		private int <totalNPCs>5__2;
+
+		[Token(Token = "0x4005984")]
+		[FieldOffset(Offset = "0x2C")]
+		private int <i>5__3;
+
+		[Token(Token = "0x17000A3A")]
+		object IEnumerator<object>.Current
+		{
+			[DebuggerHidden]
+			[Token(Token = "0x6005FEC")]
+			[Address(RVA = "0x6B1E50", Offset = "0x6B0E50", Length = "0x5")]
+			get
+			{
+				return null;
+			}
+		}
+
+		[Token(Token = "0x17000A3B")]
+		object IEnumerator.Current
+		{
+			[DebuggerHidden]
+			[Token(Token = "0x6005FEE")]
+			[Address(RVA = "0x6B1E50", Offset = "0x6B0E50", Length = "0x5")]
+			get
+			{
+				return null;
+			}
+		}
+
+		[DebuggerHidden]
+		[Token(Token = "0x6005FE9")]
+		[Address(RVA = "0x6B1EA0", Offset = "0x6B0EA0", Length = "0x24")]
+		public <SpawnNPCsCoroutine>d__162(int <>1__state)
+		{
+		}
+
+		[DebuggerHidden]
+		[Token(Token = "0x6005FEA")]
+		[Address(RVA = "0x6AAC60", Offset = "0x6A9C60", Length = "0x3")]
+		void IDisposable.Dispose()
+		{
+		}
+
+		[Token(Token = "0x6005FEB")]
+		[Address(RVA = "0xF62380", Offset = "0xF61380", Length = "0x958")]
+		private bool MoveNext()
+		{
+			return false;
+		}
+
+		bool IEnumerator.MoveNext()
+		{
+			//ILSpy generated this explicit interface implementation from .override directive in MoveNext
+			return this.MoveNext();
+		}
+
+		[DebuggerHidden]
+		[Token(Token = "0x6005FED")]
+		[Address(RVA = "0xF62CE0", Offset = "0xF61CE0", Length = "0x3E")]
+		void IEnumerator.Reset()
+		{
+		}
+	}
+
+	[CompilerGenerated]
+	[Token(Token = "0x2000BD0")]
+	private sealed class <SpawnPokerTablesCoroutine>d__164 : IEnumerator<object>, IEnumerator, IDisposable
+	{
+		[Token(Token = "0x4005985")]
+		[FieldOffset(Offset = "0x10")]
+		private int <>1__state;
+
+		[Token(Token = "0x4005986")]
+		[FieldOffset(Offset = "0x18")]
+		private object <>2__current;
+
+		[Token(Token = "0x4005987")]
+		[FieldOffset(Offset = "0x20")]
+		public SceneHandler <>4__this;
+
+		[Token(Token = "0x4005988")]
+		[FieldOffset(Offset = "0x28")]
+		private int <i>5__2;
+
+		[Token(Token = "0x17000A3C")]
+		object IEnumerator<object>.Current
+		{
+			[DebuggerHidden]
+			[Token(Token = "0x6005FF2")]
+			[Address(RVA = "0x6B1E50", Offset = "0x6B0E50", Length = "0x5")]
+			get
+			{
+				return null;
+			}
+		}
+
+		[Token(Token = "0x17000A3D")]
+		object IEnumerator.Current
+		{
+			[DebuggerHidden]
+			[Token(Token = "0x6005FF4")]
+			[Address(RVA = "0x6B1E50", Offset = "0x6B0E50", Length = "0x5")]
+			get
+			{
+				return null;
+			}
+		}
+
+		[DebuggerHidden]
+		[Token(Token = "0x6005FEF")]
+		[Address(RVA = "0x6B1EA0", Offset = "0x6B0EA0", Length = "0x24")]
+		public <SpawnPokerTablesCoroutine>d__164(int <>1__state)
+		{
+		}
+
+		[DebuggerHidden]
+		[Token(Token = "0x6005FF0")]
+		[Address(RVA = "0x6AAC60", Offset = "0x6A9C60", Length = "0x3")]
+		void IDisposable.Dispose()
+		{
+		}
+
+		[Token(Token = "0x6005FF1")]
+		[Address(RVA = "0xF62D20", Offset = "0xF61D20", Length = "0x36D")]
+		private bool MoveNext()
+		{
+			return false;
+		}
+
+		bool IEnumerator.MoveNext()
+		{
+			//ILSpy generated this explicit interface implementation from .override directive in MoveNext
+			return this.MoveNext();
+		}
+
+		[DebuggerHidden]
+		[Token(Token = "0x6005FF3")]
+		[Address(RVA = "0xF63090", Offset = "0xF62090", Length = "0x3E")]
+		void IEnumerator.Reset()
+		{
+		}
+	}
+
+	[CompilerGenerated]
+	[Token(Token = "0x2000BD1")]
+	private sealed class <SpawnStoragesCoroutine>d__163 : IEnumerator<object>, IEnumerator, IDisposable
+	{
+		[Token(Token = "0x4005989")]
+		[FieldOffset(Offset = "0x10")]
+		private int <>1__state;
+
+		[Token(Token = "0x400598A")]
+		[FieldOffset(Offset = "0x18")]
+		private object <>2__current;
+
+		[Token(Token = "0x400598B")]
+		[FieldOffset(Offset = "0x20")]
+		public SceneHandler <>4__this;
+
+		[Token(Token = "0x400598C")]
+		[FieldOffset(Offset = "0x28")]
+		private List<StorageSpawn> <allStoragesToSpawn>5__2;
+
+		[Token(Token = "0x400598D")]
+		[FieldOffset(Offset = "0x30")]
+		private int <totalStorages>5__3;
+
+		[Token(Token = "0x400598E")]
+		[FieldOffset(Offset = "0x34")]
+		private int <i>5__4;
+
+		[Token(Token = "0x17000A3E")]
+		object IEnumerator<object>.Current
+		{
+			[DebuggerHidden]
+			[Token(Token = "0x6005FF8")]
+			[Address(RVA = "0x6B1E50", Offset = "0x6B0E50", Length = "0x5")]
+			get
+			{
+				return null;
+			}
+		}
+
+		[Token(Token = "0x17000A3F")]
+		object IEnumerator.Current
+		{
+			[DebuggerHidden]
+			[Token(Token = "0x6005FFA")]
+			[Address(RVA = "0x6B1E50", Offset = "0x6B0E50", Length = "0x5")]
+			get
+			{
+				return null;
+			}
+		}
+
+		[DebuggerHidden]
+		[Token(Token = "0x6005FF5")]
+		[Address(RVA = "0x6B1EA0", Offset = "0x6B0EA0", Length = "0x24")]
+		public <SpawnStoragesCoroutine>d__163(int <>1__state)
+		{
+		}
+
+		[DebuggerHidden]
+		[Token(Token = "0x6005FF6")]
+		[Address(RVA = "0x6AAC60", Offset = "0x6A9C60", Length = "0x3")]
+		void IDisposable.Dispose()
+		{
+		}
+
+		[Token(Token = "0x6005FF7")]
+		[Address(RVA = "0xF630D0", Offset = "0xF620D0", Length = "0x6CA")]
+		private bool MoveNext()
+		{
+			return false;
+		}
+
+		bool IEnumerator.MoveNext()
+		{
+			//ILSpy generated this explicit interface implementation from .override directive in MoveNext
+			return this.MoveNext();
+		}
+
+		[DebuggerHidden]
+		[Token(Token = "0x6005FF9")]
+		[Address(RVA = "0xF637A0", Offset = "0xF627A0", Length = "0x3E")]
+		void IEnumerator.Reset()
+		{
+		}
+	}
+
+	[CompilerGenerated]
+	[Token(Token = "0x2000BD2")]
+	private sealed class <SplitTags>d__116 : IEnumerable<string>, IEnumerable, IEnumerator<string>, IEnumerator, IDisposable
+	{
+		[Token(Token = "0x400598F")]
+		[FieldOffset(Offset = "0x10")]
+		private int <>1__state;
+
+		[Token(Token = "0x4005990")]
+		[FieldOffset(Offset = "0x18")]
+		private string <>2__current;
+
+		[Token(Token = "0x4005991")]
+		[FieldOffset(Offset = "0x20")]
+		private int <>l__initialThreadId;
+
+		[Token(Token = "0x4005992")]
+		[FieldOffset(Offset = "0x24")]
+		private FixedString512Bytes joined;
+
+		[Token(Token = "0x4005993")]
+		[FieldOffset(Offset = "0x224")]
+		public FixedString512Bytes <>3__joined;
+
+		[Token(Token = "0x4005994")]
+		[FieldOffset(Offset = "0x428")]
+		private string[] <>7__wrap1;
+
+		[Token(Token = "0x4005995")]
+		[FieldOffset(Offset = "0x430")]
+		private int <>7__wrap2;
+
+		[Token(Token = "0x17000A40")]
+		string IEnumerator<string>.Current
+		{
+			[DebuggerHidden]
+			[Token(Token = "0x6005FFE")]
+			[Address(RVA = "0x6B1E50", Offset = "0x6B0E50", Length = "0x5")]
+			get
+			{
+				return null;
+			}
+		}
+
+		[Token(Token = "0x17000A41")]
+		object IEnumerator.Current
+		{
+			[DebuggerHidden]
+			[Token(Token = "0x6006000")]
+			[Address(RVA = "0x6B1E50", Offset = "0x6B0E50", Length = "0x5")]
+			get
+			{
+				return null;
+			}
+		}
+
+		[DebuggerHidden]
+		[Token(Token = "0x6005FFB")]
+		[Address(RVA = "0x6D4300", Offset = "0x6D3300", Length = "0x2E")]
+		public <SplitTags>d__116(int <>1__state)
+		{
+		}
+
+		[DebuggerHidden]
+		[Token(Token = "0x6005FFC")]
+		[Address(RVA = "0x6AAC60", Offset = "0x6A9C60", Length = "0x3")]
+		void IDisposable.Dispose()
+		{
+		}
+
+		[Token(Token = "0x6005FFD")]
+		[Address(RVA = "0xF637E0", Offset = "0xF627E0", Length = "0x121")]
+		private bool MoveNext()
+		{
+			return false;
+		}
+
+		bool IEnumerator.MoveNext()
+		{
+			//ILSpy generated this explicit interface implementation from .override directive in MoveNext
+			return this.MoveNext();
+		}
+
+		[DebuggerHidden]
+		[Token(Token = "0x6005FFF")]
+		[Address(RVA = "0xF63A80", Offset = "0xF62A80", Length = "0x3E")]
+		void IEnumerator.Reset()
+		{
+		}
+
+		[DebuggerHidden]
+		[Token(Token = "0x6006001")]
+		[Address(RVA = "0xF63910", Offset = "0xF62910", Length = "0x16C")]
+		IEnumerator<string> IEnumerable<string>.GetEnumerator()
+		{
+			return null;
+		}
+
+		[DebuggerHidden]
+		[Token(Token = "0x6006002")]
+		[Address(RVA = "0xF63910", Offset = "0xF62910", Length = "0x16C")]
+		IEnumerator IEnumerable.GetEnumerator()
+		{
+			return null;
+		}
+	}
+
+	[Token(Token = "0x40058A9")]
+	[FieldOffset(Offset = "0x88")]
+	public bool Indoors;
+
+	[Token(Token = "0x40058AA")]
+	[FieldOffset(Offset = "0x8C")]
+	public Color IndoorTint;
+
+	[Token(Token = "0x40058AB")]
+	[FieldOffset(Offset = "0x9C")]
+	public bool Transport;
+
+	[Token(Token = "0x40058AC")]
+	[FieldOffset(Offset = "0x9D")]
+	public bool SafeZone;
+
+	[Token(Token = "0x40058AD")]
+	[FieldOffset(Offset = "0x9E")]
+	public bool IgnoreAreaPopUp;
+
+	[Token(Token = "0x40058AE")]
+	[FieldOffset(Offset = "0xA0")]
+	public float ZLevel;
+
+	[Token(Token = "0x40058AF")]
+	[FieldOffset(Offset = "0xA4")]
+	public Areas.Scene Scene;
+
+	[Token(Token = "0x40058B0")]
+	[FieldOffset(Offset = "0xA8")]
+	public Kingdom Kingdom;
+
+	[Token(Token = "0x40058B1")]
+	[FieldOffset(Offset = "0xAC")]
+	public Biome Biome;
+
+	[Tooltip("Override the kingdom weather for this scene. When enabled, this scene always uses the specified weather.")]
+	[Token(Token = "0x40058B2")]
+	[FieldOffset(Offset = "0xB0")]
+	public bool OverrideWeather;
+
+	[Token(Token = "0x40058B3")]
+	[FieldOffset(Offset = "0xB4")]
+	public Weathers WeatherOverride;
+
+	[Tooltip("If set, this scene acts as part of the parent scene - activates/deactivates together, uses parent's NavMesh")]
+	[Token(Token = "0x40058B4")]
+	[FieldOffset(Offset = "0xB8")]
+	public Areas.Scene NavMeshParent;
+
+	[Tooltip("Every scene that is part of the SAME LOGICAL PLACE as this one — e.g. WildwoodForestPartIVa through IVe are all 'Part IV' to a player. Quest and event scene locks ask this list whether the player is 'here'.\n\nThis exists because NavMeshParent cannot answer that question: an area too large to bake as one NavMesh gets split across SEVERAL parents (Part IV is IVa/IVb/IVc under IVa, and IVd under IVe), so nav grouping reports one place as two.\n\nNOT MapConglomerates — that is map scope (every scene drawn on the Wildwood map) and is far too broad to lock a quest to.\n\nMembership is symmetric: listing the other scene on either handler is enough. Leave empty for a scene whose NavMesh group already matches its logical area — the nav group is still honoured as a fallback.")]
+	[Token(Token = "0x40058B5")]
+	[FieldOffset(Offset = "0xC0")]
+	public List<Areas.Scene> SceneConglomerate;
+
+	[Tooltip("Marks this scene as a wave-survival arena. When a player enters, ArenaManager runs the waves.")]
+	[Token(Token = "0x40058B6")]
+	[FieldOffset(Offset = "0xC8")]
+	public bool IsArena;
+
+	[Tooltip("Which ArenaDefinition (by ArenaType) drives this scene's waves.")]
+	[Token(Token = "0x40058B7")]
+	[FieldOffset(Offset = "0xCC")]
+	public ArenaType ArenaMode;
+
+	[Token(Token = "0x40058B8")]
+	[FieldOffset(Offset = "0xD0")]
+	private bool _arenaRunning;
+
+	[Token(Token = "0x40058B9")]
+	[FieldOffset(Offset = "0xD4")]
+	public EventReference Music;
+
+	[Token(Token = "0x40058BA")]
+	[FieldOffset(Offset = "0xE4")]
+	public EventReference Ambience;
+
+	[Token(Token = "0x40058BB")]
+	[FieldOffset(Offset = "0xF8")]
+	public List<Areas.Scene> AudioConglomerates;
+
+	[Token(Token = "0x40058BC")]
+	[FieldOffset(Offset = "0x100")]
+	public bool MapIndoors;
+
+	[Token(Token = "0x40058BD")]
+	[FieldOffset(Offset = "0x108")]
+	public MapDataAsset Map;
+
+	[Token(Token = "0x40058BE")]
+	[FieldOffset(Offset = "0x110")]
+	public List<Areas.Scene> MapConglomerates;
+
+	[Token(Token = "0x40058BF")]
+	[FieldOffset(Offset = "0x118")]
+	public Vector2 IndoorMapMiddleCoordinates;
+
+	[Token(Token = "0x40058C0")]
+	[FieldOffset(Offset = "0x120")]
+	public float IndoorLightLevel;
+
+	[Token(Token = "0x40058C1")]
+	[FieldOffset(Offset = "0x124")]
+	public float EnvironmentDayLevel;
+
+	[Token(Token = "0x40058C2")]
+	[FieldOffset(Offset = "0x128")]
+	public float EnvironmentNightLevel;
+
+	[Token(Token = "0x40058C3")]
+	[FieldOffset(Offset = "0x12C")]
+	public float SunDayLevel;
+
+	[Token(Token = "0x40058C4")]
+	[FieldOffset(Offset = "0x130")]
+	public float SunNightLevel;
+
+	[Token(Token = "0x40058C5")]
+	[FieldOffset(Offset = "0x138")]
+	public List<MonsterSpawn> MonstersInScene;
+
+	[Token(Token = "0x40058C6")]
+	[FieldOffset(Offset = "0x140")]
+	public List<NPCSpawn> NPCsInScene;
+
+	[Token(Token = "0x40058C7")]
+	[FieldOffset(Offset = "0x148")]
+	public List<StorageSpawn> StoragesInScene;
+
+	[Token(Token = "0x40058C8")]
+	[FieldOffset(Offset = "0x150")]
+	public List<HarvestSpawn> HarvestsInScene;
+
+	[Token(Token = "0x40058C9")]
+	[FieldOffset(Offset = "0x158")]
+	public List<DestructibleSpawn> DestructiblesInScene;
+
+	[Token(Token = "0x40058CA")]
+	[FieldOffset(Offset = "0x160")]
+	public List<InteractClientSpawn> InteractClientsInScene;
+
+	[Token(Token = "0x40058CB")]
+	[FieldOffset(Offset = "0x168")]
+	public List<FacilityClientSpawn> FacilityClientsInScene;
+
+	[Token(Token = "0x40058CC")]
+	[FieldOffset(Offset = "0x170")]
+	public List<PokerTableSpawn> PokerTablesInScene;
+
+	[Token(Token = "0x40058CD")]
+	[FieldOffset(Offset = "0x178")]
+	public List<EventData> EventsInScene;
+
+	[HideInInspector]
+	[Token(Token = "0x40058CE")]
+	[FieldOffset(Offset = "0x180")]
+	public NetworkVariable<bool> Active;
+
+	[Token(Token = "0x40058CF")]
+	[FieldOffset(Offset = "0x188")]
+	public NetworkList<ulong> PlayersInScene;
+
+	[Token(Token = "0x40058D0")]
+	[FieldOffset(Offset = "0x190")]
+	protected List<FixedString64Bytes> _corpsesAlreadySpawned;
+
+	[Token(Token = "0x40058D1")]
+	[FieldOffset(Offset = "0x198")]
+	protected List<NetworkObject> _monstersSpawned;
+
+	[Token(Token = "0x40058D2")]
+	[FieldOffset(Offset = "0x1A0")]
+	protected List<NetworkObject> _npcsSpawned;
+
+	[Token(Token = "0x40058D3")]
+	[FieldOffset(Offset = "0x1A8")]
+	protected List<NetworkObject> _storagesSpawned;
+
+	[Token(Token = "0x40058D4")]
+	[FieldOffset(Offset = "0x1B0")]
+	protected List<NetworkObject> _corpsesSpawned;
+
+	[Token(Token = "0x40058D5")]
+	[FieldOffset(Offset = "0x1B8")]
+	protected List<NetworkObject> _harvestsSpawned;
+
+	[Token(Token = "0x40058D6")]
+	[FieldOffset(Offset = "0x1C0")]
+	protected List<NetworkObject> _destructiblesSpawned;
+
+	[Token(Token = "0x40058D7")]
+	[FieldOffset(Offset = "0x1C8")]
+	public List<NetworkObject> _interactClientsSpawned;
+
+	[Token(Token = "0x40058D8")]
+	[FieldOffset(Offset = "0x1D0")]
+	public List<NetworkObject> _facilityClientsSpawned;
+
+	[Token(Token = "0x40058D9")]
+	[FieldOffset(Offset = "0x1D8")]
+	protected List<NetworkObject> _pokerTablesSpawned;
+
+	[Token(Token = "0x40058DA")]
+	[FieldOffset(Offset = "0x1E0")]
+	protected Coroutine _spawnMonstersCoroutine;
+
+	[Token(Token = "0x40058DB")]
+	[FieldOffset(Offset = "0x1E8")]
+	protected Coroutine _spawnNPCsCoroutine;
+
+	[Token(Token = "0x40058DC")]
+	[FieldOffset(Offset = "0x1F0")]
+	protected Coroutine _spawnStoragesCoroutine;
+
+	[Token(Token = "0x40058DD")]
+	[FieldOffset(Offset = "0x1F8")]
+	protected Coroutine _spawnCorpsesCoroutine;
+
+	[Token(Token = "0x40058DE")]
+	[FieldOffset(Offset = "0x200")]
+	protected Coroutine _spawnHarvestsCoroutine;
+
+	[Token(Token = "0x40058DF")]
+	[FieldOffset(Offset = "0x208")]
+	protected Coroutine _spawnDestructiblesCoroutine;
+
+	[Token(Token = "0x40058E0")]
+	[FieldOffset(Offset = "0x210")]
+	protected Coroutine _spawnInteractClientsCoroutine;
+
+	[Token(Token = "0x40058E1")]
+	[FieldOffset(Offset = "0x218")]
+	protected Coroutine _spawnFacilityClientsCoroutine;
+
+	[Token(Token = "0x40058E2")]
+	[FieldOffset(Offset = "0x220")]
+	protected Coroutine _spawnPokerTablesCoroutine;
+
+	[Token(Token = "0x40058E3")]
+	[FieldOffset(Offset = "0x228")]
+	protected Coroutine _despawnCoroutine;
+
+	[CompilerGenerated]
+	[Token(Token = "0x40058E4")]
+	private static SceneHandlerChangeDelegate m_handlerChange;
+
+	[Token(Token = "0x40058E5")]
+	[FieldOffset(Offset = "0x230")]
+	private readonly Dictionary<InGameEvent, HashSet<InGameEvent>> _despawnDependents;
+
+	[Token(Token = "0x40058E6")]
+	[FieldOffset(Offset = "0x238")]
+	private readonly Dictionary<string, ActiveConversation> _activeConversations;
+
+	[Token(Token = "0x40058E7")]
+	private const float LateJoinGrace = 5f;
+
+	[Token(Token = "0x40058E8")]
+	[FieldOffset(Offset = "0x240")]
+	private readonly Dictionary<ulong, Coroutine> _pendingNpcDespawns;
+
+	[Token(Token = "0x40058E9")]
+	[FieldOffset(Offset = "0x248")]
+	private readonly HashSet<ulong> _fadingNpcs;
+
+	[Token(Token = "0x40058EA")]
+	[FieldOffset(Offset = "0x250")]
+	private readonly HashSet<ulong> _clientFadingNpcs;
+
+	[Token(Token = "0x40058EB")]
+	[FieldOffset(Offset = "0x258")]
+	private readonly HashSet<InGameEvent> _activatedEvents;
+
+	[Token(Token = "0x40058EC")]
+	[FieldOffset(Offset = "0x260")]
+	private readonly List<Coroutine> _eventCoroutines;
+
+	[Token(Token = "0x40058ED")]
+	[FieldOffset(Offset = "0x268")]
+	private bool _persistedPetDropsSpawned;
+
+	[Token(Token = "0x14000075")]
+	public static event SceneHandlerChangeDelegate handlerChange
+	{
+		[CompilerGenerated]
+		[Token(Token = "0x6005EC2")]
+		[Address(RVA = "0xF3EBD0", Offset = "0xF3DBD0", Length = "0xB4")]
+		add
+		{
+		}
+		[CompilerGenerated]
+		[Token(Token = "0x6005EC3")]
+		[Address(RVA = "0xF3EC90", Offset = "0xF3DC90", Length = "0xB4")]
+		remove
+		{
+		}
+	}
+
+	[Token(Token = "0x6005EC4")]
+	[Address(RVA = "0xF2D9F0", Offset = "0xF2C9F0", Length = "0xCC")]
+	protected void Awake()
+	{
+	}
+
+	[Token(Token = "0x6005EC5")]
+	[Address(RVA = "0xF3C3C0", Offset = "0xF3B3C0", Length = "0xEC")]
+	protected void Start()
+	{
+	}
+
+	[Token(Token = "0x6005EC6")]
+	[Address(RVA = "0xF35760", Offset = "0xF34760", Length = "0x129")]
+	public override void OnNetworkSpawn()
+	{
+	}
+
+	[Token(Token = "0x6005EC7")]
+	[Address(RVA = "0xF355B0", Offset = "0xF345B0", Length = "0x1A4")]
+	private void OnEnable()
+	{
+	}
+
+	[Token(Token = "0x6005EC8")]
+	[Address(RVA = "0xF35470", Offset = "0xF34470", Length = "0x133")]
+	private void OnDisable()
+	{
+	}
+
+	[Token(Token = "0x6005EC9")]
+	[Address(RVA = "0xF3C960", Offset = "0xF3B960", Length = "0x294")]
+	protected void Update()
+	{
+	}
+
+	[Token(Token = "0x6005ECA")]
+	[Address(RVA = "0xF2B500", Offset = "0xF2A500", Length = "0x91")]
+	private void ActivateScene()
+	{
+	}
+
+	[Token(Token = "0x6005ECB")]
+	[Address(RVA = "0xF2EE40", Offset = "0xF2DE40", Length = "0x1AF")]
+	private void DeactivateScene()
+	{
+	}
+
+	[Token(Token = "0x6005ECC")]
+	[Address(RVA = "0xF33A90", Offset = "0xF32A90", Length = "0x120")]
+	private void HandleMonsterDeath(Damage damage, Monster monster)
+	{
+	}
+
+	[IteratorStateMachine(typeof(<DespawnEventMonsterAfterCorpse>d__73))]
+	[Token(Token = "0x6005ECD")]
+	[Address(RVA = "0xF303D0", Offset = "0xF2F3D0", Length = "0x8A")]
+	private IEnumerator DespawnEventMonsterAfterCorpse(Monster monster)
+	{
+		return null;
+	}
+
+	[Token(Token = "0x6005ECE")]
+	[Address(RVA = "0xF39570", Offset = "0xF38570", Length = "0x82")]
+	public void SceneHandlerOnClientDisconnect(ulong clientId)
+	{
+	}
+
+	[Token(Token = "0x6005ECF")]
+	[Address(RVA = "0xF2E9E0", Offset = "0xF2D9E0", Length = "0x2D1")]
+	private void DeactivateEventCheck()
+	{
+	}
+
+	[Token(Token = "0x6005ED0")]
+	[Address(RVA = "0xF2B5A0", Offset = "0xF2A5A0", Length = "0xF1")]
+	public void AddCorpseUUIDToSceneHandler(FixedString64Bytes uuid)
+	{
+	}
+
+	[Token(Token = "0x6005ED1")]
+	[Address(RVA = "0xF32C30", Offset = "0xF31C30", Length = "0x55")]
+	public void FireHandlerChange()
+	{
+	}
+
+	[ServerRpc(RequireOwnership = false, Delivery = RpcDelivery.Reliable)]
+	[Token(Token = "0x6005ED2")]
+	[Address(RVA = "0xF2C4C0", Offset = "0xF2B4C0", Length = "0x45A")]
+	public void AddPlayerServerRpc(ulong playerNetworkId)
+	{
+	}
+
+	[ServerRpc(RequireOwnership = false, Delivery = RpcDelivery.Reliable)]
+	[Token(Token = "0x6005ED3")]
+	[Address(RVA = "0xF37000", Offset = "0xF36000", Length = "0x169")]
+	public void RemovePlayerServerRpc(ulong playerNetworkId)
+	{
+	}
+
+	[Token(Token = "0x6005ED4")]
+	[Address(RVA = "0xF3C880", Offset = "0xF3B880", Length = "0x4D")]
+	public void UpdateMapData(Vector2 newScale, Vector2 newOffset)
+	{
+	}
+
+	[Token(Token = "0x6005ED5")]
+	[Address(RVA = "0xF33720", Offset = "0xF32720", Length = "0x17")]
+	public Areas.Scene GetNavMeshParentScene()
+	{
+		return default(Areas.Scene);
+	}
+
+	[Token(Token = "0x6005ED6")]
+	[Address(RVA = "0xF336C0", Offset = "0xF326C0", Length = "0x60")]
+	public SceneHandler GetNavMeshParentHandler()
+	{
+		return null;
+	}
+
+	[Token(Token = "0x6005ED7")]
+	[Address(RVA = "0xF33430", Offset = "0xF32430", Length = "0x234")]
+	public List<Areas.Scene> GetAllRelatedScenes()
+	{
+		return null;
+	}
+
+	[Token(Token = "0x6005ED8")]
+	[Address(RVA = "0xF33250", Offset = "0xF32250", Length = "0x1D3")]
+	public List<SceneHandler> GetAllRelatedHandlers()
+	{
+		return null;
+	}
+
+	[Token(Token = "0x6005ED9")]
+	[Address(RVA = "0xF33BC0", Offset = "0xF32BC0", Length = "0x151")]
+	public bool HasPlayersInGroup()
+	{
+		return false;
+	}
+
+	[Token(Token = "0x6005EDA")]
+	[Address(RVA = "0xF34040", Offset = "0xF33040", Length = "0xB")]
+	public bool IsChildScene()
+	{
+		return false;
+	}
+
+	[Token(Token = "0x6005EDB")]
+	[Address(RVA = "0xF34050", Offset = "0xF33050", Length = "0x1B3")]
+	public bool IsParentScene()
+	{
+		return false;
+	}
+
+	[Token(Token = "0x6005EDC")]
+	[Address(RVA = "0xF396B0", Offset = "0xF386B0", Length = "0x247")]
+	protected void SetNetworkObjectInvisibleToHost(GameObject obj)
+	{
+	}
+
+	[Token(Token = "0x6005EDD")]
+	[Address(RVA = "0xF328A0", Offset = "0xF318A0", Length = "0x196")]
+	protected StorageSpawn FindMatchingStorageInScene(StorageData storage)
+	{
+		return null;
+	}
+
+	[Token(Token = "0x6005EDE")]
+	[Address(RVA = "0xF3C8D0", Offset = "0xF3B8D0", Length = "0x83")]
+	protected void UpdateStorageData(StorageData storage, StorageSpawn store)
+	{
+	}
+
+	[Token(Token = "0x6005EDF")]
+	[Address(RVA = "0xF2E670", Offset = "0xF2D670", Length = "0x1B2")]
+	protected StorageData CreateNewStorageData(StorageSpawn store)
+	{
+		return null;
+	}
+
+	[Token(Token = "0x6005EE0")]
+	[Address(RVA = "0xF390B0", Offset = "0xF380B0", Length = "0x4B6")]
+	public void RespawnDeadMonstersNearPosition(Vector2 position)
+	{
+	}
+
+	[Token(Token = "0x6005EE1")]
+	[Address(RVA = "0xF33A80", Offset = "0xF32A80", Length = "0x8")]
+	public List<NetworkObject> GetSpawnedHarvests()
+	{
+		return null;
+	}
+
+	[Token(Token = "0x6005EE2")]
+	[Address(RVA = "0xF36F70", Offset = "0xF35F70", Length = "0x82")]
+	public void RemoveHarvestFromSpawnList(NetworkObject networkObject)
+	{
+	}
+
+	[IteratorStateMachine(typeof(<GetMapDataAssets>d__95))]
+	[Token(Token = "0x6005EE3")]
+	[Address(RVA = "0xF33670", Offset = "0xF32670", Length = "0x4A")]
+	private IEnumerable<MapDataAsset> GetMapDataAssets()
+	{
+		return null;
+	}
+
+	[ServerRpc]
+	[Token(Token = "0x6005EE4")]
+	[Address(RVA = "0xF31490", Offset = "0xF30490", Length = "0x34B")]
+	public void DestroyHarvestedItemsServerRpc(Areas.Scene scene)
+	{
+	}
+
+	[ClientRpc]
+	[Token(Token = "0x6005EE5")]
+	[Address(RVA = "0xF311A0", Offset = "0xF301A0", Length = "0x2EA")]
+	public void DestroyHarvestedItemsClientRpc(HarvestRespawnsList harvestRespawns)
+	{
+	}
+
+	[ServerRpc(RequireOwnership = false)]
+	[Token(Token = "0x6005EE6")]
+	[Address(RVA = "0xF37170", Offset = "0xF36170", Length = "0x1DE5")]
+	public void RequestMonsterCutsceneServerRpc(int monsterType, MonsterCutsceneSettings settings, ServerRpcParams rpc = default(ServerRpcParams))
+	{
+	}
+
+	[ClientRpc]
+	[Token(Token = "0x6005EE7")]
+	[Address(RVA = "0xF35F40", Offset = "0xF34F40", Length = "0x66D")]
+	private void PlayMonsterCutsceneClientRpc(NetworkObjectReference monsterRef, MonsterCutsceneSettings settings)
+	{
+	}
+
+	[ClientRpc]
+	[Token(Token = "0x6005EE8")]
+	[Address(RVA = "0xF35890", Offset = "0xF34890", Length = "0x605")]
+	private void OpenDialogueClientRpc(NetworkObjectReference npcRef, FixedString64Bytes cutsceneId, ClientRpcParams rpcParams = default(ClientRpcParams))
+	{
+	}
+
+	[ClientRpc]
+	[Token(Token = "0x6005EE9")]
+	[Address(RVA = "0xF2DD90", Offset = "0xF2CD90", Length = "0x276")]
+	private void CloseDialogueClientRpc(ClientRpcParams rpcParams = default(ClientRpcParams))
+	{
+	}
+
+	[Token(Token = "0x6005EEA")]
+	[Address(RVA = "0xF2D690", Offset = "0xF2C690", Length = "0x350")]
+	private static bool AwaitingLateJoin(ActiveConversation live)
+	{
+		return false;
+	}
+
+	[Token(Token = "0x6005EEB")]
+	[Address(RVA = "0xF34310", Offset = "0xF33310", Length = "0x66E")]
+	private void JoinLateParticipant(string id, ActiveConversation live, ulong senderId, MonsterCutsceneSettings settings)
+	{
+	}
+
+	[IteratorStateMachine(typeof(<ConversationEncounter>d__107))]
+	[Token(Token = "0x6005EEC")]
+	[Address(RVA = "0xF2E590", Offset = "0xF2D590", Length = "0xD3")]
+	private IEnumerator ConversationEncounter(string id, List<ulong> participants, NetworkObject npcObj, NetworkObject monsterObj, MonsterCutsceneSettings settings)
+	{
+		return null;
+	}
+
+	[Token(Token = "0x6005EED")]
+	[Address(RVA = "0xF34210", Offset = "0xF33210", Length = "0xF6")]
+	private bool IsPlayerInConversation(ulong clientId)
+	{
+		return false;
+	}
+
+	[Token(Token = "0x6005EEE")]
+	[Address(RVA = "0xF3C7C0", Offset = "0xF3B7C0", Length = "0x9A")]
+	private static ClientRpcParams ToClientRpcParams(List<ulong> clientIds)
+	{
+		return default(ClientRpcParams);
+	}
+
+	[Token(Token = "0x6005EEF")]
+	[Address(RVA = "0xF39600", Offset = "0xF38600", Length = "0xAC")]
+	private static ClientRpcParams SenderOnly(ulong clientId)
+	{
+		return default(ClientRpcParams);
+	}
+
+	[ClientRpc]
+	[Token(Token = "0x6005EF0")]
+	[Address(RVA = "0xF36C80", Offset = "0xF35C80", Length = "0x1A4")]
+	private void ReArmColliderClientRpc(FixedString64Bytes cutsceneId, ClientRpcParams rpcParams = default(ClientRpcParams))
+	{
+	}
+
+	[IteratorStateMachine(typeof(<AggroAfterDelay>d__112))]
+	[Token(Token = "0x6005EF1")]
+	[Address(RVA = "0xF2C920", Offset = "0xF2B920", Length = "0xAE")]
+	private IEnumerator AggroAfterDelay(Monster monster, float delay, float postAggroRange = 0f)
+	{
+		return null;
+	}
+
+	[Token(Token = "0x6005EF2")]
+	[Address(RVA = "0xF2C9D0", Offset = "0xF2B9D0", Length = "0x806")]
+	private void AggroMonster(Monster monster, float postAggroRange = 0f)
+	{
+	}
+
+	[Token(Token = "0x6005EF3")]
+	[Address(RVA = "0xF351E0", Offset = "0xF341E0", Length = "0x28A")]
+	private Player NearestPlayerInScene(Vector3 pos)
+	{
+		return null;
+	}
+
+	[Token(Token = "0x6005EF4")]
+	[Address(RVA = "0xF34980", Offset = "0xF33980", Length = "0x85D")]
+	private bool MeetsTagRequirements(Player player, MonsterCutsceneSettings s)
+	{
+		return false;
+	}
+
+	[IteratorStateMachine(typeof(<SplitTags>d__116))]
+	[Token(Token = "0x6005EF5")]
+	[Address(RVA = "0xF3BF60", Offset = "0xF3AF60", Length = "0xC6")]
+	private static IEnumerable<string> SplitTags(FixedString512Bytes joined)
+	{
+		return null;
+	}
+
+	[Token(Token = "0x6005EF6")]
+	[Address(RVA = "0xF36E30", Offset = "0xF35E30", Length = "0x13B")]
+	private void RecordOnlyOnce(MonsterCutsceneSettings settings, string id)
+	{
+	}
+
+	[Token(Token = "0x6005EF7")]
+	[Address(RVA = "0xF369C0", Offset = "0xF359C0", Length = "0x2B8")]
+	private List<ulong> PlayersInRange(Vector3 pos, float range)
+	{
+		return null;
+	}
+
+	[IteratorStateMachine(typeof(<PlayMonsterAnimationAfter>d__119))]
+	[Token(Token = "0x6005EF8")]
+	[Address(RVA = "0xF35EA0", Offset = "0xF34EA0", Length = "0x9C")]
+	private IEnumerator PlayMonsterAnimationAfter(Monster monster, string stateName, float delay)
+	{
+		return null;
+	}
+
+	[Token(Token = "0x6005EF9")]
+	[Address(RVA = "0xF31D10", Offset = "0xF30D10", Length = "0x4F7")]
+	private NetworkObject FindFirstAliveMonster(MonsterType type, out Monster monster)
+	{
+		monster = null;
+		return null;
+	}
+
+	[Token(Token = "0x6005EFA")]
+	[Address(RVA = "0xF33D20", Offset = "0xF32D20", Length = "0xD0")]
+	private static bool IsAliveMonsterOfType(Monster m, MonsterType type)
+	{
+		return false;
+	}
+
+	[Token(Token = "0x6005EFB")]
+	[Address(RVA = "0xF32210", Offset = "0xF31210", Length = "0x685")]
+	private NetworkObject FindFirstNpc(NPCType type)
+	{
+		return null;
+	}
+
+	[Token(Token = "0x6005EFC")]
+	[Address(RVA = "0xF2B370", Offset = "0xF2A370", Length = "0x18B")]
+	public void ActivateEvent(InGameEvent eventName)
+	{
+	}
+
+	[Token(Token = "0x6005EFD")]
+	[Address(RVA = "0xF2DAC0", Offset = "0xF2CAC0", Length = "0x229")]
+	private void CleanupPreviousEventMonsters(InGameEvent eventName)
+	{
+	}
+
+	[Token(Token = "0x6005EFE")]
+	[Address(RVA = "0xF2ED40", Offset = "0xF2DD40", Length = "0xFF")]
+	public void DeactivateEvent(InGameEvent eventName, bool expired)
+	{
+	}
+
+	[Token(Token = "0x6005EFF")]
+	[Address(RVA = "0xF3C650", Offset = "0xF3B650", Length = "0x160")]
+	public void StopEventCoroutines()
+	{
+	}
+
+	[Token(Token = "0x6005F00")]
+	[Address(RVA = "0xF39900", Offset = "0xF38900", Length = "0xBF")]
+	private static bool ShouldDespawnTypeOrAbsent(EventDefinition def, DespawnDeferralType type, InGameEvent trigger)
+	{
+		return false;
+	}
+
+	[IteratorStateMachine(typeof(<DeactivateEventCoroutine>d__133))]
+	[Token(Token = "0x6005F01")]
+	[Address(RVA = "0xF2ECC0", Offset = "0xF2DCC0", Length = "0x77")]
+	private IEnumerator DeactivateEventCoroutine(InGameEvent eventName, bool expired)
+	{
+		return null;
+	}
+
+	[Token(Token = "0x6005F02")]
+	[Address(RVA = "0xF2F2B0", Offset = "0xF2E2B0", Length = "0xF55")]
+	private void DespawnDeferredForPreviousEvents(InGameEvent finishingEvent, bool expired)
+	{
+	}
+
+	[Token(Token = "0x6005F03")]
+	[Address(RVA = "0xF31940", Offset = "0xF30940", Length = "0x3CE")]
+	private void EnsureDespawnDependentsIndex()
+	{
+	}
+
+	[IteratorStateMachine(typeof(<ActivateAutoAggroForMonster>d__136))]
+	[Token(Token = "0x6005F04")]
+	[Address(RVA = "0xF2B270", Offset = "0xF2A270", Length = "0x7D")]
+	private IEnumerator ActivateAutoAggroForMonster(Monster monsterComponent, InGameEvent eventName)
+	{
+		return null;
+	}
+
+	[IteratorStateMachine(typeof(<ActivateEventCoroutine>d__137))]
+	[Token(Token = "0x6005F05")]
+	[Address(RVA = "0xF2B2F0", Offset = "0xF2A2F0", Length = "0x7C")]
+	private IEnumerator ActivateEventCoroutine(InGameEvent eventName)
+	{
+		return null;
+	}
+
+	[Token(Token = "0x6005F06")]
+	[Address(RVA = "0xF33E00", Offset = "0xF32E00", Length = "0x230")]
+	private bool IsAnyPlayerNear(Transform target, float radius)
+	{
+		return false;
+	}
+
+	[Token(Token = "0x6005F07")]
+	[Address(RVA = "0xF317E0", Offset = "0xF307E0", Length = "0x15F")]
+	private void EnqueueDeferredDespawnNPC(NetworkObject npcNetObj, InGameEvent eventName)
+	{
+	}
+
+	[IteratorStateMachine(typeof(<DeferredDespawnNPCWhenClearCoroutine>d__140))]
+	[Token(Token = "0x6005F08")]
+	[Address(RVA = "0xF2EFF0", Offset = "0xF2DFF0", Length = "0x83")]
+	private IEnumerator DeferredDespawnNPCWhenClearCoroutine(NetworkObject npcNetObj, InGameEvent eventName)
+	{
+		return null;
+	}
+
+	[ClientRpc]
+	[Token(Token = "0x6005F09")]
+	[Address(RVA = "0xF3C030", Offset = "0xF3B030", Length = "0x382")]
+	private void StartNpcFadeClientRpc(NetworkObjectReference npcRef, float durationSeconds, ClientRpcParams rpcParams = default(ClientRpcParams))
+	{
+	}
+
+	[IteratorStateMachine(typeof(<ClientFadeNpcVisualsCoroutine>d__142))]
+	[Token(Token = "0x6005F0A")]
+	[Address(RVA = "0xF2DCF0", Offset = "0xF2CCF0", Length = "0x9C")]
+	private IEnumerator ClientFadeNpcVisualsCoroutine(NetworkObject npcNetObj, float durationSeconds)
+	{
+		return null;
+	}
+
+	[IteratorStateMachine(typeof(<SpawnEventMonsterWithVFX>d__143))]
+	[Token(Token = "0x6005F0B")]
+	[Address(RVA = "0xF39E90", Offset = "0xF38E90", Length = "0x83")]
+	private IEnumerator SpawnEventMonsterWithVFX(MonsterSpawn eventMonster, InGameEvent eventName)
+	{
+		return null;
+	}
+
+	[Token(Token = "0x6005F0C")]
+	[Address(RVA = "0xF2D1E0", Offset = "0xF2C1E0", Length = "0x2CF")]
+	private void ApplyDeedTierOverrides(GameObject monsterGO, InGameEvent eventName)
+	{
+	}
+
+	[ClientRpc]
+	[Token(Token = "0x6005F0D")]
+	[Address(RVA = "0xF365B0", Offset = "0xF355B0", Length = "0x406")]
+	private void PlayMonsterSpawnVFXClientRpc(MonsterType monsterType, Vector3 position, ClientRpcParams rpcParams = default(ClientRpcParams))
+	{
+	}
+
+	[Token(Token = "0x6005F0E")]
+	[Address(RVA = "0xF33740", Offset = "0xF32740", Length = "0x337")]
+	private ClientRpcParams GetPlayersInSceneRpcParams()
+	{
+		return default(ClientRpcParams);
+	}
+
+	[Token(Token = "0x6005F0F")]
+	[Address(RVA = "0xF38F60", Offset = "0xF37F60", Length = "0x14D")]
+	public void ResetEventSpawns(InGameEvent eventName)
+	{
+	}
+
+	[Token(Token = "0x6005F10")]
+	[Address(RVA = "0xF33090", Offset = "0xF32090", Length = "0x1B9")]
+	private void ForceDespawnEventTagged(List<NetworkObject> list, InGameEvent eventName, bool unregisterTick = false)
+	{
+	}
+
+	[Token(Token = "0x6005F11")]
+	[Address(RVA = "0xF32A40", Offset = "0xF31A40", Length = "0x1E5")]
+	public Monster FindSpawnedMonsterOfType(MonsterType monsterType)
+	{
+		return null;
+	}
+
+	[Token(Token = "0x6005F12")]
+	[Address(RVA = "0xF2E360", Offset = "0xF2D360", Length = "0x228")]
+	public void CollectSpawnedEventMonsters(InGameEvent eventName, List<Monster> results)
+	{
+	}
+
+	[Token(Token = "0x6005F13")]
+	[Address(RVA = "0xF3A6A0", Offset = "0xF396A0", Length = "0x447")]
+	protected void SpawnInSceneObjects()
+	{
+	}
+
+	[Token(Token = "0x6005F14")]
+	[Address(RVA = "0xF3B840", Offset = "0xF3A840", Length = "0x3C2")]
+	private void SpawnPersistedPetDrops()
+	{
+	}
+
+	[Token(Token = "0x6005F15")]
+	[Address(RVA = "0xF39F20", Offset = "0xF38F20", Length = "0x38E")]
+	protected void SpawnEventsInProgress()
+	{
+	}
+
+	[Token(Token = "0x6005F16")]
+	[Address(RVA = "0xF2E830", Offset = "0xF2D830", Length = "0x1A5")]
+	protected void DeSpawnSceneObjects()
+	{
+	}
+
+	[IteratorStateMachine(typeof(<DespawnAllGradually>d__156))]
+	[Token(Token = "0x6005F17")]
+	[Address(RVA = "0xF2F080", Offset = "0xF2E080", Length = "0x6D")]
+	private IEnumerator DespawnAllGradually()
+	{
+		return null;
+	}
+
+	[Token(Token = "0x6005F18")]
+	[Address(RVA = "0xF2E010", Offset = "0xF2D010", Length = "0x34C")]
+	public void CollectAnimatorPreloadTypes(HashSet<MonsterType> into)
+	{
+	}
+
+	[Token(Token = "0x6005F19")]
+	[Address(RVA = "0xF307E0", Offset = "0xF2F7E0", Length = "0x179")]
+	private void DespawnLastEntry(List<NetworkObject> list, bool unregisterTick)
+	{
+	}
+
+	[Token(Token = "0x6005F1A")]
+	[Address(RVA = "0xF31080", Offset = "0xF30080", Length = "0x11D")]
+	private void DespawnStragglers(List<NetworkObject> list, bool unregisterTick, string what)
+	{
+	}
+
+	[Token(Token = "0x6005F1B")]
+	[Address(RVA = "0xF3C4B0", Offset = "0xF3B4B0", Length = "0x197")]
+	protected void StopAllSpawningCoroutines()
+	{
+	}
+
+	[IteratorStateMachine(typeof(<SpawnMonstersCoroutine>d__161))]
+	[Token(Token = "0x6005F1C")]
+	[Address(RVA = "0xF3B760", Offset = "0xF3A760", Length = "0x6D")]
+	protected IEnumerator SpawnMonstersCoroutine()
+	{
+		return null;
+	}
+
+	[IteratorStateMachine(typeof(<SpawnNPCsCoroutine>d__162))]
+	[Token(Token = "0x6005F1D")]
+	[Address(RVA = "0xF3B7D0", Offset = "0xF3A7D0", Length = "0x6D")]
+	protected IEnumerator SpawnNPCsCoroutine()
+	{
+		return null;
+	}
+
+	[IteratorStateMachine(typeof(<SpawnStoragesCoroutine>d__163))]
+	[Token(Token = "0x6005F1E")]
+	[Address(RVA = "0xF3BEF0", Offset = "0xF3AEF0", Length = "0x6D")]
+	protected IEnumerator SpawnStoragesCoroutine()
+	{
+		return null;
+	}
+
+	[IteratorStateMachine(typeof(<SpawnPokerTablesCoroutine>d__164))]
+	[Token(Token = "0x6005F1F")]
+	[Address(RVA = "0xF3BC10", Offset = "0xF3AC10", Length = "0x6D")]
+	protected IEnumerator SpawnPokerTablesCoroutine()
+	{
+		return null;
+	}
+
+	[Token(Token = "0x6005F20")]
+	[Address(RVA = "0xF30D00", Offset = "0xF2FD00", Length = "0x1B0")]
+	public void DespawnPokerTables()
+	{
+	}
+
+	[IteratorStateMachine(typeof(<SpawnHarvestsCoroutine>d__166))]
+	[Token(Token = "0x6005F21")]
+	[Address(RVA = "0xF3A630", Offset = "0xF39630", Length = "0x6D")]
+	protected IEnumerator SpawnHarvestsCoroutine()
+	{
+		return null;
+	}
+
+	[IteratorStateMachine(typeof(<SpawnDestructiblesCoroutine>d__167))]
+	[Token(Token = "0x6005F22")]
+	[Address(RVA = "0xF39E20", Offset = "0xF38E20", Length = "0x6D")]
+	protected IEnumerator SpawnDestructiblesCoroutine()
+	{
+		return null;
+	}
+
+	[IteratorStateMachine(typeof(<SpawnInteractClientsCoroutine>d__168))]
+	[Token(Token = "0x6005F23")]
+	[Address(RVA = "0xF3AAF0", Offset = "0xF39AF0", Length = "0x6D")]
+	protected IEnumerator SpawnInteractClientsCoroutine()
+	{
+		return null;
+	}
+
+	[IteratorStateMachine(typeof(<SpawnFacilityClientsCoroutine>d__169))]
+	[Token(Token = "0x6005F24")]
+	[Address(RVA = "0xF3A2B0", Offset = "0xF392B0", Length = "0x6D")]
+	protected IEnumerator SpawnFacilityClientsCoroutine()
+	{
+		return null;
+	}
+
+	[Token(Token = "0x6005F25")]
+	[Address(RVA = "0xF2D4B0", Offset = "0xF2C4B0", Length = "0x1D5")]
+	public void ApplyIndoorMaterial(ObjectsCommon obj)
+	{
+	}
+
+	[Token(Token = "0x6005F26")]
+	[Address(RVA = "0xF3B240", Offset = "0xF3A240", Length = "0x512")]
+	protected void SpawnMonster(int index, Vector3 position)
+	{
+	}
+
+	[Token(Token = "0x6005F27")]
+	[Address(RVA = "0xF3BC80", Offset = "0xF3AC80", Length = "0x267")]
+	protected void SpawnStorage(StorageSpawn storage)
+	{
+	}
+
+	[Token(Token = "0x6005F28")]
+	[Address(RVA = "0xF3A320", Offset = "0xF39320", Length = "0x306")]
+	public void SpawnHarvest(HarvestSpawn harvest)
+	{
+	}
+
+	[Token(Token = "0x6005F29")]
+	[Address(RVA = "0xF399C0", Offset = "0xF389C0", Length = "0x451")]
+	public void SpawnDestructible(DestructibleSpawn destructible)
+	{
+	}
+
+	[Token(Token = "0x6005F2A")]
+	[Address(RVA = "0xF30960", Offset = "0xF2F960", Length = "0x1DC")]
+	public void DespawnMonsters()
+	{
+	}
+
+	[Token(Token = "0x6005F2B")]
+	[Address(RVA = "0xF30B40", Offset = "0xF2FB40", Length = "0x1B0")]
+	public void DespawnNPCs()
+	{
+	}
+
+	[Token(Token = "0x6005F2C")]
+	[Address(RVA = "0xF30620", Offset = "0xF2F620", Length = "0x1B0")]
+	public void DespawnInteractClients()
+	{
+	}
+
+	[Token(Token = "0x6005F2D")]
+	[Address(RVA = "0xF30EC0", Offset = "0xF2FEC0", Length = "0x1B0")]
+	public void DespawnStorages()
+	{
+	}
+
+	[Token(Token = "0x6005F2E")]
+	[Address(RVA = "0xF30460", Offset = "0xF2F460", Length = "0x1B0")]
+	public void DespawnHarvests()
+	{
+	}
+
+	[Token(Token = "0x6005F2F")]
+	[Address(RVA = "0xF30210", Offset = "0xF2F210", Length = "0x1B0")]
+	public void DespawnDestructibles()
+	{
+	}
+
+	[Token(Token = "0x6005F30")]
+	[Address(RVA = "0xF2F0F0", Offset = "0xF2E0F0", Length = "0x1B0")]
+	public void DespawnCorpses()
+	{
+	}
+
+	[Token(Token = "0x6005F31")]
+	[Address(RVA = "0xF2C110", Offset = "0xF2B110", Length = "0x3A0")]
+	public void AddMonsterSpawn(MonsterType monsterType, Vector3 position)
+	{
+	}
+
+	[Token(Token = "0x6005F32")]
+	[Address(RVA = "0xF2BA00", Offset = "0xF2AA00", Length = "0x3A0")]
+	public void AddHarvestSpawn(HarvestType harvestType, Vector3 position)
+	{
+	}
+
+	[Token(Token = "0x6005F33")]
+	[Address(RVA = "0xF2BDB0", Offset = "0xF2ADB0", Length = "0x351")]
+	public void AddMonsterRandomSpawn(MonsterType monsterType, List<Vector3> positions)
+	{
+	}
+
+	[Token(Token = "0x6005F34")]
+	[Address(RVA = "0xF3AB60", Offset = "0xF39B60", Length = "0x6D5")]
+	public NetworkObject SpawnMonsterInstance(MonsterType monsterType, Vector3 position, string customName = null, bool playSpawnVfx = false, bool triggerAutoAggro = false, InGameEvent sourceEvent = InGameEvent.None, Action<Monster> configure = null, bool transientSpawn = false)
+	{
+		return null;
+	}
+
+	[Token(Token = "0x6005F35")]
+	[Address(RVA = "0xF2B6A0", Offset = "0xF2A6A0", Length = "0x351")]
+	public void AddHarvestRandomSpawn(HarvestType harvestType, List<Vector3> positions)
+	{
+	}
+
+	[Token(Token = "0x6005F36")]
+	[Address(RVA = "0xF32C90", Offset = "0xF31C90", Length = "0x3F1")]
+	private void ForceAggroForSpawn(Monster monsterComponent)
+	{
+	}
+
+	[Token(Token = "0x6005F37")]
+	[Address(RVA = "0xF3E6D0", Offset = "0xF3D6D0", Length = "0x4FE")]
+	public SceneHandler()
+	{
+	}
+
+	[Token(Token = "0x6005F3A")]
+	[Address(RVA = "0xF3D040", Offset = "0xF3C040", Length = "0x195")]
+	protected override void __initializeVariables()
+	{
+	}
+
+	[Token(Token = "0x6005F3B")]
+	[Address(RVA = "0xF3CC30", Offset = "0xF3BC30", Length = "0x40A")]
+	protected override void __initializeRpcs()
+	{
+	}
+
+	[Token(Token = "0x6005F3C")]
+	[Address(RVA = "0xF3E020", Offset = "0xF3D020", Length = "0xCD")]
+	private static void __rpc_handler_3542486529(NetworkBehaviour target, FastBufferReader reader, __RpcParams rpcParams)
+	{
+	}
+
+	[Token(Token = "0x6005F3D")]
+	[Address(RVA = "0xF3E4A0", Offset = "0xF3D4A0", Length = "0x225")]
+	private static void __rpc_handler_808291498(NetworkBehaviour target, FastBufferReader reader, __RpcParams rpcParams)
+	{
+	}
+
+	[Token(Token = "0x6005F3E")]
+	[Address(RVA = "0xF3E2B0", Offset = "0xF3D2B0", Length = "0x1E7")]
+	private static void __rpc_handler_536282220(NetworkBehaviour target, FastBufferReader reader, __RpcParams rpcParams)
+	{
+	}
+
+	[Token(Token = "0x6005F3F")]
+	[Address(RVA = "0xF3DA10", Offset = "0xF3CA10", Length = "0x1C5")]
+	private static void __rpc_handler_325152781(NetworkBehaviour target, FastBufferReader reader, __RpcParams rpcParams)
+	{
+	}
+
+	[Token(Token = "0x6005F40")]
+	[Address(RVA = "0xF3D1E0", Offset = "0xF3C1E0", Length = "0x208")]
+	private static void __rpc_handler_1380004932(NetworkBehaviour target, FastBufferReader reader, __RpcParams rpcParams)
+	{
+	}
+
+	[Token(Token = "0x6005F41")]
+	[Address(RVA = "0xF3DE60", Offset = "0xF3CE60", Length = "0x1BF")]
+	private static void __rpc_handler_3529320889(NetworkBehaviour target, FastBufferReader reader, __RpcParams rpcParams)
+	{
+	}
+
+	[Token(Token = "0x6005F42")]
+	[Address(RVA = "0xF3D800", Offset = "0xF3C800", Length = "0x206")]
+	private static void __rpc_handler_2881240810(NetworkBehaviour target, FastBufferReader reader, __RpcParams rpcParams)
+	{
+	}
+
+	[Token(Token = "0x6005F43")]
+	[Address(RVA = "0xF3D6C0", Offset = "0xF3C6C0", Length = "0x135")]
+	private static void __rpc_handler_2811856298(NetworkBehaviour target, FastBufferReader reader, __RpcParams rpcParams)
+	{
+	}
+
+	[Token(Token = "0x6005F44")]
+	[Address(RVA = "0xF3E0F0", Offset = "0xF3D0F0", Length = "0x1B6")]
+	private static void __rpc_handler_3933207115(NetworkBehaviour target, FastBufferReader reader, __RpcParams rpcParams)
+	{
+	}
+
+	[Token(Token = "0x6005F45")]
+	[Address(RVA = "0xF3DBE0", Offset = "0xF3CBE0", Length = "0x272")]
+	private static void __rpc_handler_3504275490(NetworkBehaviour target, FastBufferReader reader, __RpcParams rpcParams)
+	{
+	}
+
+	[Token(Token = "0x6005F46")]
+	[Address(RVA = "0xF3D3F0", Offset = "0xF3C3F0", Length = "0x2C5")]
+	private static void __rpc_handler_148644000(NetworkBehaviour target, FastBufferReader reader, __RpcParams rpcParams)
+	{
+	}
+
+	[Token(Token = "0x6005F47")]
+	[Address(RVA = "0xF3CC00", Offset = "0xF3BC00", Length = "0x2C")]
+	protected internal override string __getTypeName()
+	{
+		return null;
+	}
+}

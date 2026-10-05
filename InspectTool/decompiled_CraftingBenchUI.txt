@@ -1,0 +1,91 @@
+using Cpp2ILInjected;
+using UnityEngine;
+
+[Token(Token = "0x20001E2")]
+public class CraftingBenchUI : StorageView
+{
+	[HideInInspector]
+	[Token(Token = "0x40010F9")]
+	[FieldOffset(Offset = "0x1D0")]
+	public CraftingBench _bench;
+
+	[Token(Token = "0x40010FA")]
+	[FieldOffset(Offset = "0x1D8")]
+	private Inventory _playerInventory;
+
+	[Token(Token = "0x40010FB")]
+	[FieldOffset(Offset = "0x1E0")]
+	private bool _isBeingDestroyed;
+
+	[Token(Token = "0x1700025B")]
+	private string BenchDisallowedError
+	{
+		[Token(Token = "0x6000EB0")]
+		[Address(RVA = "0x11CC380", Offset = "0x11CB380", Length = "0xBF")]
+		get
+		{
+			return null;
+		}
+	}
+
+	[Token(Token = "0x6000EA8")]
+	[Address(RVA = "0x11CAB70", Offset = "0x11C9B70", Length = "0x4F")]
+	private void Awake()
+	{
+	}
+
+	[Token(Token = "0x6000EA9")]
+	[Address(RVA = "0x11CAF30", Offset = "0x11C9F30", Length = "0x15")]
+	private void Start()
+	{
+	}
+
+	[Token(Token = "0x6000EAA")]
+	[Address(RVA = "0x11CAD60", Offset = "0x11C9D60", Length = "0x111")]
+	private void OnDestroy()
+	{
+	}
+
+	[Token(Token = "0x6000EAB")]
+	[Address(RVA = "0x11CAF10", Offset = "0x11C9F10", Length = "0x13")]
+	public void SetBench(CraftingBench bench)
+	{
+	}
+
+	[Token(Token = "0x6000EAC")]
+	[Address(RVA = "0x11CAE80", Offset = "0x11C9E80", Length = "0x88")]
+	public void Open()
+	{
+	}
+
+	[Token(Token = "0x6000EAD")]
+	[Address(RVA = "0x11CABC0", Offset = "0x11C9BC0", Length = "0x10A")]
+	public void Close()
+	{
+	}
+
+	[Token(Token = "0x6000EAE")]
+	[Address(RVA = "0x11CB850", Offset = "0x11CA850", Length = "0xAD5")]
+	private void UnlockStartingRecipes()
+	{
+	}
+
+	[Token(Token = "0x6000EAF")]
+	[Address(RVA = "0x11CAF50", Offset = "0x11C9F50", Length = "0x8F3")]
+	public override void SwapContainerItems(int dragIndex, int dropIndex)
+	{
+	}
+
+	[Token(Token = "0x6000EB1")]
+	[Address(RVA = "0x11CACD0", Offset = "0x11C9CD0", Length = "0x82")]
+	private static bool IsBenchDisallowed(InventoryEntry entry)
+	{
+		return false;
+	}
+
+	[Token(Token = "0x6000EB2")]
+	[Address(RVA = "0x11CC330", Offset = "0x11CB330", Length = "0x49")]
+	public CraftingBenchUI()
+	{
+	}
+}

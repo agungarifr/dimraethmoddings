@@ -1,0 +1,66 @@
+using Cpp2ILInjected;
+using UnityEngine.Rendering;
+
+[Token(Token = "0x2000DF6")]
+public static class TimeOfDayLerp
+{
+	[Token(Token = "0x6006F83")]
+	[Address(RVA = "0x111B2E0", Offset = "0x111A2E0", Length = "0x3C4")]
+	public static void LerpColorAdjustments(Volume volume, VolumeProfile initialProfile, VolumeProfile targetProfile, float t)
+	{
+	}
+
+	[Token(Token = "0x6006F84")]
+	[Address(RVA = "0x111A640", Offset = "0x1119640", Length = "0x1E9")]
+	public static void ApplyColorAdjustments(Volume volume, VolumeProfile profile)
+	{
+	}
+
+	[Token(Token = "0x6006F85")]
+	[Address(RVA = "0x111BBF0", Offset = "0x111ABF0", Length = "0x3F3")]
+	private static void LerpTextureCurve(TextureCurveParameter from, TextureCurveParameter to, float t)
+	{
+	}
+
+	[Token(Token = "0x6006F86")]
+	[Address(RVA = "0x111B6B0", Offset = "0x111A6B0", Length = "0x532")]
+	public static void LerpColorCurves(Volume volume, VolumeProfile initialProfile, VolumeProfile targetProfile, float t)
+	{
+	}
+
+	[Token(Token = "0x6006F87")]
+	[Address(RVA = "0x111A830", Offset = "0x1119830", Length = "0x3AC")]
+	public static void ApplyColorCurves(Volume volume, VolumeProfile profile)
+	{
+	}
+
+	[Token(Token = "0x6006F88")]
+	[Address(RVA = "0x111BFF0", Offset = "0x111AFF0", Length = "0x317")]
+	public static void LerpWhiteBalance(Volume volume, VolumeProfile initialProfile, VolumeProfile targetProfile, float t)
+	{
+	}
+
+	[Token(Token = "0x6006F89")]
+	[Address(RVA = "0x111ABE0", Offset = "0x1119BE0", Length = "0x1D9")]
+	public static void ApplyWhiteBalance(Volume volume, VolumeProfile profile)
+	{
+	}
+
+	[Token(Token = "0x6006F8A")]
+	[Address(RVA = "0x111ADC0", Offset = "0x1119DC0", Length = "0x1D6")]
+	public static void CopyColorAdjustments(VolumeProfile from, VolumeProfile to)
+	{
+	}
+
+	[Token(Token = "0x6006F8B")]
+	[Address(RVA = "0x111AFA0", Offset = "0x1119FA0", Length = "0x167")]
+	public static void CopyColorCurves(VolumeProfile from, VolumeProfile to)
+	{
+	}
+
+	[Token(Token = "0x6006F8C")]
+	[Address(RVA = "0x111B110", Offset = "0x111A110", Length = "0x1C6")]
+	public static void CopyWhiteBalance(VolumeProfile from, VolumeProfile to)
+	{
+	}
+}

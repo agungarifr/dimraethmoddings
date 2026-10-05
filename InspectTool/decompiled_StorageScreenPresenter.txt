@@ -1,0 +1,85 @@
+using System;
+using Cpp2ILInjected;
+using UnityEngine;
+
+[Token(Token = "0x2000400")]
+public sealed class StorageScreenPresenter : IDisposable
+{
+	[Token(Token = "0x4002483")]
+	[FieldOffset(Offset = "0x10")]
+	private readonly InventoryPanePresenter _panePresenter;
+
+	[Token(Token = "0x4002484")]
+	[FieldOffset(Offset = "0x18")]
+	private readonly StorageView _host;
+
+	[Token(Token = "0x4002485")]
+	[FieldOffset(Offset = "0x20")]
+	private readonly UIActionInvoker _backInvoker;
+
+	[Token(Token = "0x4002486")]
+	[FieldOffset(Offset = "0x28")]
+	private readonly InventoryPaneView _pane;
+
+	[Token(Token = "0x4002487")]
+	[FieldOffset(Offset = "0x30")]
+	private readonly Action _onClose;
+
+	[Token(Token = "0x4002488")]
+	[FieldOffset(Offset = "0x38")]
+	private readonly BackpackView _chrome;
+
+	[Token(Token = "0x4002489")]
+	[FieldOffset(Offset = "0x40")]
+	private readonly Backpack _backpack;
+
+	[Token(Token = "0x400248A")]
+	[FieldOffset(Offset = "0x48")]
+	private readonly Action<int> _onFilterClicked;
+
+	[Token(Token = "0x400248B")]
+	[FieldOffset(Offset = "0x50")]
+	private readonly Action _onFilterStateChanged;
+
+	[Token(Token = "0x400248C")]
+	[FieldOffset(Offset = "0x58")]
+	private readonly Inventory _inventory;
+
+	[Token(Token = "0x400248D")]
+	[FieldOffset(Offset = "0x60")]
+	private readonly UIActionInvoker[] _storageActionInvokers;
+
+	[Token(Token = "0x400248E")]
+	[FieldOffset(Offset = "0x68")]
+	private readonly Action _onSlotGroupChanged;
+
+	[Token(Token = "0x400248F")]
+	[FieldOffset(Offset = "0x70")]
+	private readonly StorageHeaderControllerPresenter _headerPresenter;
+
+	[Token(Token = "0x4002490")]
+	[FieldOffset(Offset = "0x78")]
+	private readonly ControllerScrollbar _slotGridScrollbar;
+
+	[Token(Token = "0x4002491")]
+	[FieldOffset(Offset = "0x80")]
+	private readonly ControllerScrollbar _paneScrollbar;
+
+	[Token(Token = "0x6002698")]
+	[Address(RVA = "0xAAA160", Offset = "0xAA9160", Length = "0x17EC")]
+	public StorageScreenPresenter(Player player, StorageView host, StorageUIView view, InventoryPaneView pane, UIBindContext ctx, string title = null)
+	{
+	}
+
+	[Token(Token = "0x6002699")]
+	[Address(RVA = "0xAA9E60", Offset = "0xAA8E60", Length = "0x27F")]
+	public void Dispose()
+	{
+	}
+
+	[Token(Token = "0x600269A")]
+	[Address(RVA = "0xAA9D90", Offset = "0xAA8D90", Length = "0xC6")]
+	private static void ClearPanelButtonListeners(GameObject panelRoot)
+	{
+	}
+}

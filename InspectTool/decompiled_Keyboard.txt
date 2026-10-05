@@ -1,0 +1,301 @@
+﻿using System;
+using System.Collections;
+using System.Collections.Generic;
+using System.Diagnostics;
+using System.Runtime.CompilerServices;
+using Cpp2ILInjected;
+using Unity.Netcode;
+using UnityEngine;
+
+[Token(Token = "0x200025E")]
+public class Keyboard : NetworkBehaviour
+{
+	[CompilerGenerated]
+	[Token(Token = "0x2000262")]
+	private sealed class <SprintTutorialDelay>d__32 : IEnumerator<object>, IEnumerator, IDisposable
+	{
+		[Token(Token = "0x40015B3")]
+		[FieldOffset(Offset = "0x10")]
+		private int <>1__state;
+
+		[Token(Token = "0x40015B4")]
+		[FieldOffset(Offset = "0x18")]
+		private object <>2__current;
+
+		[Token(Token = "0x40015B5")]
+		[FieldOffset(Offset = "0x20")]
+		public Keyboard <>4__this;
+
+		[Token(Token = "0x40015B6")]
+		[FieldOffset(Offset = "0x28")]
+		private float <elapsed>5__2;
+
+		[Token(Token = "0x40015B7")]
+		[FieldOffset(Offset = "0x30")]
+		private PlayerAnimations <animations>5__3;
+
+		[Token(Token = "0x170002F1")]
+		object IEnumerator<object>.Current
+		{
+			[DebuggerHidden]
+			[Token(Token = "0x600156F")]
+			[Address(RVA = "0x6B1E50", Offset = "0x6B0E50", Length = "0x5")]
+			get
+			{
+				return null;
+			}
+		}
+
+		[Token(Token = "0x170002F2")]
+		object IEnumerator.Current
+		{
+			[DebuggerHidden]
+			[Token(Token = "0x6001571")]
+			[Address(RVA = "0x6B1E50", Offset = "0x6B0E50", Length = "0x5")]
+			get
+			{
+				return null;
+			}
+		}
+
+		[DebuggerHidden]
+		[Token(Token = "0x600156C")]
+		[Address(RVA = "0x6B1EA0", Offset = "0x6B0EA0", Length = "0x24")]
+		public <SprintTutorialDelay>d__32(int <>1__state)
+		{
+		}
+
+		[DebuggerHidden]
+		[Token(Token = "0x600156D")]
+		[Address(RVA = "0x6AAC60", Offset = "0x6A9C60", Length = "0x3")]
+		void IDisposable.Dispose()
+		{
+		}
+
+		[Token(Token = "0x600156E")]
+		[Address(RVA = "0x902C80", Offset = "0x901C80", Length = "0x237")]
+		private bool MoveNext()
+		{
+			return false;
+		}
+
+		bool IEnumerator.MoveNext()
+		{
+			//ILSpy generated this explicit interface implementation from .override directive in MoveNext
+			return this.MoveNext();
+		}
+
+		[DebuggerHidden]
+		[Token(Token = "0x6001570")]
+		[Address(RVA = "0x902EC0", Offset = "0x901EC0", Length = "0x3E")]
+		void IEnumerator.Reset()
+		{
+		}
+	}
+
+	[SerializeField]
+	[Token(Token = "0x400159F")]
+	[FieldOffset(Offset = "0x88")]
+	private PlayerStateMachine _psm;
+
+	[SerializeField]
+	[Token(Token = "0x40015A0")]
+	[FieldOffset(Offset = "0x90")]
+	private ItemBar _itemBar;
+
+	[SerializeField]
+	[Token(Token = "0x40015A1")]
+	[FieldOffset(Offset = "0x98")]
+	private SpellBar _spellBar;
+
+	[Token(Token = "0x40015A2")]
+	[FieldOffset(Offset = "0xA0")]
+	private Player _player;
+
+	[Token(Token = "0x40015A3")]
+	[FieldOffset(Offset = "0xA8")]
+	private PlayerAnimations _animations;
+
+	[Token(Token = "0x40015A4")]
+	[FieldOffset(Offset = "0xB0")]
+	public bool PotentialHoldCastActivated;
+
+	[Token(Token = "0x40015A5")]
+	[FieldOffset(Offset = "0xB8")]
+	private UIActionId _holdCastArmedAction;
+
+	[Token(Token = "0x40015A6")]
+	[FieldOffset(Offset = "0xC0")]
+	private InputBuffer _inputBuffer;
+
+	[Token(Token = "0x40015A7")]
+	[FieldOffset(Offset = "0xC8")]
+	private Coroutine _sprintCoroutine;
+
+	[Token(Token = "0x40015A8")]
+	[FieldOffset(Offset = "0xD0")]
+	private float _movementSpellDownTime;
+
+	[SerializeField]
+	[Token(Token = "0x40015A9")]
+	[FieldOffset(Offset = "0xD4")]
+	private float _movementSpellTapThreshold;
+
+	[Token(Token = "0x40015AA")]
+	private const int SpellCount = 7;
+
+	[Token(Token = "0x40015AB")]
+	private const int ItemCount = 4;
+
+	[Token(Token = "0x600154C")]
+	[Address(RVA = "0x8EE7D0", Offset = "0x8ED7D0", Length = "0xB1")]
+	private void Awake()
+	{
+	}
+
+	[Token(Token = "0x600154D")]
+	[Address(RVA = "0x8EF370", Offset = "0x8EE370", Length = "0xBE")]
+	private static GameplayInputSource Gp()
+	{
+		return null;
+	}
+
+	[Token(Token = "0x600154E")]
+	[Address(RVA = "0x8F0630", Offset = "0x8EF630", Length = "0x339")]
+	private void Update()
+	{
+	}
+
+	[Token(Token = "0x600154F")]
+	[Address(RVA = "0x8F0210", Offset = "0x8EF210", Length = "0xBA")]
+	private void ProcessKeyInputs(GameplayInputSource gp)
+	{
+	}
+
+	[Token(Token = "0x6001550")]
+	[Address(RVA = "0x8EF1B0", Offset = "0x8EE1B0", Length = "0x38")]
+	private UIActionId GetSpellAction(int index)
+	{
+		return default(UIActionId);
+	}
+
+	[Token(Token = "0x6001551")]
+	[Address(RVA = "0x8EF0A0", Offset = "0x8EE0A0", Length = "0x103")]
+	private UIActionId GetItemAction(int index)
+	{
+		return default(UIActionId);
+	}
+
+	[Token(Token = "0x6001552")]
+	[Address(RVA = "0x8EE890", Offset = "0x8ED890", Length = "0x1FD")]
+	private void BufferSpellInputsDuringCast(GameplayInputSource gp)
+	{
+	}
+
+	[Token(Token = "0x6001553")]
+	[Address(RVA = "0x8EEA90", Offset = "0x8EDA90", Length = "0x12E")]
+	private void BufferSpellPress(int barIndex, UIActionId action)
+	{
+	}
+
+	[Token(Token = "0x6001554")]
+	[Address(RVA = "0x8F02D0", Offset = "0x8EF2D0", Length = "0x19B")]
+	private void ReplaySpellPress(int barIndex, UIActionId action)
+	{
+	}
+
+	[Token(Token = "0x6001555")]
+	[Address(RVA = "0x8EF610", Offset = "0x8EE610", Length = "0x4C7")]
+	private void HandleMovementSpellInput(GameplayInputSource gp, UIActionId action, int spellIndex)
+	{
+	}
+
+	[Token(Token = "0x6001556")]
+	[Address(RVA = "0x8EFAE0", Offset = "0x8EEAE0", Length = "0x36F")]
+	private void HandleSpellButtonInput(GameplayInputSource gp, UIActionId action, int barIndex)
+	{
+	}
+
+	[Token(Token = "0x6001557")]
+	[Address(RVA = "0x8F0470", Offset = "0x8EF470", Length = "0x11F")]
+	private bool ShouldBufferDuringAttack(int barIndex)
+	{
+		return false;
+	}
+
+	[Token(Token = "0x6001558")]
+	[Address(RVA = "0x8EF430", Offset = "0x8EE430", Length = "0x1D9")]
+	private void HandleItemButtonInput(GameplayInputSource gp, UIActionId action, int itemIndex)
+	{
+	}
+
+	[Token(Token = "0x6001559")]
+	[Address(RVA = "0x8EFE50", Offset = "0x8EEE50", Length = "0x22A")]
+	private void HandleSpellKeyDown(Action action, UIActionId armingAction)
+	{
+	}
+
+	[Token(Token = "0x600155A")]
+	[Address(RVA = "0x8EE630", Offset = "0x8ED630", Length = "0x19C")]
+	private void ApplySprintState(bool isSprinting)
+	{
+	}
+
+	[Token(Token = "0x600155B")]
+	[Address(RVA = "0x8EECB0", Offset = "0x8EDCB0", Length = "0x105")]
+	private void CheckForHoldCastCancel(GameplayInputSource gp)
+	{
+	}
+
+	[Token(Token = "0x600155C")]
+	[Address(RVA = "0x8EEDC0", Offset = "0x8EDDC0", Length = "0x2D8")]
+	private void ClearStaleHoldLatches(GameplayInputSource gp)
+	{
+	}
+
+	[Token(Token = "0x600155D")]
+	[Address(RVA = "0x8F0080", Offset = "0x8EF080", Length = "0x182")]
+	private bool IsArmingActionConsumed(GameplayInputSource gp)
+	{
+		return false;
+	}
+
+	[Token(Token = "0x600155E")]
+	[Address(RVA = "0x8EEBC0", Offset = "0x8EDBC0", Length = "0xEC")]
+	private void CancelStaleTargeting()
+	{
+	}
+
+	[IteratorStateMachine(typeof(<SprintTutorialDelay>d__32))]
+	[Token(Token = "0x600155F")]
+	[Address(RVA = "0x8F0590", Offset = "0x8EF590", Length = "0x67")]
+	private IEnumerator SprintTutorialDelay()
+	{
+		return null;
+	}
+
+	[Token(Token = "0x6001560")]
+	[Address(RVA = "0x8F09A0", Offset = "0x8EF9A0", Length = "0x53")]
+	public Keyboard()
+	{
+	}
+
+	[Token(Token = "0x6001562")]
+	[Address(RVA = "0x6B2110", Offset = "0x6B1110", Length = "0x7")]
+	protected override void __initializeVariables()
+	{
+	}
+
+	[Token(Token = "0x6001563")]
+	[Address(RVA = "0x6B2110", Offset = "0x6B1110", Length = "0x7")]
+	protected override void __initializeRpcs()
+	{
+	}
+
+	[Token(Token = "0x6001564")]
+	[Address(RVA = "0x8F0970", Offset = "0x8EF970", Length = "0x2C")]
+	protected internal override string __getTypeName()
+	{
+		return null;
+	}
+}

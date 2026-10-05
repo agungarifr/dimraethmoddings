@@ -1,0 +1,84 @@
+using Cpp2ILInjected;
+
+[Token(Token = "0x2000E1A")]
+public static class XP
+{
+	[Token(Token = "0x60070ED")]
+	[Address(RVA = "0x114C0C0", Offset = "0x114B0C0", Length = "0x1E8")]
+	public static int GrantXP(Damage damage, int partySplit = 1)
+	{
+		return 0;
+	}
+
+	[Token(Token = "0x60070EE")]
+	[Address(RVA = "0x114C2B0", Offset = "0x114B2B0", Length = "0x125")]
+	public static bool IsXPGainBlocked(Player player)
+	{
+		return false;
+	}
+
+	[Token(Token = "0x60070EF")]
+	[Address(RVA = "0x114B510", Offset = "0x114A510", Length = "0x577")]
+	public static int CalculateXPGained(Damage damage, int partySplit = 1, bool raveEquipped = false)
+	{
+		return 0;
+	}
+
+	[Token(Token = "0x60070F0")]
+	[Address(RVA = "0x114B1A0", Offset = "0x114A1A0", Length = "0x145")]
+	private static int CalculatePartyXP(int xp, int partySplit)
+	{
+		return 0;
+	}
+
+	[Token(Token = "0x60070F1")]
+	[Address(RVA = "0x114C3E0", Offset = "0x114B3E0", Length = "0x8D")]
+	public static void TriggerXPPopUp(Player player, int xp)
+	{
+	}
+
+	[Token(Token = "0x60070F2")]
+	[Address(RVA = "0x114BE40", Offset = "0x114AE40", Length = "0x27D")]
+	public static void GrantXPToPlayer(Player player, int xp, string source = "Unknown", bool showPopup = true)
+	{
+	}
+
+	[Token(Token = "0x60070F3")]
+	[Address(RVA = "0x114AD20", Offset = "0x1149D20", Length = "0x29B")]
+	private static void AddXPToPlayer(Player player, int xp)
+	{
+	}
+
+	[Token(Token = "0x60070F4")]
+	[Address(RVA = "0x114AC10", Offset = "0x1149C10", Length = "0x106")]
+	private static void AddXPToPet(Player player, int xp)
+	{
+	}
+
+	[Token(Token = "0x60070F5")]
+	[Address(RVA = "0x114BB60", Offset = "0x114AB60", Length = "0x2D5")]
+	public static void GrantPetXPOwnerSide(Player player, int xp)
+	{
+	}
+
+	[Token(Token = "0x60070F6")]
+	[Address(RVA = "0x114B2F0", Offset = "0x114A2F0", Length = "0x219")]
+	private static int CalculatePetXPGain(LocalPetData petData, Player player, int xp)
+	{
+		return 0;
+	}
+
+	[Token(Token = "0x60070F7")]
+	[Address(RVA = "0x114AFC0", Offset = "0x1149FC0", Length = "0x1D8")]
+	public static int CalculateBonusXP(Player player)
+	{
+		return 0;
+	}
+
+	[Token(Token = "0x60070F8")]
+	[Address(RVA = "0x114BA90", Offset = "0x114AA90", Length = "0xC6")]
+	public static int GetXPFromMonster(MonsterConfiguration monster)
+	{
+		return 0;
+	}
+}

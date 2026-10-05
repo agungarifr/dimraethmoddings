@@ -1,0 +1,360 @@
+using System;
+using System.Runtime.CompilerServices;
+using Il2CppInterop.Common.Attributes;
+using Il2CppInterop.Runtime;
+using Il2CppInterop.Runtime.Runtime;
+using Il2CppSystem;
+using Il2CppSystem.Collections.Generic;
+using UnityEngine;
+
+public sealed class InventoryPanelSlots : Il2CppSystem.Object
+{
+	private static readonly System.IntPtr NativeFieldInfoPtr_TrashCan;
+
+	private static readonly System.IntPtr NativeFieldInfoPtr_BackpackSlots;
+
+	private static readonly System.IntPtr NativeFieldInfoPtr_CraftingBackpackSlots;
+
+	private static readonly System.IntPtr NativeFieldInfoPtr_BackpackBackgroundSlots;
+
+	private static readonly System.IntPtr NativeFieldInfoPtr_CraftingBackgroundSlots;
+
+	private static readonly System.IntPtr NativeFieldInfoPtr_EquipmentSlots;
+
+	private static readonly System.IntPtr NativeFieldInfoPtr_PetSlots;
+
+	private static readonly System.IntPtr NativeFieldInfoPtr_EquipmentSlotBackgrounds;
+
+	private static readonly System.IntPtr NativeFieldInfoPtr_EquippedRunes;
+
+	private static readonly System.IntPtr NativeFieldInfoPtr_InventoryItemSlots;
+
+	private static readonly System.IntPtr NativeFieldInfoPtr_EquippedTools;
+
+	private static readonly System.IntPtr NativeFieldInfoPtr_BackpackScrollContent;
+
+	private static readonly System.IntPtr NativeFieldInfoPtr_CraftingScrollContent;
+
+	private static readonly System.IntPtr NativeFieldInfoPtr_EquippedPet;
+
+	private static readonly System.IntPtr NativeFieldInfoPtr_EquippedFood;
+
+	private static readonly System.IntPtr NativeFieldInfoPtr_EquippedDrink;
+
+	private static readonly System.IntPtr NativeFieldInfoPtr_PetSlotsParent;
+
+	private static readonly System.IntPtr NativeFieldInfoPtr_SplitSlider;
+
+	private static readonly System.IntPtr NativeMethodInfoPtr__ctor_Public_Void_0;
+
+	public unsafe GameObject TrashCan
+	{
+		get
+		{
+			nint num = (nint)IL2CPP.Il2CppObjectBaseToPtrNotNull(this) + (int)IL2CPP.il2cpp_field_get_offset(NativeFieldInfoPtr_TrashCan);
+			System.IntPtr intPtr = *(System.IntPtr*)num;
+			return (intPtr != (System.IntPtr)0) ? Il2CppObjectPool.Get<GameObject>(intPtr) : null;
+		}
+		set
+		{
+			System.IntPtr num = IL2CPP.Il2CppObjectBaseToPtrNotNull(this);
+			IL2CPP.il2cpp_gc_wbarrier_set_field(num, (nint)num + (int)IL2CPP.il2cpp_field_get_offset(NativeFieldInfoPtr_TrashCan), IL2CPP.Il2CppObjectBaseToPtr(obj));
+		}
+	}
+
+	public unsafe List<GameObject> BackpackSlots
+	{
+		get
+		{
+			nint num = (nint)IL2CPP.Il2CppObjectBaseToPtrNotNull(this) + (int)IL2CPP.il2cpp_field_get_offset(NativeFieldInfoPtr_BackpackSlots);
+			System.IntPtr intPtr = *(System.IntPtr*)num;
+			return (intPtr != (System.IntPtr)0) ? Il2CppObjectPool.Get<List<GameObject>>(intPtr) : null;
+		}
+		set
+		{
+			System.IntPtr num = IL2CPP.Il2CppObjectBaseToPtrNotNull(this);
+			IL2CPP.il2cpp_gc_wbarrier_set_field(num, (nint)num + (int)IL2CPP.il2cpp_field_get_offset(NativeFieldInfoPtr_BackpackSlots), IL2CPP.Il2CppObjectBaseToPtr(obj));
+		}
+	}
+
+	public unsafe List<GameObject> CraftingBackpackSlots
+	{
+		get
+		{
+			nint num = (nint)IL2CPP.Il2CppObjectBaseToPtrNotNull(this) + (int)IL2CPP.il2cpp_field_get_offset(NativeFieldInfoPtr_CraftingBackpackSlots);
+			System.IntPtr intPtr = *(System.IntPtr*)num;
+			return (intPtr != (System.IntPtr)0) ? Il2CppObjectPool.Get<List<GameObject>>(intPtr) : null;
+		}
+		set
+		{
+			System.IntPtr num = IL2CPP.Il2CppObjectBaseToPtrNotNull(this);
+			IL2CPP.il2cpp_gc_wbarrier_set_field(num, (nint)num + (int)IL2CPP.il2cpp_field_get_offset(NativeFieldInfoPtr_CraftingBackpackSlots), IL2CPP.Il2CppObjectBaseToPtr(obj));
+		}
+	}
+
+	public unsafe List<GameObject> BackpackBackgroundSlots
+	{
+		get
+		{
+			nint num = (nint)IL2CPP.Il2CppObjectBaseToPtrNotNull(this) + (int)IL2CPP.il2cpp_field_get_offset(NativeFieldInfoPtr_BackpackBackgroundSlots);
+			System.IntPtr intPtr = *(System.IntPtr*)num;
+			return (intPtr != (System.IntPtr)0) ? Il2CppObjectPool.Get<List<GameObject>>(intPtr) : null;
+		}
+		set
+		{
+			System.IntPtr num = IL2CPP.Il2CppObjectBaseToPtrNotNull(this);
+			IL2CPP.il2cpp_gc_wbarrier_set_field(num, (nint)num + (int)IL2CPP.il2cpp_field_get_offset(NativeFieldInfoPtr_BackpackBackgroundSlots), IL2CPP.Il2CppObjectBaseToPtr(obj));
+		}
+	}
+
+	public unsafe List<GameObject> CraftingBackgroundSlots
+	{
+		get
+		{
+			nint num = (nint)IL2CPP.Il2CppObjectBaseToPtrNotNull(this) + (int)IL2CPP.il2cpp_field_get_offset(NativeFieldInfoPtr_CraftingBackgroundSlots);
+			System.IntPtr intPtr = *(System.IntPtr*)num;
+			return (intPtr != (System.IntPtr)0) ? Il2CppObjectPool.Get<List<GameObject>>(intPtr) : null;
+		}
+		set
+		{
+			System.IntPtr num = IL2CPP.Il2CppObjectBaseToPtrNotNull(this);
+			IL2CPP.il2cpp_gc_wbarrier_set_field(num, (nint)num + (int)IL2CPP.il2cpp_field_get_offset(NativeFieldInfoPtr_CraftingBackgroundSlots), IL2CPP.Il2CppObjectBaseToPtr(obj));
+		}
+	}
+
+	public unsafe List<GameObject> EquipmentSlots
+	{
+		get
+		{
+			nint num = (nint)IL2CPP.Il2CppObjectBaseToPtrNotNull(this) + (int)IL2CPP.il2cpp_field_get_offset(NativeFieldInfoPtr_EquipmentSlots);
+			System.IntPtr intPtr = *(System.IntPtr*)num;
+			return (intPtr != (System.IntPtr)0) ? Il2CppObjectPool.Get<List<GameObject>>(intPtr) : null;
+		}
+		set
+		{
+			System.IntPtr num = IL2CPP.Il2CppObjectBaseToPtrNotNull(this);
+			IL2CPP.il2cpp_gc_wbarrier_set_field(num, (nint)num + (int)IL2CPP.il2cpp_field_get_offset(NativeFieldInfoPtr_EquipmentSlots), IL2CPP.Il2CppObjectBaseToPtr(obj));
+		}
+	}
+
+	public unsafe List<GameObject> PetSlots
+	{
+		get
+		{
+			nint num = (nint)IL2CPP.Il2CppObjectBaseToPtrNotNull(this) + (int)IL2CPP.il2cpp_field_get_offset(NativeFieldInfoPtr_PetSlots);
+			System.IntPtr intPtr = *(System.IntPtr*)num;
+			return (intPtr != (System.IntPtr)0) ? Il2CppObjectPool.Get<List<GameObject>>(intPtr) : null;
+		}
+		set
+		{
+			System.IntPtr num = IL2CPP.Il2CppObjectBaseToPtrNotNull(this);
+			IL2CPP.il2cpp_gc_wbarrier_set_field(num, (nint)num + (int)IL2CPP.il2cpp_field_get_offset(NativeFieldInfoPtr_PetSlots), IL2CPP.Il2CppObjectBaseToPtr(obj));
+		}
+	}
+
+	public unsafe List<GameObject> EquipmentSlotBackgrounds
+	{
+		get
+		{
+			nint num = (nint)IL2CPP.Il2CppObjectBaseToPtrNotNull(this) + (int)IL2CPP.il2cpp_field_get_offset(NativeFieldInfoPtr_EquipmentSlotBackgrounds);
+			System.IntPtr intPtr = *(System.IntPtr*)num;
+			return (intPtr != (System.IntPtr)0) ? Il2CppObjectPool.Get<List<GameObject>>(intPtr) : null;
+		}
+		set
+		{
+			System.IntPtr num = IL2CPP.Il2CppObjectBaseToPtrNotNull(this);
+			IL2CPP.il2cpp_gc_wbarrier_set_field(num, (nint)num + (int)IL2CPP.il2cpp_field_get_offset(NativeFieldInfoPtr_EquipmentSlotBackgrounds), IL2CPP.Il2CppObjectBaseToPtr(obj));
+		}
+	}
+
+	public unsafe List<GameObject> EquippedRunes
+	{
+		get
+		{
+			nint num = (nint)IL2CPP.Il2CppObjectBaseToPtrNotNull(this) + (int)IL2CPP.il2cpp_field_get_offset(NativeFieldInfoPtr_EquippedRunes);
+			System.IntPtr intPtr = *(System.IntPtr*)num;
+			return (intPtr != (System.IntPtr)0) ? Il2CppObjectPool.Get<List<GameObject>>(intPtr) : null;
+		}
+		set
+		{
+			System.IntPtr num = IL2CPP.Il2CppObjectBaseToPtrNotNull(this);
+			IL2CPP.il2cpp_gc_wbarrier_set_field(num, (nint)num + (int)IL2CPP.il2cpp_field_get_offset(NativeFieldInfoPtr_EquippedRunes), IL2CPP.Il2CppObjectBaseToPtr(obj));
+		}
+	}
+
+	public unsafe List<GameObject> InventoryItemSlots
+	{
+		get
+		{
+			nint num = (nint)IL2CPP.Il2CppObjectBaseToPtrNotNull(this) + (int)IL2CPP.il2cpp_field_get_offset(NativeFieldInfoPtr_InventoryItemSlots);
+			System.IntPtr intPtr = *(System.IntPtr*)num;
+			return (intPtr != (System.IntPtr)0) ? Il2CppObjectPool.Get<List<GameObject>>(intPtr) : null;
+		}
+		set
+		{
+			System.IntPtr num = IL2CPP.Il2CppObjectBaseToPtrNotNull(this);
+			IL2CPP.il2cpp_gc_wbarrier_set_field(num, (nint)num + (int)IL2CPP.il2cpp_field_get_offset(NativeFieldInfoPtr_InventoryItemSlots), IL2CPP.Il2CppObjectBaseToPtr(obj));
+		}
+	}
+
+	public unsafe List<GameObject> EquippedTools
+	{
+		get
+		{
+			nint num = (nint)IL2CPP.Il2CppObjectBaseToPtrNotNull(this) + (int)IL2CPP.il2cpp_field_get_offset(NativeFieldInfoPtr_EquippedTools);
+			System.IntPtr intPtr = *(System.IntPtr*)num;
+			return (intPtr != (System.IntPtr)0) ? Il2CppObjectPool.Get<List<GameObject>>(intPtr) : null;
+		}
+		set
+		{
+			System.IntPtr num = IL2CPP.Il2CppObjectBaseToPtrNotNull(this);
+			IL2CPP.il2cpp_gc_wbarrier_set_field(num, (nint)num + (int)IL2CPP.il2cpp_field_get_offset(NativeFieldInfoPtr_EquippedTools), IL2CPP.Il2CppObjectBaseToPtr(obj));
+		}
+	}
+
+	public unsafe RectTransform BackpackScrollContent
+	{
+		get
+		{
+			nint num = (nint)IL2CPP.Il2CppObjectBaseToPtrNotNull(this) + (int)IL2CPP.il2cpp_field_get_offset(NativeFieldInfoPtr_BackpackScrollContent);
+			System.IntPtr intPtr = *(System.IntPtr*)num;
+			return (intPtr != (System.IntPtr)0) ? Il2CppObjectPool.Get<RectTransform>(intPtr) : null;
+		}
+		set
+		{
+			System.IntPtr num = IL2CPP.Il2CppObjectBaseToPtrNotNull(this);
+			IL2CPP.il2cpp_gc_wbarrier_set_field(num, (nint)num + (int)IL2CPP.il2cpp_field_get_offset(NativeFieldInfoPtr_BackpackScrollContent), IL2CPP.Il2CppObjectBaseToPtr(obj));
+		}
+	}
+
+	public unsafe RectTransform CraftingScrollContent
+	{
+		get
+		{
+			nint num = (nint)IL2CPP.Il2CppObjectBaseToPtrNotNull(this) + (int)IL2CPP.il2cpp_field_get_offset(NativeFieldInfoPtr_CraftingScrollContent);
+			System.IntPtr intPtr = *(System.IntPtr*)num;
+			return (intPtr != (System.IntPtr)0) ? Il2CppObjectPool.Get<RectTransform>(intPtr) : null;
+		}
+		set
+		{
+			System.IntPtr num = IL2CPP.Il2CppObjectBaseToPtrNotNull(this);
+			IL2CPP.il2cpp_gc_wbarrier_set_field(num, (nint)num + (int)IL2CPP.il2cpp_field_get_offset(NativeFieldInfoPtr_CraftingScrollContent), IL2CPP.Il2CppObjectBaseToPtr(obj));
+		}
+	}
+
+	public unsafe GameObject EquippedPet
+	{
+		get
+		{
+			nint num = (nint)IL2CPP.Il2CppObjectBaseToPtrNotNull(this) + (int)IL2CPP.il2cpp_field_get_offset(NativeFieldInfoPtr_EquippedPet);
+			System.IntPtr intPtr = *(System.IntPtr*)num;
+			return (intPtr != (System.IntPtr)0) ? Il2CppObjectPool.Get<GameObject>(intPtr) : null;
+		}
+		set
+		{
+			System.IntPtr num = IL2CPP.Il2CppObjectBaseToPtrNotNull(this);
+			IL2CPP.il2cpp_gc_wbarrier_set_field(num, (nint)num + (int)IL2CPP.il2cpp_field_get_offset(NativeFieldInfoPtr_EquippedPet), IL2CPP.Il2CppObjectBaseToPtr(obj));
+		}
+	}
+
+	public unsafe GameObject EquippedFood
+	{
+		get
+		{
+			nint num = (nint)IL2CPP.Il2CppObjectBaseToPtrNotNull(this) + (int)IL2CPP.il2cpp_field_get_offset(NativeFieldInfoPtr_EquippedFood);
+			System.IntPtr intPtr = *(System.IntPtr*)num;
+			return (intPtr != (System.IntPtr)0) ? Il2CppObjectPool.Get<GameObject>(intPtr) : null;
+		}
+		set
+		{
+			System.IntPtr num = IL2CPP.Il2CppObjectBaseToPtrNotNull(this);
+			IL2CPP.il2cpp_gc_wbarrier_set_field(num, (nint)num + (int)IL2CPP.il2cpp_field_get_offset(NativeFieldInfoPtr_EquippedFood), IL2CPP.Il2CppObjectBaseToPtr(obj));
+		}
+	}
+
+	public unsafe GameObject EquippedDrink
+	{
+		get
+		{
+			nint num = (nint)IL2CPP.Il2CppObjectBaseToPtrNotNull(this) + (int)IL2CPP.il2cpp_field_get_offset(NativeFieldInfoPtr_EquippedDrink);
+			System.IntPtr intPtr = *(System.IntPtr*)num;
+			return (intPtr != (System.IntPtr)0) ? Il2CppObjectPool.Get<GameObject>(intPtr) : null;
+		}
+		set
+		{
+			System.IntPtr num = IL2CPP.Il2CppObjectBaseToPtrNotNull(this);
+			IL2CPP.il2cpp_gc_wbarrier_set_field(num, (nint)num + (int)IL2CPP.il2cpp_field_get_offset(NativeFieldInfoPtr_EquippedDrink), IL2CPP.Il2CppObjectBaseToPtr(obj));
+		}
+	}
+
+	public unsafe GameObject PetSlotsParent
+	{
+		get
+		{
+			nint num = (nint)IL2CPP.Il2CppObjectBaseToPtrNotNull(this) + (int)IL2CPP.il2cpp_field_get_offset(NativeFieldInfoPtr_PetSlotsParent);
+			System.IntPtr intPtr = *(System.IntPtr*)num;
+			return (intPtr != (System.IntPtr)0) ? Il2CppObjectPool.Get<GameObject>(intPtr) : null;
+		}
+		set
+		{
+			System.IntPtr num = IL2CPP.Il2CppObjectBaseToPtrNotNull(this);
+			IL2CPP.il2cpp_gc_wbarrier_set_field(num, (nint)num + (int)IL2CPP.il2cpp_field_get_offset(NativeFieldInfoPtr_PetSlotsParent), IL2CPP.Il2CppObjectBaseToPtr(obj));
+		}
+	}
+
+	public unsafe GameObject SplitSlider
+	{
+		get
+		{
+			nint num = (nint)IL2CPP.Il2CppObjectBaseToPtrNotNull(this) + (int)IL2CPP.il2cpp_field_get_offset(NativeFieldInfoPtr_SplitSlider);
+			System.IntPtr intPtr = *(System.IntPtr*)num;
+			return (intPtr != (System.IntPtr)0) ? Il2CppObjectPool.Get<GameObject>(intPtr) : null;
+		}
+		set
+		{
+			System.IntPtr num = IL2CPP.Il2CppObjectBaseToPtrNotNull(this);
+			IL2CPP.il2cpp_gc_wbarrier_set_field(num, (nint)num + (int)IL2CPP.il2cpp_field_get_offset(NativeFieldInfoPtr_SplitSlider), IL2CPP.Il2CppObjectBaseToPtr(obj));
+		}
+	}
+
+	static InventoryPanelSlots()
+	{
+		Il2CppClassPointerStore<InventoryPanelSlots>.NativeClassPtr = IL2CPP.GetIl2CppClass("Assembly-CSharp.dll", "", "InventoryPanelSlots");
+		IL2CPP.il2cpp_runtime_class_init(Il2CppClassPointerStore<InventoryPanelSlots>.NativeClassPtr);
+		NativeFieldInfoPtr_TrashCan = IL2CPP.GetIl2CppField(Il2CppClassPointerStore<InventoryPanelSlots>.NativeClassPtr, "TrashCan");
+		NativeFieldInfoPtr_BackpackSlots = IL2CPP.GetIl2CppField(Il2CppClassPointerStore<InventoryPanelSlots>.NativeClassPtr, "BackpackSlots");
+		NativeFieldInfoPtr_CraftingBackpackSlots = IL2CPP.GetIl2CppField(Il2CppClassPointerStore<InventoryPanelSlots>.NativeClassPtr, "CraftingBackpackSlots");
+		NativeFieldInfoPtr_BackpackBackgroundSlots = IL2CPP.GetIl2CppField(Il2CppClassPointerStore<InventoryPanelSlots>.NativeClassPtr, "BackpackBackgroundSlots");
+		NativeFieldInfoPtr_CraftingBackgroundSlots = IL2CPP.GetIl2CppField(Il2CppClassPointerStore<InventoryPanelSlots>.NativeClassPtr, "CraftingBackgroundSlots");
+		NativeFieldInfoPtr_EquipmentSlots = IL2CPP.GetIl2CppField(Il2CppClassPointerStore<InventoryPanelSlots>.NativeClassPtr, "EquipmentSlots");
+		NativeFieldInfoPtr_PetSlots = IL2CPP.GetIl2CppField(Il2CppClassPointerStore<InventoryPanelSlots>.NativeClassPtr, "PetSlots");
+		NativeFieldInfoPtr_EquipmentSlotBackgrounds = IL2CPP.GetIl2CppField(Il2CppClassPointerStore<InventoryPanelSlots>.NativeClassPtr, "EquipmentSlotBackgrounds");
+		NativeFieldInfoPtr_EquippedRunes = IL2CPP.GetIl2CppField(Il2CppClassPointerStore<InventoryPanelSlots>.NativeClassPtr, "EquippedRunes");
+		NativeFieldInfoPtr_InventoryItemSlots = IL2CPP.GetIl2CppField(Il2CppClassPointerStore<InventoryPanelSlots>.NativeClassPtr, "InventoryItemSlots");
+		NativeFieldInfoPtr_EquippedTools = IL2CPP.GetIl2CppField(Il2CppClassPointerStore<InventoryPanelSlots>.NativeClassPtr, "EquippedTools");
+		NativeFieldInfoPtr_BackpackScrollContent = IL2CPP.GetIl2CppField(Il2CppClassPointerStore<InventoryPanelSlots>.NativeClassPtr, "BackpackScrollContent");
+		NativeFieldInfoPtr_CraftingScrollContent = IL2CPP.GetIl2CppField(Il2CppClassPointerStore<InventoryPanelSlots>.NativeClassPtr, "CraftingScrollContent");
+		NativeFieldInfoPtr_EquippedPet = IL2CPP.GetIl2CppField(Il2CppClassPointerStore<InventoryPanelSlots>.NativeClassPtr, "EquippedPet");
+		NativeFieldInfoPtr_EquippedFood = IL2CPP.GetIl2CppField(Il2CppClassPointerStore<InventoryPanelSlots>.NativeClassPtr, "EquippedFood");
+		NativeFieldInfoPtr_EquippedDrink = IL2CPP.GetIl2CppField(Il2CppClassPointerStore<InventoryPanelSlots>.NativeClassPtr, "EquippedDrink");
+		NativeFieldInfoPtr_PetSlotsParent = IL2CPP.GetIl2CppField(Il2CppClassPointerStore<InventoryPanelSlots>.NativeClassPtr, "PetSlotsParent");
+		NativeFieldInfoPtr_SplitSlider = IL2CPP.GetIl2CppField(Il2CppClassPointerStore<InventoryPanelSlots>.NativeClassPtr, "SplitSlider");
+		NativeMethodInfoPtr__ctor_Public_Void_0 = IL2CPP.GetIl2CppMethodByToken(Il2CppClassPointerStore<InventoryPanelSlots>.NativeClassPtr, 100695776);
+	}
+
+	[CallerCount(3573)]
+	[CachedScanResults(RefRangeStart = 24693, RefRangeEnd = 28266, XrefRangeStart = 24693, XrefRangeEnd = 28266, MetadataInitTokenRva = 0L, MetadataInitFlagRva = 0L)]
+	public unsafe InventoryPanelSlots()
+		: this(IL2CPP.il2cpp_object_new(Il2CppClassPointerStore<InventoryPanelSlots>.NativeClassPtr))
+	{
+		System.IntPtr* param = null;
+		Unsafe.SkipInit(out System.IntPtr exc);
+		System.IntPtr intPtr = IL2CPP.il2cpp_runtime_invoke(NativeMethodInfoPtr__ctor_Public_Void_0, IL2CPP.Il2CppObjectBaseToPtrNotNull(this), (void**)param, ref exc);
+		Il2CppInterop.Runtime.Il2CppException.RaiseExceptionIfNecessary(exc);
+	}
+
+	public InventoryPanelSlots(System.IntPtr pointer)
+		: base(pointer)
+	{
+	}
+}

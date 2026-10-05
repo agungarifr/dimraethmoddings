@@ -1,0 +1,718 @@
+using System;
+using System.Collections;
+using System.Collections.Generic;
+using System.Diagnostics;
+using System.Runtime.CompilerServices;
+using Cpp2ILInjected;
+using Unity.Netcode;
+using UnityEngine;
+
+[Token(Token = "0x2000B20")]
+public class TimeManager : NetworkBehaviour
+{
+	[Token(Token = "0x2000B21")]
+	public delegate void TimePulseDelegate(GameTime currentTime);
+
+	[Token(Token = "0x2000B22")]
+	public delegate void TimeChangeDelegate(GameTime newTime);
+
+	[Token(Token = "0x2000B23")]
+	public delegate void NightChangeDelegate(bool isNight);
+
+	[Token(Token = "0x2000B24")]
+	public delegate void SeasonChangeDelegate(bool isWinter);
+
+	[CompilerGenerated]
+	[Token(Token = "0x2000B25")]
+	private sealed class <LightUpdateCoroutine>d__41 : IEnumerator<object>, IEnumerator, IDisposable
+	{
+		[Token(Token = "0x40054EF")]
+		[FieldOffset(Offset = "0x10")]
+		private int <>1__state;
+
+		[Token(Token = "0x40054F0")]
+		[FieldOffset(Offset = "0x18")]
+		private object <>2__current;
+
+		[Token(Token = "0x40054F1")]
+		[FieldOffset(Offset = "0x20")]
+		public TimeManager <>4__this;
+
+		[Token(Token = "0x40054F2")]
+		[FieldOffset(Offset = "0x28")]
+		private WaitForSeconds <wait>5__2;
+
+		[Token(Token = "0x170009D1")]
+		object IEnumerator<object>.Current
+		{
+			[DebuggerHidden]
+			[Token(Token = "0x6005B68")]
+			[Address(RVA = "0x6B1E50", Offset = "0x6B0E50", Length = "0x5")]
+			get
+			{
+				return null;
+			}
+		}
+
+		[Token(Token = "0x170009D2")]
+		object IEnumerator.Current
+		{
+			[DebuggerHidden]
+			[Token(Token = "0x6005B6A")]
+			[Address(RVA = "0x6B1E50", Offset = "0x6B0E50", Length = "0x5")]
+			get
+			{
+				return null;
+			}
+		}
+
+		[DebuggerHidden]
+		[Token(Token = "0x6005B65")]
+		[Address(RVA = "0x6B1EA0", Offset = "0x6B0EA0", Length = "0x24")]
+		public <LightUpdateCoroutine>d__41(int <>1__state)
+		{
+		}
+
+		[DebuggerHidden]
+		[Token(Token = "0x6005B66")]
+		[Address(RVA = "0x6AAC60", Offset = "0x6A9C60", Length = "0x3")]
+		void IDisposable.Dispose()
+		{
+		}
+
+		[Token(Token = "0x6005B67")]
+		[Address(RVA = "0xEFFE40", Offset = "0xEFEE40", Length = "0xCB")]
+		private bool MoveNext()
+		{
+			return false;
+		}
+
+		bool IEnumerator.MoveNext()
+		{
+			//ILSpy generated this explicit interface implementation from .override directive in MoveNext
+			return this.MoveNext();
+		}
+
+		[DebuggerHidden]
+		[Token(Token = "0x6005B69")]
+		[Address(RVA = "0xEFFF10", Offset = "0xEFEF10", Length = "0x3E")]
+		void IEnumerator.Reset()
+		{
+		}
+	}
+
+	[CompilerGenerated]
+	[Token(Token = "0x2000B26")]
+	private sealed class <ShiftLightFromOneSceneToNext>d__52 : IEnumerator<object>, IEnumerator, IDisposable
+	{
+		[Token(Token = "0x40054F3")]
+		[FieldOffset(Offset = "0x10")]
+		private int <>1__state;
+
+		[Token(Token = "0x40054F4")]
+		[FieldOffset(Offset = "0x18")]
+		private object <>2__current;
+
+		[Token(Token = "0x40054F5")]
+		[FieldOffset(Offset = "0x20")]
+		public TimeManager <>4__this;
+
+		[Token(Token = "0x40054F6")]
+		[FieldOffset(Offset = "0x28")]
+		public SceneHandler newHandler;
+
+		[Token(Token = "0x40054F7")]
+		[FieldOffset(Offset = "0x30")]
+		public bool instantDuration;
+
+		[Token(Token = "0x40054F8")]
+		[FieldOffset(Offset = "0x34")]
+		private float <startSunIntensity>5__2;
+
+		[Token(Token = "0x40054F9")]
+		[FieldOffset(Offset = "0x38")]
+		private float <startEnvIntensity>5__3;
+
+		[Token(Token = "0x40054FA")]
+		[FieldOffset(Offset = "0x3C")]
+		private float <targetSunIntensity>5__4;
+
+		[Token(Token = "0x40054FB")]
+		[FieldOffset(Offset = "0x40")]
+		private float <targetEnvIntensity>5__5;
+
+		[Token(Token = "0x40054FC")]
+		[FieldOffset(Offset = "0x44")]
+		private float <duration>5__6;
+
+		[Token(Token = "0x40054FD")]
+		[FieldOffset(Offset = "0x48")]
+		private float <elapsed>5__7;
+
+		[Token(Token = "0x170009D3")]
+		object IEnumerator<object>.Current
+		{
+			[DebuggerHidden]
+			[Token(Token = "0x6005B6E")]
+			[Address(RVA = "0x6B1E50", Offset = "0x6B0E50", Length = "0x5")]
+			get
+			{
+				return null;
+			}
+		}
+
+		[Token(Token = "0x170009D4")]
+		object IEnumerator.Current
+		{
+			[DebuggerHidden]
+			[Token(Token = "0x6005B70")]
+			[Address(RVA = "0x6B1E50", Offset = "0x6B0E50", Length = "0x5")]
+			get
+			{
+				return null;
+			}
+		}
+
+		[DebuggerHidden]
+		[Token(Token = "0x6005B6B")]
+		[Address(RVA = "0x6B1EA0", Offset = "0x6B0EA0", Length = "0x24")]
+		public <ShiftLightFromOneSceneToNext>d__52(int <>1__state)
+		{
+		}
+
+		[DebuggerHidden]
+		[Token(Token = "0x6005B6C")]
+		[Address(RVA = "0x6AAC60", Offset = "0x6A9C60", Length = "0x3")]
+		void IDisposable.Dispose()
+		{
+		}
+
+		[Token(Token = "0x6005B6D")]
+		[Address(RVA = "0xEFFF50", Offset = "0xEFEF50", Length = "0x50C")]
+		private bool MoveNext()
+		{
+			return false;
+		}
+
+		bool IEnumerator.MoveNext()
+		{
+			//ILSpy generated this explicit interface implementation from .override directive in MoveNext
+			return this.MoveNext();
+		}
+
+		[DebuggerHidden]
+		[Token(Token = "0x6005B6F")]
+		[Address(RVA = "0xF00460", Offset = "0xEFF460", Length = "0x3E")]
+		void IEnumerator.Reset()
+		{
+		}
+	}
+
+	[CompilerGenerated]
+	[Token(Token = "0x2000B27")]
+	private sealed class <TimePulseCoroutine>d__39 : IEnumerator<object>, IEnumerator, IDisposable
+	{
+		[Token(Token = "0x40054FE")]
+		[FieldOffset(Offset = "0x10")]
+		private int <>1__state;
+
+		[Token(Token = "0x40054FF")]
+		[FieldOffset(Offset = "0x18")]
+		private object <>2__current;
+
+		[Token(Token = "0x4005500")]
+		[FieldOffset(Offset = "0x20")]
+		public TimeManager <>4__this;
+
+		[Token(Token = "0x4005501")]
+		[FieldOffset(Offset = "0x28")]
+		private WaitForSeconds <wait>5__2;
+
+		[Token(Token = "0x170009D5")]
+		object IEnumerator<object>.Current
+		{
+			[DebuggerHidden]
+			[Token(Token = "0x6005B74")]
+			[Address(RVA = "0x6B1E50", Offset = "0x6B0E50", Length = "0x5")]
+			get
+			{
+				return null;
+			}
+		}
+
+		[Token(Token = "0x170009D6")]
+		object IEnumerator.Current
+		{
+			[DebuggerHidden]
+			[Token(Token = "0x6005B76")]
+			[Address(RVA = "0x6B1E50", Offset = "0x6B0E50", Length = "0x5")]
+			get
+			{
+				return null;
+			}
+		}
+
+		[DebuggerHidden]
+		[Token(Token = "0x6005B71")]
+		[Address(RVA = "0x6B1EA0", Offset = "0x6B0EA0", Length = "0x24")]
+		public <TimePulseCoroutine>d__39(int <>1__state)
+		{
+		}
+
+		[DebuggerHidden]
+		[Token(Token = "0x6005B72")]
+		[Address(RVA = "0x6AAC60", Offset = "0x6A9C60", Length = "0x3")]
+		void IDisposable.Dispose()
+		{
+		}
+
+		[Token(Token = "0x6005B73")]
+		[Address(RVA = "0xF004A0", Offset = "0xEFF4A0", Length = "0x113")]
+		private bool MoveNext()
+		{
+			return false;
+		}
+
+		bool IEnumerator.MoveNext()
+		{
+			//ILSpy generated this explicit interface implementation from .override directive in MoveNext
+			return this.MoveNext();
+		}
+
+		[DebuggerHidden]
+		[Token(Token = "0x6005B75")]
+		[Address(RVA = "0xF005C0", Offset = "0xEFF5C0", Length = "0x3E")]
+		void IEnumerator.Reset()
+		{
+		}
+	}
+
+	[CompilerGenerated]
+	[Token(Token = "0x2000B28")]
+	private sealed class <TimeUpdateCoroutine>d__40 : IEnumerator<object>, IEnumerator, IDisposable
+	{
+		[Token(Token = "0x4005502")]
+		[FieldOffset(Offset = "0x10")]
+		private int <>1__state;
+
+		[Token(Token = "0x4005503")]
+		[FieldOffset(Offset = "0x18")]
+		private object <>2__current;
+
+		[Token(Token = "0x4005504")]
+		[FieldOffset(Offset = "0x20")]
+		public TimeManager <>4__this;
+
+		[Token(Token = "0x170009D7")]
+		object IEnumerator<object>.Current
+		{
+			[DebuggerHidden]
+			[Token(Token = "0x6005B7A")]
+			[Address(RVA = "0x6B1E50", Offset = "0x6B0E50", Length = "0x5")]
+			get
+			{
+				return null;
+			}
+		}
+
+		[Token(Token = "0x170009D8")]
+		object IEnumerator.Current
+		{
+			[DebuggerHidden]
+			[Token(Token = "0x6005B7C")]
+			[Address(RVA = "0x6B1E50", Offset = "0x6B0E50", Length = "0x5")]
+			get
+			{
+				return null;
+			}
+		}
+
+		[DebuggerHidden]
+		[Token(Token = "0x6005B77")]
+		[Address(RVA = "0x6B1EA0", Offset = "0x6B0EA0", Length = "0x24")]
+		public <TimeUpdateCoroutine>d__40(int <>1__state)
+		{
+		}
+
+		[DebuggerHidden]
+		[Token(Token = "0x6005B78")]
+		[Address(RVA = "0x6AAC60", Offset = "0x6A9C60", Length = "0x3")]
+		void IDisposable.Dispose()
+		{
+		}
+
+		[Token(Token = "0x6005B79")]
+		[Address(RVA = "0xF00600", Offset = "0xEFF600", Length = "0xF8")]
+		private bool MoveNext()
+		{
+			return false;
+		}
+
+		bool IEnumerator.MoveNext()
+		{
+			//ILSpy generated this explicit interface implementation from .override directive in MoveNext
+			return this.MoveNext();
+		}
+
+		[DebuggerHidden]
+		[Token(Token = "0x6005B7B")]
+		[Address(RVA = "0xF00700", Offset = "0xEFF700", Length = "0x3E")]
+		void IEnumerator.Reset()
+		{
+		}
+	}
+
+	[Token(Token = "0x40054E3")]
+	[FieldOffset(Offset = "0x88")]
+	private NetworkVariable<GameTime> _networkGameTime;
+
+	[CompilerGenerated]
+	[Token(Token = "0x40054E6")]
+	private static TimePulseDelegate m_OnTimePulse;
+
+	[CompilerGenerated]
+	[Token(Token = "0x40054E7")]
+	private static TimeChangeDelegate m_OnTimeChanged;
+
+	[CompilerGenerated]
+	[Token(Token = "0x40054E8")]
+	private static NightChangeDelegate m_OnNightChanged;
+
+	[CompilerGenerated]
+	[Token(Token = "0x40054E9")]
+	private static SeasonChangeDelegate m_OnSeaonChanged;
+
+	[Token(Token = "0x40054EA")]
+	[FieldOffset(Offset = "0x98")]
+	private Coroutine _timeUpdateCoroutine;
+
+	[Token(Token = "0x40054EB")]
+	[FieldOffset(Offset = "0xA0")]
+	private Coroutine _lightUpdateCoroutine;
+
+	[Token(Token = "0x40054EC")]
+	[FieldOffset(Offset = "0xA8")]
+	private Coroutine _pulseCoroutine;
+
+	[Token(Token = "0x40054ED")]
+	[FieldOffset(Offset = "0xB0")]
+	private bool _temporarySceneShift;
+
+	[Token(Token = "0x40054EE")]
+	[FieldOffset(Offset = "0xB1")]
+	private bool _initialLoad;
+
+	[Token(Token = "0x170009CD")]
+	[field: Token(Token = "0x40054E2")]
+	public static TimeManager Singleton
+	{
+		[Token(Token = "0x6005B28")]
+		[Address(RVA = "0xEFEF00", Offset = "0xEFDF00", Length = "0x36")]
+		get;
+		[Token(Token = "0x6005B29")]
+		[Address(RVA = "0xEFF260", Offset = "0xEFE260", Length = "0x51")]
+		private set;
+	}
+
+	[Token(Token = "0x170009CE")]
+	public GameTime CurrentGameTime
+	{
+		[Token(Token = "0x6005B2A")]
+		[Address(RVA = "0xEFEEB0", Offset = "0xEFDEB0", Length = "0x2A")]
+		get
+		{
+			return null;
+		}
+	}
+
+	[Token(Token = "0x170009CF")]
+	[field: Token(Token = "0x40054E4")]
+	[field: FieldOffset(Offset = "0x90")]
+	public bool IsNight
+	{
+		[Token(Token = "0x6005B2C")]
+		[Address(RVA = "0xEFEEE0", Offset = "0xEFDEE0", Length = "0x8")]
+		get;
+		[Token(Token = "0x6005B2D")]
+		[Address(RVA = "0xEFF240", Offset = "0xEFE240", Length = "0x7")]
+		private set;
+	}
+
+	[Token(Token = "0x170009D0")]
+	[field: Token(Token = "0x40054E5")]
+	[field: FieldOffset(Offset = "0x91")]
+	public bool IsWinter
+	{
+		[Token(Token = "0x6005B2E")]
+		[Address(RVA = "0xEFEEF0", Offset = "0xEFDEF0", Length = "0x8")]
+		get;
+		[Token(Token = "0x6005B2F")]
+		[Address(RVA = "0xEFF250", Offset = "0xEFE250", Length = "0x7")]
+		private set;
+	}
+
+	[Token(Token = "0x1400006E")]
+	public static event TimePulseDelegate OnTimePulse
+	{
+		[CompilerGenerated]
+		[Token(Token = "0x6005B30")]
+		[Address(RVA = "0xEFEDF0", Offset = "0xEFDDF0", Length = "0xB8")]
+		add
+		{
+		}
+		[CompilerGenerated]
+		[Token(Token = "0x6005B31")]
+		[Address(RVA = "0xEFF180", Offset = "0xEFE180", Length = "0xB8")]
+		remove
+		{
+		}
+	}
+
+	[Token(Token = "0x1400006F")]
+	public static event TimeChangeDelegate OnTimeChanged
+	{
+		[CompilerGenerated]
+		[Token(Token = "0x6005B32")]
+		[Address(RVA = "0xEFED30", Offset = "0xEFDD30", Length = "0xB8")]
+		add
+		{
+		}
+		[CompilerGenerated]
+		[Token(Token = "0x6005B33")]
+		[Address(RVA = "0xEFF0C0", Offset = "0xEFE0C0", Length = "0xB8")]
+		remove
+		{
+		}
+	}
+
+	[Token(Token = "0x14000070")]
+	public static event NightChangeDelegate OnNightChanged
+	{
+		[CompilerGenerated]
+		[Token(Token = "0x6005B34")]
+		[Address(RVA = "0xEFEBB0", Offset = "0xEFDBB0", Length = "0xB8")]
+		add
+		{
+		}
+		[CompilerGenerated]
+		[Token(Token = "0x6005B35")]
+		[Address(RVA = "0xEFEF40", Offset = "0xEFDF40", Length = "0xB8")]
+		remove
+		{
+		}
+	}
+
+	[Token(Token = "0x14000071")]
+	public static event SeasonChangeDelegate OnSeaonChanged
+	{
+		[CompilerGenerated]
+		[Token(Token = "0x6005B36")]
+		[Address(RVA = "0xEFEC70", Offset = "0xEFDC70", Length = "0xB8")]
+		add
+		{
+		}
+		[CompilerGenerated]
+		[Token(Token = "0x6005B37")]
+		[Address(RVA = "0xEFF000", Offset = "0xEFE000", Length = "0xB8")]
+		remove
+		{
+		}
+	}
+
+	[Token(Token = "0x6005B2B")]
+	[Address(RVA = "0xEFE510", Offset = "0xEFD510", Length = "0x36")]
+	public bool SeasonChange()
+	{
+		return false;
+	}
+
+	[Token(Token = "0x6005B38")]
+	[Address(RVA = "0xEFCB30", Offset = "0xEFBB30", Length = "0x183")]
+	private void Awake()
+	{
+	}
+
+	[Token(Token = "0x6005B39")]
+	[Address(RVA = "0xEFE210", Offset = "0xEFD210", Length = "0x2FB")]
+	public override void OnNetworkSpawn()
+	{
+	}
+
+	[IteratorStateMachine(typeof(<TimePulseCoroutine>d__39))]
+	[Token(Token = "0x6005B3A")]
+	[Address(RVA = "0xEFE5D0", Offset = "0xEFD5D0", Length = "0x67")]
+	private IEnumerator TimePulseCoroutine()
+	{
+		return null;
+	}
+
+	[IteratorStateMachine(typeof(<TimeUpdateCoroutine>d__40))]
+	[Token(Token = "0x6005B3B")]
+	[Address(RVA = "0xEFE640", Offset = "0xEFD640", Length = "0x67")]
+	private IEnumerator TimeUpdateCoroutine()
+	{
+		return null;
+	}
+
+	[IteratorStateMachine(typeof(<LightUpdateCoroutine>d__41))]
+	[Token(Token = "0x6005B3C")]
+	[Address(RVA = "0xEFE090", Offset = "0xEFD090", Length = "0x67")]
+	private IEnumerator LightUpdateCoroutine()
+	{
+		return null;
+	}
+
+	[Token(Token = "0x6005B3D")]
+	[Address(RVA = "0xEFDED0", Offset = "0xEFCED0", Length = "0x1BB")]
+	private void IncrementGameTime()
+	{
+	}
+
+	[Token(Token = "0x6005B3E")]
+	[Address(RVA = "0xEFDEA0", Offset = "0xEFCEA0", Length = "0x23")]
+	private void HourCheck(GameTime newTime)
+	{
+	}
+
+	[Token(Token = "0x6005B3F")]
+	[Address(RVA = "0xEFD310", Offset = "0xEFC310", Length = "0xEE")]
+	private void DayCheck(GameTime newTime)
+	{
+	}
+
+	[Token(Token = "0x6005B40")]
+	[Address(RVA = "0xEFE100", Offset = "0xEFD100", Length = "0x23")]
+	private void MonthCheck(GameTime newTime)
+	{
+	}
+
+	[Token(Token = "0x6005B41")]
+	[Address(RVA = "0xEFE990", Offset = "0xEFD990", Length = "0x23")]
+	private void YearCheck(GameTime newTime)
+	{
+	}
+
+	[Token(Token = "0x6005B42")]
+	[Address(RVA = "0xEFDBB0", Offset = "0xEFCBB0", Length = "0x2ED")]
+	private void HandleTimeChanged(GameTime oldTime, GameTime newTime)
+	{
+	}
+
+	[Token(Token = "0x6005B43")]
+	[Address(RVA = "0xEFE830", Offset = "0xEFD830", Length = "0x82")]
+	private void UpdateDayNightCycle(GameTime gameTime)
+	{
+	}
+
+	[Token(Token = "0x6005B44")]
+	[Address(RVA = "0xEFE8C0", Offset = "0xEFD8C0", Length = "0xC2")]
+	private void UpdateSeason()
+	{
+	}
+
+	[Token(Token = "0x6005B45")]
+	[Address(RVA = "0xEFE130", Offset = "0xEFD130", Length = "0xDE")]
+	private void NewDayCheck(GameTime newTime)
+	{
+	}
+
+	[Token(Token = "0x6005B46")]
+	[Address(RVA = "0xEFD400", Offset = "0xEFC400", Length = "0x480")]
+	public void DayNightCycleUpdate()
+	{
+	}
+
+	[IteratorStateMachine(typeof(<ShiftLightFromOneSceneToNext>d__52))]
+	[Token(Token = "0x6005B47")]
+	[Address(RVA = "0xEFE550", Offset = "0xEFD550", Length = "0x7F")]
+	public IEnumerator ShiftLightFromOneSceneToNext(SceneHandler newHandler, bool instantDuration = false)
+	{
+		return null;
+	}
+
+	[Token(Token = "0x6005B48")]
+	[Address(RVA = "0xEFCDA0", Offset = "0xEFBDA0", Length = "0xDF")]
+	private float CalculateTargetIntensityForNewScene(SceneHandler handler, GameTime gameTime)
+	{
+		return 0f;
+	}
+
+	[Token(Token = "0x6005B49")]
+	[Address(RVA = "0xEFCCC0", Offset = "0xEFBCC0", Length = "0xDF")]
+	private float CalculateTargetEnvIntensityForNewScene(SceneHandler handler, GameTime gameTime)
+	{
+		return 0f;
+	}
+
+	[Token(Token = "0x6005B4A")]
+	[Address(RVA = "0xEFCFC0", Offset = "0xEFBFC0", Length = "0x13C")]
+	private float CalculateTargetIntensity(GameTime gameTime)
+	{
+		return 0f;
+	}
+
+	[Token(Token = "0x6005B4B")]
+	[Address(RVA = "0xEFCE80", Offset = "0xEFBE80", Length = "0x13C")]
+	private float CalculateTargetIntensityForSecondLight(GameTime gameTime)
+	{
+		return 0f;
+	}
+
+	[Token(Token = "0x6005B4C")]
+	[Address(RVA = "0xEFD100", Offset = "0xEFC100", Length = "0x97")]
+	private float CalculateTransitionProgress(GameTime gameTime)
+	{
+		return 0f;
+	}
+
+	[Token(Token = "0x6005B4D")]
+	[Address(RVA = "0xEFD890", Offset = "0xEFC890", Length = "0x27")]
+	private bool DetermineIfNight(GameTime gameTime)
+	{
+		return false;
+	}
+
+	[Token(Token = "0x6005B4E")]
+	[Address(RVA = "0xEFD1A0", Offset = "0xEFC1A0", Length = "0x16F")]
+	public void ChangeGameTime(GameTime gameTime)
+	{
+	}
+
+	[Token(Token = "0x6005B4F")]
+	[Address(RVA = "0xEFE6B0", Offset = "0xEFD6B0", Length = "0x178")]
+	private void UpdateAudioHour()
+	{
+	}
+
+	[Token(Token = "0x6005B50")]
+	[Address(RVA = "0xEFD8C0", Offset = "0xEFC8C0", Length = "0x2E6")]
+	public static PlayerLocalWorldTime GetLocalWorldTime()
+	{
+		return default(PlayerLocalWorldTime);
+	}
+
+	[Token(Token = "0x6005B51")]
+	[Address(RVA = "0xEFEAD0", Offset = "0xEFDAD0", Length = "0xDB")]
+	public TimeManager()
+	{
+	}
+
+	[Token(Token = "0x6005B52")]
+	[Address(RVA = "0xEFE9F0", Offset = "0xEFD9F0", Length = "0xDF")]
+	protected override void __initializeVariables()
+	{
+	}
+
+	[Token(Token = "0x6005B53")]
+	[Address(RVA = "0x6B2110", Offset = "0x6B1110", Length = "0x7")]
+	protected override void __initializeRpcs()
+	{
+	}
+
+	[Token(Token = "0x6005B54")]
+	[Address(RVA = "0xEFE9C0", Offset = "0xEFD9C0", Length = "0x2C")]
+	protected internal override string __getTypeName()
+	{
+		return null;
+	}
+}

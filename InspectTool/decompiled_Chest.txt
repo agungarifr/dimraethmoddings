@@ -1,0 +1,84 @@
+using System.Collections.Generic;
+using Cpp2ILInjected;
+using UnityEngine;
+
+[Token(Token = "0x20001B9")]
+public class Chest : StorageView
+{
+	[SerializeField]
+	[Token(Token = "0x4000FA3")]
+	[FieldOffset(Offset = "0x1D0")]
+	protected List<GameObject> _storageBackgrounds;
+
+	[Token(Token = "0x17000249")]
+	public override bool AllowsDropFromContainer
+	{
+		[Token(Token = "0x6000CE7")]
+		[Address(RVA = "0x6BBA80", Offset = "0x6BAA80", Length = "0x3")]
+		get
+		{
+			return false;
+		}
+	}
+
+	[Token(Token = "0x6000CE4")]
+	[Address(RVA = "0x9C7570", Offset = "0x9C6570", Length = "0xB")]
+	public void Start()
+	{
+	}
+
+	[Token(Token = "0x6000CE5")]
+	[Address(RVA = "0x1098090", Offset = "0x1097090", Length = "0x96")]
+	public override void BindStorageView(StorageUIView v)
+	{
+	}
+
+	[Token(Token = "0x6000CE6")]
+	[Address(RVA = "0x1098EB0", Offset = "0x1097EB0", Length = "0x466")]
+	private void SetupChestSlotEventTriggers()
+	{
+	}
+
+	[Token(Token = "0x6000CE8")]
+	[Address(RVA = "0x9C5B50", Offset = "0x9C4B50", Length = "0x2A")]
+	private void OnChestSlotRightClicked(int globalIndex)
+	{
+	}
+
+	[Token(Token = "0x6000CE9")]
+	[Address(RVA = "0x10986D0", Offset = "0x10976D0", Length = "0x2A")]
+	private void OnChestSlotMiddleClicked(int globalIndex)
+	{
+	}
+
+	[Token(Token = "0x6000CEA")]
+	[Address(RVA = "0x1098700", Offset = "0x1097700", Length = "0x5C2")]
+	public override void PopulateStorageView()
+	{
+	}
+
+	[Token(Token = "0x6000CEB")]
+	[Address(RVA = "0x1099320", Offset = "0x1098320", Length = "0x380")]
+	public override void SwapContainerItems(int dragIndex, int dropIndex)
+	{
+	}
+
+	[Token(Token = "0x6000CEC")]
+	[Address(RVA = "0x1098CD0", Offset = "0x1097CD0", Length = "0x1D3")]
+	private void SetChestSlotBackground(int index, InventoryEntry entry)
+	{
+	}
+
+	[Token(Token = "0x6000CED")]
+	[Address(RVA = "0x1098130", Offset = "0x1097130", Length = "0x591")]
+	private Sprite ChooseChestBackground(InventoryEntry entry)
+	{
+		return null;
+	}
+
+	[Token(Token = "0x6000CEE")]
+	[Address(RVA = "0x10996B0", Offset = "0x10986B0", Length = "0x49")]
+	public Chest()
+	{
+	}
+}

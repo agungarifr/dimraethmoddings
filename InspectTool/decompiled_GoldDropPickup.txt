@@ -1,0 +1,131 @@
+﻿using System.Collections.Generic;
+using Cpp2ILInjected;
+using Unity.Netcode;
+using UnityEngine;
+
+[Token(Token = "0x200009C")]
+public class GoldDropPickup : NetworkBehaviour
+{
+	[Token(Token = "0x400063B")]
+	public static readonly HashSet<GoldDropPickup> ActiveInstances;
+
+	[Token(Token = "0x400063C")]
+	[FieldOffset(Offset = "0x88")]
+	private List<Player> _players;
+
+	[Token(Token = "0x400063D")]
+	[FieldOffset(Offset = "0x90")]
+	public int GoldAmount;
+
+	[Token(Token = "0x400063E")]
+	[FieldOffset(Offset = "0x94")]
+	private float _delayTimer;
+
+	[Token(Token = "0x400063F")]
+	[FieldOffset(Offset = "0x98")]
+	private float _delayThreshold;
+
+	[Token(Token = "0x4000640")]
+	private const float PickupDetectionRange = 2f;
+
+	[Token(Token = "0x4000641")]
+	[FieldOffset(Offset = "0x9C")]
+	private bool _f11Hidden;
+
+	[Token(Token = "0x4000642")]
+	[FieldOffset(Offset = "0xA0")]
+	private readonly List<Renderer> _f11DisabledRenderers;
+
+	[Token(Token = "0x6000383")]
+	[Address(RVA = "0x6D8960", Offset = "0x6D7960", Length = "0x78")]
+	private void OnEnable()
+	{
+	}
+
+	[Token(Token = "0x6000384")]
+	[Address(RVA = "0x6D88D0", Offset = "0x6D78D0", Length = "0x8A")]
+	private void OnDisable()
+	{
+	}
+
+	[Token(Token = "0x6000385")]
+	[Address(RVA = "0x6D9030", Offset = "0x6D8030", Length = "0x1D8")]
+	private void UpdateF11Visibility()
+	{
+	}
+
+	[Token(Token = "0x6000386")]
+	[Address(RVA = "0x6D8DD0", Offset = "0x6D7DD0", Length = "0x1AA")]
+	private void RestoreF11Renderers()
+	{
+	}
+
+	[Token(Token = "0x6000387")]
+	[Address(RVA = "0x6D8F80", Offset = "0x6D7F80", Length = "0xAE")]
+	private void Start()
+	{
+	}
+
+	[Token(Token = "0x6000388")]
+	[Address(RVA = "0x6D89E0", Offset = "0x6D79E0", Length = "0x187")]
+	public void OnTriggerStay2D(Collider2D collider)
+	{
+	}
+
+	[Token(Token = "0x6000389")]
+	[Address(RVA = "0x6D9210", Offset = "0x6D8210", Length = "0x9A6")]
+	private void Update()
+	{
+	}
+
+	[ServerRpc(RequireOwnership = false)]
+	[Token(Token = "0x600038A")]
+	[Address(RVA = "0x6D8B70", Offset = "0x6D7B70", Length = "0x259")]
+	public void RequestPetPickupServerRpc(ulong ownerId)
+	{
+	}
+
+	[ClientRpc]
+	[Token(Token = "0x600038B")]
+	[Address(RVA = "0x6D86A0", Offset = "0x6D76A0", Length = "0x223")]
+	private void GoldPickupSFXClientRpc(int gold, ClientRpcParams clientRpcParams = default(ClientRpcParams))
+	{
+	}
+
+	[Token(Token = "0x600038C")]
+	[Address(RVA = "0x6D9FC0", Offset = "0x6D8FC0", Length = "0xF4")]
+	public GoldDropPickup()
+	{
+	}
+
+	[Token(Token = "0x600038E")]
+	[Address(RVA = "0x6B2110", Offset = "0x6B1110", Length = "0x7")]
+	protected override void __initializeVariables()
+	{
+	}
+
+	[Token(Token = "0x600038F")]
+	[Address(RVA = "0x6D9BF0", Offset = "0x6D8BF0", Length = "0xF3")]
+	protected override void __initializeRpcs()
+	{
+	}
+
+	[Token(Token = "0x6000390")]
+	[Address(RVA = "0x6D9CF0", Offset = "0x6D8CF0", Length = "0xCD")]
+	private static void __rpc_handler_3929118356(NetworkBehaviour target, FastBufferReader reader, __RpcParams rpcParams)
+	{
+	}
+
+	[Token(Token = "0x6000391")]
+	[Address(RVA = "0x6D9DC0", Offset = "0x6D8DC0", Length = "0x16A")]
+	private static void __rpc_handler_4235816479(NetworkBehaviour target, FastBufferReader reader, __RpcParams rpcParams)
+	{
+	}
+
+	[Token(Token = "0x6000392")]
+	[Address(RVA = "0x6D9BC0", Offset = "0x6D8BC0", Length = "0x2C")]
+	protected internal override string __getTypeName()
+	{
+		return null;
+	}
+}

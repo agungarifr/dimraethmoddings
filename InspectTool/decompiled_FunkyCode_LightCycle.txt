@@ -1,0 +1,40 @@
+using Cpp2ILInjected;
+using UnityEngine;
+
+namespace FunkyCode;
+
+[ExecuteInEditMode]
+[Token(Token = "0x2001266")]
+public class LightCycle : MonoBehaviour
+{
+	[Range(0f, 1f)]
+	[Token(Token = "0x40089B1")]
+	[FieldOffset(Offset = "0x20")]
+	public float time;
+
+	[Token(Token = "0x40089B2")]
+	[FieldOffset(Offset = "0x28")]
+	public LightDayProperties dayProperties;
+
+	[Token(Token = "0x40089B3")]
+	[FieldOffset(Offset = "0x30")]
+	public LightCycleBuffer[] nightProperties;
+
+	[Token(Token = "0x6009173")]
+	[Address(RVA = "0x7AF880", Offset = "0x7AE880", Length = "0x6")]
+	public void SetTime(float setTime)
+	{
+	}
+
+	[Token(Token = "0x6009174")]
+	[Address(RVA = "0x7AF640", Offset = "0x7AE640", Length = "0x238")]
+	private void LateUpdate()
+	{
+	}
+
+	[Token(Token = "0x6009175")]
+	[Address(RVA = "0x7AF890", Offset = "0x7AE890", Length = "0x10B")]
+	public LightCycle()
+	{
+	}
+}

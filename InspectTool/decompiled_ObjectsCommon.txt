@@ -1,0 +1,1363 @@
+using System;
+using System.Collections;
+using System.Collections.Generic;
+using System.Diagnostics;
+using System.Runtime.CompilerServices;
+using Cpp2ILInjected;
+using Unity.Netcode;
+using UnityEngine;
+using UnityEngine.AI;
+
+[Token(Token = "0x2000CF7")]
+public abstract class ObjectsCommon : NetworkBehaviour, ICommonInterface, ICombatInterface
+{
+	[CompilerGenerated]
+	[Token(Token = "0x2000CFA")]
+	private sealed class <KnockbackRoutine>d__133 : IEnumerator<object>, IEnumerator, IDisposable
+	{
+		[Token(Token = "0x40062D7")]
+		[FieldOffset(Offset = "0x10")]
+		private int <>1__state;
+
+		[Token(Token = "0x40062D8")]
+		[FieldOffset(Offset = "0x18")]
+		private object <>2__current;
+
+		[Token(Token = "0x40062D9")]
+		[FieldOffset(Offset = "0x20")]
+		public ObjectsCommon <>4__this;
+
+		[Token(Token = "0x40062DA")]
+		[FieldOffset(Offset = "0x28")]
+		public Vector2 force;
+
+		[Token(Token = "0x40062DB")]
+		[FieldOffset(Offset = "0x30")]
+		public float duration;
+
+		[Token(Token = "0x40062DC")]
+		[FieldOffset(Offset = "0x34")]
+		public bool playerDash;
+
+		[Token(Token = "0x40062DD")]
+		[FieldOffset(Offset = "0x38")]
+		public Transform ignoreRoot;
+
+		[Token(Token = "0x40062DE")]
+		[FieldOffset(Offset = "0x40")]
+		private bool <wasAgentEnabled>5__2;
+
+		[Token(Token = "0x40062DF")]
+		[FieldOffset(Offset = "0x44")]
+		private Vector3 <startPosition>5__3;
+
+		[Token(Token = "0x40062E0")]
+		[FieldOffset(Offset = "0x50")]
+		private Vector3 <endPosition>5__4;
+
+		[Token(Token = "0x40062E1")]
+		[FieldOffset(Offset = "0x5C")]
+		private float <timer>5__5;
+
+		[Token(Token = "0x40062E2")]
+		[FieldOffset(Offset = "0x60")]
+		private int <frameCount>5__6;
+
+		[Token(Token = "0x40062E3")]
+		[FieldOffset(Offset = "0x64")]
+		private Vector3 <previousPosition>5__7;
+
+		[Token(Token = "0x40062E4")]
+		[FieldOffset(Offset = "0x70")]
+		private bool <stoppedByBoundary>5__8;
+
+		[Token(Token = "0x17000B3A")]
+		object IEnumerator<object>.Current
+		{
+			[DebuggerHidden]
+			[Token(Token = "0x6006958")]
+			[Address(RVA = "0x6B1E50", Offset = "0x6B0E50", Length = "0x5")]
+			get
+			{
+				return null;
+			}
+		}
+
+		[Token(Token = "0x17000B3B")]
+		object IEnumerator.Current
+		{
+			[DebuggerHidden]
+			[Token(Token = "0x600695A")]
+			[Address(RVA = "0x6B1E50", Offset = "0x6B0E50", Length = "0x5")]
+			get
+			{
+				return null;
+			}
+		}
+
+		[DebuggerHidden]
+		[Token(Token = "0x6006955")]
+		[Address(RVA = "0x6B1EA0", Offset = "0x6B0EA0", Length = "0x24")]
+		public <KnockbackRoutine>d__133(int <>1__state)
+		{
+		}
+
+		[DebuggerHidden]
+		[Token(Token = "0x6006956")]
+		[Address(RVA = "0x6AAC60", Offset = "0x6A9C60", Length = "0x3")]
+		void IDisposable.Dispose()
+		{
+		}
+
+		[Token(Token = "0x6006957")]
+		[Address(RVA = "0x1082070", Offset = "0x1081070", Length = "0x13A1")]
+		private bool MoveNext()
+		{
+			return false;
+		}
+
+		bool IEnumerator.MoveNext()
+		{
+			//ILSpy generated this explicit interface implementation from .override directive in MoveNext
+			return this.MoveNext();
+		}
+
+		[DebuggerHidden]
+		[Token(Token = "0x6006959")]
+		[Address(RVA = "0x1083420", Offset = "0x1082420", Length = "0x3E")]
+		void IEnumerator.Reset()
+		{
+		}
+	}
+
+	[CompilerGenerated]
+	[Token(Token = "0x2000CFB")]
+	private sealed class <ResetIsAttackingAfterStun>d__176 : IEnumerator<object>, IEnumerator, IDisposable
+	{
+		[Token(Token = "0x40062E5")]
+		[FieldOffset(Offset = "0x10")]
+		private int <>1__state;
+
+		[Token(Token = "0x40062E6")]
+		[FieldOffset(Offset = "0x18")]
+		private object <>2__current;
+
+		[Token(Token = "0x40062E7")]
+		[FieldOffset(Offset = "0x20")]
+		public ObjectsCommon <>4__this;
+
+		[Token(Token = "0x17000B3C")]
+		object IEnumerator<object>.Current
+		{
+			[DebuggerHidden]
+			[Token(Token = "0x600695E")]
+			[Address(RVA = "0x6B1E50", Offset = "0x6B0E50", Length = "0x5")]
+			get
+			{
+				return null;
+			}
+		}
+
+		[Token(Token = "0x17000B3D")]
+		object IEnumerator.Current
+		{
+			[DebuggerHidden]
+			[Token(Token = "0x6006960")]
+			[Address(RVA = "0x6B1E50", Offset = "0x6B0E50", Length = "0x5")]
+			get
+			{
+				return null;
+			}
+		}
+
+		[DebuggerHidden]
+		[Token(Token = "0x600695B")]
+		[Address(RVA = "0x6B1EA0", Offset = "0x6B0EA0", Length = "0x24")]
+		public <ResetIsAttackingAfterStun>d__176(int <>1__state)
+		{
+		}
+
+		[DebuggerHidden]
+		[Token(Token = "0x600695C")]
+		[Address(RVA = "0x6AAC60", Offset = "0x6A9C60", Length = "0x3")]
+		void IDisposable.Dispose()
+		{
+		}
+
+		[Token(Token = "0x600695D")]
+		[Address(RVA = "0x1083460", Offset = "0x1082460", Length = "0x17B")]
+		private bool MoveNext()
+		{
+			return false;
+		}
+
+		bool IEnumerator.MoveNext()
+		{
+			//ILSpy generated this explicit interface implementation from .override directive in MoveNext
+			return this.MoveNext();
+		}
+
+		[DebuggerHidden]
+		[Token(Token = "0x600695F")]
+		[Address(RVA = "0x10835E0", Offset = "0x10825E0", Length = "0x3E")]
+		void IEnumerator.Reset()
+		{
+		}
+	}
+
+	[Token(Token = "0x4006283")]
+	[FieldOffset(Offset = "0x88")]
+	private readonly Vector3 _normalSize;
+
+	[Token(Token = "0x4006284")]
+	[FieldOffset(Offset = "0x94")]
+	public readonly Vector3 _largeSize;
+
+	[Token(Token = "0x4006285")]
+	[FieldOffset(Offset = "0xA0")]
+	public readonly Vector3 _smallSize;
+
+	[Token(Token = "0x4006286")]
+	[FieldOffset(Offset = "0xB0")]
+	private readonly List<EffectValues> _effectsToRemove;
+
+	[HideInInspector]
+	[Token(Token = "0x4006287")]
+	[FieldOffset(Offset = "0xB8")]
+	public ObfuscatedNetworkInt Level;
+
+	[HideInInspector]
+	[Token(Token = "0x400628A")]
+	[FieldOffset(Offset = "0xD0")]
+	public ObfuscatedNetworkFloat Concentration;
+
+	[HideInInspector]
+	[Token(Token = "0x400628B")]
+	[FieldOffset(Offset = "0xD8")]
+	public ObfuscatedNetworkFloat MaxConcentration;
+
+	[HideInInspector]
+	[Token(Token = "0x400628C")]
+	[FieldOffset(Offset = "0xE0")]
+	public ObfuscatedNetworkFloat Stamina;
+
+	[HideInInspector]
+	[Token(Token = "0x400628D")]
+	[FieldOffset(Offset = "0xE8")]
+	public ObfuscatedNetworkFloat MaxStamina;
+
+	[HideInInspector]
+	[Token(Token = "0x400628E")]
+	[FieldOffset(Offset = "0xF0")]
+	public ObfuscatedNetworkFloat Shield;
+
+	[HideInInspector]
+	[Token(Token = "0x400628F")]
+	[FieldOffset(Offset = "0xF8")]
+	public NetworkVariable<float> Speed;
+
+	[HideInInspector]
+	[Token(Token = "0x4006290")]
+	[FieldOffset(Offset = "0x100")]
+	public NetworkVariable<bool> Immobile;
+
+	[HideInInspector]
+	[Token(Token = "0x4006291")]
+	[FieldOffset(Offset = "0x108")]
+	public NetworkVariable<bool> PreCasting;
+
+	[HideInInspector]
+	[Token(Token = "0x4006292")]
+	[FieldOffset(Offset = "0x110")]
+	public NetworkVariable<bool> IsCasting;
+
+	[HideInInspector]
+	[Token(Token = "0x4006293")]
+	[FieldOffset(Offset = "0x118")]
+	public NetworkVariable<bool> Sneaking;
+
+	[HideInInspector]
+	[Token(Token = "0x4006294")]
+	[FieldOffset(Offset = "0x120")]
+	public NetworkVariable<bool> Stunned;
+
+	[HideInInspector]
+	[Token(Token = "0x4006295")]
+	[FieldOffset(Offset = "0x128")]
+	public NetworkVariable<bool> Silenced;
+
+	[HideInInspector]
+	[Token(Token = "0x4006298")]
+	[FieldOffset(Offset = "0x140")]
+	public NetworkVariable<bool> Immune;
+
+	[HideInInspector]
+	[Token(Token = "0x4006299")]
+	[FieldOffset(Offset = "0x148")]
+	public NetworkVariable<bool> Invisible;
+
+	[HideInInspector]
+	[Token(Token = "0x400629A")]
+	[FieldOffset(Offset = "0x150")]
+	public NetworkVariable<bool> Command;
+
+	[HideInInspector]
+	[Token(Token = "0x400629B")]
+	[FieldOffset(Offset = "0x158")]
+	public NetworkVariable<int> Class;
+
+	[HideInInspector]
+	[Token(Token = "0x400629C")]
+	[FieldOffset(Offset = "0x160")]
+	public NetworkVariable<int> Race;
+
+	[HideInInspector]
+	[Token(Token = "0x400629D")]
+	[FieldOffset(Offset = "0x168")]
+	public NetworkVariable<int> Element;
+
+	[HideInInspector]
+	[Token(Token = "0x400629E")]
+	[FieldOffset(Offset = "0x170")]
+	public NetworkVariable<Attributes> Attributes;
+
+	[HideInInspector]
+	[Token(Token = "0x400629F")]
+	[FieldOffset(Offset = "0x178")]
+	public NetworkVariable<Areas.Scene> _scene;
+
+	[HideInInspector]
+	[Token(Token = "0x40062A0")]
+	[FieldOffset(Offset = "0x180")]
+	public NetworkVariable<float> AreaSpeedModifier;
+
+	[HideInInspector]
+	[Token(Token = "0x40062A2")]
+	[FieldOffset(Offset = "0x190")]
+	public NavMeshAgent Agent;
+
+	[Token(Token = "0x40062A3")]
+	private static readonly List<Collider2D> _safeWarpColliderCache;
+
+	[HideInInspector]
+	[Token(Token = "0x40062A4")]
+	[FieldOffset(Offset = "0x198")]
+	public Material OriginalMaterial;
+
+	[HideInInspector]
+	[Token(Token = "0x40062A5")]
+	[FieldOffset(Offset = "0x1A0")]
+	public bool ImmobileManual;
+
+	[HideInInspector]
+	[Token(Token = "0x40062A6")]
+	[FieldOffset(Offset = "0x1A8")]
+	public MonsterConfiguration MonsterConfiguration;
+
+	[HideInInspector]
+	[Token(Token = "0x40062A7")]
+	[FieldOffset(Offset = "0x1B0")]
+	public SpriteRenderer SpriteRenderer;
+
+	[HideInInspector]
+	[Token(Token = "0x40062A8")]
+	[FieldOffset(Offset = "0x1B8")]
+	public ServerRPC RPC;
+
+	[HideInInspector]
+	[Token(Token = "0x40062A9")]
+	[FieldOffset(Offset = "0x1C0")]
+	public Animator Animator;
+
+	[HideInInspector]
+	[Token(Token = "0x40062AA")]
+	[FieldOffset(Offset = "0x1C8")]
+	public Rigidbody2D Rigidbody;
+
+	[HideInInspector]
+	[Token(Token = "0x40062AB")]
+	[FieldOffset(Offset = "0x1D0")]
+	public MonsterBehaviour _monsterBehaviour;
+
+	[HideInInspector]
+	[Token(Token = "0x40062AC")]
+	[FieldOffset(Offset = "0x1D8")]
+	public Damages Damages;
+
+	[HideInInspector]
+	[Token(Token = "0x40062AD")]
+	[FieldOffset(Offset = "0x1E0")]
+	public Effects Effects;
+
+	[HideInInspector]
+	[Token(Token = "0x40062AE")]
+	[FieldOffset(Offset = "0x1E8")]
+	public List<EffectValues> ActiveEffects;
+
+	[HideInInspector]
+	[Token(Token = "0x40062AF")]
+	[FieldOffset(Offset = "0x1F0")]
+	public List<DamageInstance> DamageInstances;
+
+	[HideInInspector]
+	[Token(Token = "0x40062B1")]
+	[FieldOffset(Offset = "0x200")]
+	public float Punish;
+
+	[HideInInspector]
+	[Token(Token = "0x40062B2")]
+	[FieldOffset(Offset = "0x204")]
+	public Difficulty Difficulty;
+
+	[HideInInspector]
+	[Token(Token = "0x40062B3")]
+	[FieldOffset(Offset = "0x208")]
+	public float SpriteHeight;
+
+	[HideInInspector]
+	[Token(Token = "0x40062B8")]
+	[FieldOffset(Offset = "0x220")]
+	public float IsRangedLastChangedTime;
+
+	[HideInInspector]
+	[Token(Token = "0x40062B9")]
+	[FieldOffset(Offset = "0x224")]
+	public bool IsMonster;
+
+	[HideInInspector]
+	[Token(Token = "0x40062BA")]
+	[FieldOffset(Offset = "0x225")]
+	public bool IsPlayer;
+
+	[HideInInspector]
+	[Token(Token = "0x40062BB")]
+	[FieldOffset(Offset = "0x226")]
+	public bool IsPet;
+
+	[HideInInspector]
+	[Token(Token = "0x40062BC")]
+	[FieldOffset(Offset = "0x227")]
+	public bool IsShadowClone;
+
+	[HideInInspector]
+	[Token(Token = "0x40062BD")]
+	[FieldOffset(Offset = "0x228")]
+	public bool IsFourLegged;
+
+	[HideInInspector]
+	[Token(Token = "0x40062BE")]
+	[FieldOffset(Offset = "0x229")]
+	public bool IsStunned;
+
+	[HideInInspector]
+	[Token(Token = "0x40062BF")]
+	[FieldOffset(Offset = "0x22C")]
+	private float _counter;
+
+	[HideInInspector]
+	[Token(Token = "0x40062C0")]
+	[FieldOffset(Offset = "0x230")]
+	private float _ZeroPointOnecounter;
+
+	[HideInInspector]
+	[Token(Token = "0x40062C1")]
+	[FieldOffset(Offset = "0x234")]
+	public float TravelSprintTime;
+
+	[HideInInspector]
+	[Token(Token = "0x40062C2")]
+	[FieldOffset(Offset = "0x238")]
+	private float _travelIdleGraceTimer;
+
+	[HideInInspector]
+	[Token(Token = "0x40062C3")]
+	[FieldOffset(Offset = "0x240")]
+	private PlayerAnimations _playerAnimations;
+
+	[HideInInspector]
+	[Token(Token = "0x40062C4")]
+	[FieldOffset(Offset = "0x248")]
+	private float _serverSideChecksCounter;
+
+	[HideInInspector]
+	[Token(Token = "0x40062C5")]
+	[FieldOffset(Offset = "0x250")]
+	public ulong NetworkId;
+
+	[HideInInspector]
+	[Token(Token = "0x40062C6")]
+	[FieldOffset(Offset = "0x258")]
+	public ulong LastDamagedByPlayerId;
+
+	[HideInInspector]
+	[Token(Token = "0x40062C7")]
+	[FieldOffset(Offset = "0x260")]
+	public float RegenTimer;
+
+	[HideInInspector]
+	[Token(Token = "0x40062C8")]
+	[FieldOffset(Offset = "0x264")]
+	public float LastActionTime;
+
+	[HideInInspector]
+	[Token(Token = "0x40062C9")]
+	[FieldOffset(Offset = "0x268")]
+	public Coroutine Dash;
+
+	[HideInInspector]
+	[Token(Token = "0x40062CA")]
+	[FieldOffset(Offset = "0x270")]
+	public int LastCastCommitFrame;
+
+	[HideInInspector]
+	[Token(Token = "0x40062CB")]
+	[FieldOffset(Offset = "0x278")]
+	public Spells CurrentSpell;
+
+	[HideInInspector]
+	[Token(Token = "0x40062CC")]
+	[FieldOffset(Offset = "0x280")]
+	public int MaxPlayersAttacked;
+
+	[HideInInspector]
+	[Token(Token = "0x40062CD")]
+	[FieldOffset(Offset = "0x288")]
+	public GameObject ActiveStunPrefab;
+
+	[HideInInspector]
+	[Token(Token = "0x40062CE")]
+	[FieldOffset(Offset = "0x290")]
+	public float currentStunExpiryTime;
+
+	[HideInInspector]
+	[Token(Token = "0x40062CF")]
+	[FieldOffset(Offset = "0x298")]
+	private VisibilityClient _visibilityClient;
+
+	[CompilerGenerated]
+	[Token(Token = "0x40062D0")]
+	[FieldOffset(Offset = "0x2A0")]
+	private Action m_OnDashCompleted;
+
+	[Token(Token = "0x40062D1")]
+	[FieldOffset(Offset = "0x2A8")]
+	private Coroutine _stunResetTimeCoroutine;
+
+	[Token(Token = "0x40062D2")]
+	[FieldOffset(Offset = "0x2B0")]
+	public Coroutine LockCastCoroutine;
+
+	[HideInInspector]
+	[Token(Token = "0x40062D3")]
+	[FieldOffset(Offset = "0x2B8")]
+	public float PullImmuneUntil;
+
+	[HideInInspector]
+	[Token(Token = "0x17000B2D")]
+	[field: Token(Token = "0x4006288")]
+	[field: FieldOffset(Offset = "0xC0")]
+	public ObfuscatedNetworkFloat Health
+	{
+		[Token(Token = "0x60068D2")]
+		[Address(RVA = "0x717FC0", Offset = "0x716FC0", Length = "0x8")]
+		get;
+		[Token(Token = "0x60068D3")]
+		[Address(RVA = "0x717FD0", Offset = "0x716FD0", Length = "0x13")]
+		set;
+	}
+
+	[HideInInspector]
+	[Token(Token = "0x17000B2E")]
+	[field: Token(Token = "0x4006289")]
+	[field: FieldOffset(Offset = "0xC8")]
+	public ObfuscatedNetworkFloat MaxHealth
+	{
+		[Token(Token = "0x60068D4")]
+		[Address(RVA = "0x8F4B80", Offset = "0x8F3B80", Length = "0x8")]
+		get;
+		[Token(Token = "0x60068D5")]
+		[Address(RVA = "0x8F58A0", Offset = "0x8F48A0", Length = "0x13")]
+		set;
+	}
+
+	[HideInInspector]
+	[Token(Token = "0x17000B2F")]
+	[field: Token(Token = "0x4006296")]
+	[field: FieldOffset(Offset = "0x130")]
+	public NetworkVariable<bool> Dead
+	{
+		[Token(Token = "0x60068D6")]
+		[Address(RVA = "0x710A00", Offset = "0x70FA00", Length = "0x8")]
+		get;
+		[Token(Token = "0x60068D7")]
+		[Address(RVA = "0x710A40", Offset = "0x70FA40", Length = "0x13")]
+		set;
+	}
+
+	[HideInInspector]
+	[Token(Token = "0x17000B30")]
+	[field: Token(Token = "0x4006297")]
+	[field: FieldOffset(Offset = "0x138")]
+	public NetworkVariable<bool> PreDead
+	{
+		[Token(Token = "0x60068D8")]
+		[Address(RVA = "0x106CAB0", Offset = "0x106BAB0", Length = "0x8")]
+		get;
+		[Token(Token = "0x60068D9")]
+		[Address(RVA = "0x79B3B0", Offset = "0x79A3B0", Length = "0x13")]
+		set;
+	}
+
+	[HideInInspector]
+	[Token(Token = "0x17000B31")]
+	public NetworkVariable<Areas.Scene> Scene
+	{
+		[Token(Token = "0x60068DA")]
+		[Address(RVA = "0xD085D0", Offset = "0xD075D0", Length = "0x8")]
+		get
+		{
+			return null;
+		}
+		[Token(Token = "0x60068DB")]
+		[Address(RVA = "0xC7AF50", Offset = "0xC79F50", Length = "0x13")]
+		set
+		{
+		}
+	}
+
+	[Token(Token = "0x17000B32")]
+	[field: Token(Token = "0x40062A1")]
+	[field: FieldOffset(Offset = "0x188")]
+	public CombatObjectType CombatObjectType
+	{
+		[Token(Token = "0x60068DC")]
+		[Address(RVA = "0x804220", Offset = "0x803220", Length = "0x7")]
+		get;
+		[Token(Token = "0x60068DD")]
+		[Address(RVA = "0x8F59C0", Offset = "0x8F49C0", Length = "0x7")]
+		set;
+	}
+
+	[HideInInspector]
+	[Token(Token = "0x17000B33")]
+	[field: Token(Token = "0x40062B0")]
+	[field: FieldOffset(Offset = "0x1F8")]
+	public GameObject ThisObject
+	{
+		[Token(Token = "0x60068DF")]
+		[Address(RVA = "0x106CAC0", Offset = "0x106BAC0", Length = "0x8")]
+		get;
+		[Token(Token = "0x60068E0")]
+		[Address(RVA = "0xC7B0A0", Offset = "0xC7A0A0", Length = "0x13")]
+		set;
+	}
+
+	[HideInInspector]
+	[Token(Token = "0x17000B34")]
+	[field: Token(Token = "0x40062B4")]
+	[field: FieldOffset(Offset = "0x20C")]
+	public Color32 FloatingDamageColor
+	{
+		[Token(Token = "0x60068E1")]
+		[Address(RVA = "0x8F5240", Offset = "0x8F4240", Length = "0x7")]
+		get;
+		[Token(Token = "0x60068E2")]
+		[Address(RVA = "0x8F5C80", Offset = "0x8F4C80", Length = "0x7")]
+		set;
+	}
+
+	[HideInInspector]
+	[Token(Token = "0x17000B35")]
+	[field: Token(Token = "0x40062B5")]
+	[field: FieldOffset(Offset = "0x210")]
+	public int MaxFloatingDamageTextSize
+	{
+		[Token(Token = "0x60068E3")]
+		[Address(RVA = "0x8F4F00", Offset = "0x8F3F00", Length = "0x7")]
+		get;
+		[Token(Token = "0x60068E4")]
+		[Address(RVA = "0x8F5AE0", Offset = "0x8F4AE0", Length = "0x7")]
+		set;
+	}
+
+	[HideInInspector]
+	[Token(Token = "0x17000B36")]
+	[field: Token(Token = "0x40062B6")]
+	[field: FieldOffset(Offset = "0x214")]
+	public Color32 DefaultColor
+	{
+		[Token(Token = "0x60068E5")]
+		[Address(RVA = "0x8F4F50", Offset = "0x8F3F50", Length = "0x7")]
+		get;
+		[Token(Token = "0x60068E6")]
+		[Address(RVA = "0x8F5B50", Offset = "0x8F4B50", Length = "0x7")]
+		set;
+	}
+
+	[Token(Token = "0x17000B37")]
+	[field: Token(Token = "0x40062B7")]
+	[field: FieldOffset(Offset = "0x218")]
+	public NetworkVariable<bool> IsRanged
+	{
+		[Token(Token = "0x60068E7")]
+		[Address(RVA = "0x106CAA0", Offset = "0x106BAA0", Length = "0x8")]
+		get;
+		[Token(Token = "0x60068E8")]
+		[Address(RVA = "0x8ADFA0", Offset = "0x8ACFA0", Length = "0x13")]
+		set;
+	}
+
+	[Token(Token = "0x17000B38")]
+	public bool IsDashing
+	{
+		[Token(Token = "0x60068E9")]
+		[Address(RVA = "0x106CA60", Offset = "0x106BA60", Length = "0xC")]
+		get
+		{
+			return false;
+		}
+	}
+
+	[Token(Token = "0x17000B39")]
+	public bool IsPullImmune
+	{
+		[Token(Token = "0x60068F0")]
+		[Address(RVA = "0x106CA70", Offset = "0x106BA70", Length = "0x24")]
+		get
+		{
+			return false;
+		}
+	}
+
+	[Token(Token = "0x1400007C")]
+	public event Action OnDashCompleted
+	{
+		[CompilerGenerated]
+		[Token(Token = "0x60068EA")]
+		[Address(RVA = "0x106C9B0", Offset = "0x106B9B0", Length = "0xA2")]
+		add
+		{
+		}
+		[CompilerGenerated]
+		[Token(Token = "0x60068EB")]
+		[Address(RVA = "0x106CAD0", Offset = "0x106BAD0", Length = "0xA2")]
+		remove
+		{
+		}
+	}
+
+	[Token(Token = "0x60068DE")]
+	[Address(RVA = "0x1066AC0", Offset = "0x1065AC0", Length = "0x5EC")]
+	public void SafeWarp(Vector3 position)
+	{
+	}
+
+	[Token(Token = "0x60068EC")]
+	[Address(RVA = "0x6AAC60", Offset = "0x6A9C60", Length = "0x3")]
+	public virtual void OnHit(bool isDamage)
+	{
+	}
+
+	[Token(Token = "0x60068ED")]
+	public abstract void Defeated();
+
+	[Token(Token = "0x60068EE")]
+	public abstract void Respawn();
+
+	[Token(Token = "0x60068EF")]
+	public abstract void OnDeath(Damage damage, bool force = false);
+
+	[Token(Token = "0x60068F1")]
+	[Address(RVA = "0x10629B0", Offset = "0x10619B0", Length = "0x26C")]
+	private bool DisplacementIsFinite(Vector2 force, string what)
+	{
+		return false;
+	}
+
+	[Token(Token = "0x60068F2")]
+	[Address(RVA = "0x105F7C0", Offset = "0x105E7C0", Length = "0x48D")]
+	public void ApplyKnockback(ObjectsCommon caster, float duration, float distance, bool allowOverride = false)
+	{
+	}
+
+	[Token(Token = "0x60068F3")]
+	[Address(RVA = "0x10621E0", Offset = "0x10611E0", Length = "0x474")]
+	public void DashInFacingDirection(float duration, float distance, bool allowOverride = false, bool playerDash = false)
+	{
+	}
+
+	[Token(Token = "0x60068F4")]
+	[Address(RVA = "0x1061B80", Offset = "0x1060B80", Length = "0x65B")]
+	public void DashInDirection(Vector2 dashDirection, float duration, float distance, bool allowOverride = false, bool playerDash = false)
+	{
+	}
+
+	[ClientRpc]
+	[Token(Token = "0x60068F5")]
+	[Address(RVA = "0x105F2B0", Offset = "0x105E2B0", Length = "0x20C")]
+	private void ApplyKnockbackToClientRpc(ulong networkId, float duration, float distance)
+	{
+	}
+
+	[Token(Token = "0x60068F6")]
+	[Address(RVA = "0x105F4C0", Offset = "0x105E4C0", Length = "0x2F2")]
+	public void ApplyKnockback(Vector2 position, float duration, float distance, bool UseMiddleOfSprite = false, bool allowOverride = false, bool playerDash = false, Transform ignoreRoot = null)
+	{
+	}
+
+	[Token(Token = "0x60068F7")]
+	[Address(RVA = "0x105FFD0", Offset = "0x105EFD0", Length = "0xDB")]
+	private static bool BelongsTo(Transform candidate, Transform root)
+	{
+		return false;
+	}
+
+	[Token(Token = "0x60068F8")]
+	[Address(RVA = "0x10600B0", Offset = "0x105F0B0", Length = "0x8E9")]
+	public float CalculateAvailableKnockback(Vector2 knockbackDirection, float distance, Transform ignoreRoot = null)
+	{
+		return 0f;
+	}
+
+	[IteratorStateMachine(typeof(<KnockbackRoutine>d__133))]
+	[Token(Token = "0x60068F9")]
+	[Address(RVA = "0x1066220", Offset = "0x1065220", Length = "0xCB")]
+	private IEnumerator KnockbackRoutine(Vector2 force, float duration, bool playerDash = false, Transform ignoreRoot = null)
+	{
+		return null;
+	}
+
+	[Token(Token = "0x60068FA")]
+	[Address(RVA = "0x1066070", Offset = "0x1065070", Length = "0x43")]
+	public bool IsNavMeshModifiable()
+	{
+		return false;
+	}
+
+	[Token(Token = "0x60068FB")]
+	[Address(RVA = "0x1060A20", Offset = "0x105FA20", Length = "0x14D")]
+	public void CancelActiveDash()
+	{
+	}
+
+	[ClientRpc]
+	[Token(Token = "0x60068FC")]
+	[Address(RVA = "0x105F170", Offset = "0x105E170", Length = "0x134")]
+	public void ApplyKnockbackClientRpc()
+	{
+	}
+
+	[Token(Token = "0x60068FD")]
+	[Address(RVA = "0x1061A10", Offset = "0x1060A10", Length = "0x148")]
+	private Vector2 ConvertFacingToVector2(Direction facing)
+	{
+		return default(Vector2);
+	}
+
+	[Token(Token = "0x60068FE")]
+	[Address(RVA = "0x1063610", Offset = "0x1062610", Length = "0x1BB")]
+	private Vector2 GetWASDDirection()
+	{
+		return default(Vector2);
+	}
+
+	[Token(Token = "0x60068FF")]
+	[Address(RVA = "0x1065E70", Offset = "0x1064E70", Length = "0x28")]
+	public void HitCheck(bool isDamage, Damage damage)
+	{
+	}
+
+	[Token(Token = "0x6006900")]
+	[Address(RVA = "0x1065380", Offset = "0x1064380", Length = "0xAED")]
+	private void HitCheckPlayer(bool isDamage, Damage damage)
+	{
+	}
+
+	[Token(Token = "0x6006901")]
+	[Address(RVA = "0x93C810", Offset = "0x93B810", Length = "0x2A")]
+	private bool FlashWouldFightStealth()
+	{
+		return false;
+	}
+
+	[Token(Token = "0x6006902")]
+	[Address(RVA = "0x1064B90", Offset = "0x1063B90", Length = "0x7E1")]
+	private void HitCheckMonster(bool isDamage, Damage damage)
+	{
+	}
+
+	[Token(Token = "0x6006903")]
+	[Address(RVA = "0x1060B70", Offset = "0x105FB70", Length = "0xDE")]
+	private static bool CaptureHidesDamageFlash()
+	{
+		return false;
+	}
+
+	[Token(Token = "0x6006904")]
+	[Address(RVA = "0x10670B0", Offset = "0x10660B0", Length = "0xE6")]
+	public void ServerHitReactions(Damage damage)
+	{
+	}
+
+	[Token(Token = "0x6006905")]
+	[Address(RVA = "0x10662F0", Offset = "0x10652F0", Length = "0x1F1")]
+	private void MonsterStaggerCheck(Damage damage)
+	{
+	}
+
+	[Token(Token = "0x6006906")]
+	[Address(RVA = "0x10681D0", Offset = "0x10671D0", Length = "0x989")]
+	private void StunDamageCheck(Damage damage)
+	{
+	}
+
+	[ClientRpc]
+	[Token(Token = "0x6006907")]
+	[Address(RVA = "0x1067440", Offset = "0x1066440", Length = "0x232")]
+	private void ShatterStunSpawnClientRpc(ulong attackerId)
+	{
+	}
+
+	[ClientRpc]
+	[Token(Token = "0x6006908")]
+	[Address(RVA = "0x1067F50", Offset = "0x1066F50", Length = "0x27D")]
+	private void StunAndShatterSpawnClientRpc(ulong attackerId, Vector3 position)
+	{
+	}
+
+	[Token(Token = "0x6006909")]
+	[Address(RVA = "0x1063300", Offset = "0x1062300", Length = "0x20A")]
+	private float GetStunBuildupPercent(ulong attackerId)
+	{
+		return 0f;
+	}
+
+	[Token(Token = "0x600690A")]
+	[Address(RVA = "0x1066980", Offset = "0x1065980", Length = "0xCD")]
+	private void PlayMonsterImpactSfx(Damage damage)
+	{
+	}
+
+	[Token(Token = "0x600690B")]
+	[Address(RVA = "0x10647A0", Offset = "0x10637A0", Length = "0xA1")]
+	public bool HasEffect(Effect effect)
+	{
+		return false;
+	}
+
+	[Token(Token = "0x600690C")]
+	[Address(RVA = "0x1065EA0", Offset = "0x1064EA0", Length = "0x66")]
+	public void ImmobilizationCheck()
+	{
+	}
+
+	[Token(Token = "0x600690D")]
+	[Address(RVA = "0x1062680", Offset = "0x1061680", Length = "0x323")]
+	public void DeathCheck(Damage damage)
+	{
+	}
+
+	[Token(Token = "0x600690E")]
+	[Address(RVA = "0x1062FD0", Offset = "0x1061FD0", Length = "0x298")]
+	private Player GetClosestPlayer()
+	{
+		return null;
+	}
+
+	[Token(Token = "0x600690F")]
+	[Address(RVA = "0x1062C20", Offset = "0x1061C20", Length = "0x3A4")]
+	private Player GetClosestPlayerInScene()
+	{
+		return null;
+	}
+
+	[Token(Token = "0x6006910")]
+	[Address(RVA = "0x1065F60", Offset = "0x1064F60", Length = "0x107")]
+	public bool IsDead()
+	{
+		return false;
+	}
+
+	[Token(Token = "0x6006911")]
+	[Address(RVA = "0x1065F10", Offset = "0x1064F10", Length = "0x4E")]
+	public bool IsAnimationLocked()
+	{
+		return false;
+	}
+
+	[Token(Token = "0x6006912")]
+	[Address(RVA = "0x10609A0", Offset = "0x105F9A0", Length = "0x7C")]
+	public bool CanObjectsCommonMove()
+	{
+		return false;
+	}
+
+	[Token(Token = "0x6006913")]
+	[Address(RVA = "0x10660C0", Offset = "0x10650C0", Length = "0x6C")]
+	public bool IsObjectStunnedOrImmobile()
+	{
+		return false;
+	}
+
+	[Token(Token = "0x6006914")]
+	[Address(RVA = "0x1063510", Offset = "0x1062510", Length = "0xFF")]
+	public float GetTotalRecentDamage(float timeThreshold)
+	{
+		return 0f;
+	}
+
+	[Token(Token = "0x6006915")]
+	[Address(RVA = "0x10672F0", Offset = "0x10662F0", Length = "0x2B")]
+	public void SetMonsterDefault()
+	{
+	}
+
+	[Token(Token = "0x6006916")]
+	[Address(RVA = "0x6AAC60", Offset = "0x6A9C60", Length = "0x3")]
+	private void OnMouseDown()
+	{
+	}
+
+	[Token(Token = "0x6006917")]
+	[Address(RVA = "0x6AAC60", Offset = "0x6A9C60", Length = "0x3")]
+	private void OnMouseOver()
+	{
+	}
+
+	[Token(Token = "0x6006918")]
+	[Address(RVA = "0x1066510", Offset = "0x1065510", Length = "0x21B")]
+	public void OnMouseEnter()
+	{
+	}
+
+	[Token(Token = "0x6006919")]
+	[Address(RVA = "0x1066730", Offset = "0x1065730", Length = "0x24F")]
+	public void OnMouseExit()
+	{
+	}
+
+	[Token(Token = "0x600691A")]
+	[Address(RVA = "0x1066130", Offset = "0x1065130", Length = "0xEC")]
+	private bool IsPlayerInteractionValid()
+	{
+		return false;
+	}
+
+	[Token(Token = "0x600691B")]
+	[Address(RVA = "0x1064500", Offset = "0x1063500", Length = "0x103")]
+	private void HandlePlayerMouseEnter()
+	{
+	}
+
+	[Token(Token = "0x600691C")]
+	[Address(RVA = "0x10641F0", Offset = "0x10631F0", Length = "0x1B7")]
+	private void HandleMouseCastingOverPlayer()
+	{
+	}
+
+	[Token(Token = "0x600691D")]
+	[Address(RVA = "0x10637D0", Offset = "0x10627D0", Length = "0x5C3")]
+	private void HandleMonsterMouseEnter()
+	{
+	}
+
+	[Token(Token = "0x600691E")]
+	[Address(RVA = "0x10643B0", Offset = "0x10633B0", Length = "0x140")]
+	private void HandleMouseOverMonster()
+	{
+	}
+
+	[Token(Token = "0x600691F")]
+	[Address(RVA = "0x1064040", Offset = "0x1063040", Length = "0x1AE")]
+	private void HandleMouseCastingOverMonster()
+	{
+	}
+
+	[Token(Token = "0x6006920")]
+	[Address(RVA = "0x1064610", Offset = "0x1063610", Length = "0x18D")]
+	private void HandlePlayerMouseExit()
+	{
+	}
+
+	[Token(Token = "0x6006921")]
+	[Address(RVA = "0x1063DA0", Offset = "0x1062DA0", Length = "0x291")]
+	private void HandleMonsterMouseExit()
+	{
+	}
+
+	[ServerRpc]
+	[Token(Token = "0x6006922")]
+	[Address(RVA = "0x105EDC0", Offset = "0x105DDC0", Length = "0x3A2")]
+	public void ActivateStunServerRpc()
+	{
+	}
+
+	[ClientRpc]
+	[Token(Token = "0x6006923")]
+	[Address(RVA = "0x105E7A0", Offset = "0x105D7A0", Length = "0x619")]
+	private void ActivateStunClientRpc(float stunTime)
+	{
+	}
+
+	[IteratorStateMachine(typeof(<ResetIsAttackingAfterStun>d__176))]
+	[Token(Token = "0x6006924")]
+	[Address(RVA = "0x1066A50", Offset = "0x1065A50", Length = "0x6D")]
+	private IEnumerator ResetIsAttackingAfterStun()
+	{
+		return null;
+	}
+
+	[Token(Token = "0x6006925")]
+	[Address(RVA = "0x105FC50", Offset = "0x105EC50", Length = "0x37C")]
+	protected virtual void Awake()
+	{
+	}
+
+	[Token(Token = "0x6006926")]
+	[Address(RVA = "0x1067B70", Offset = "0x1066B70", Length = "0x3DF")]
+	protected virtual void Start()
+	{
+	}
+
+	[Token(Token = "0x6006927")]
+	[Address(RVA = "0x1069E40", Offset = "0x1068E40", Length = "0x35C")]
+	public virtual void Update()
+	{
+	}
+
+	[Token(Token = "0x6006928")]
+	[Address(RVA = "0x10612C0", Offset = "0x10602C0", Length = "0x2E0")]
+	private void CommonsOneSecond()
+	{
+	}
+
+	[Token(Token = "0x6006929")]
+	[Address(RVA = "0x10615B0", Offset = "0x10605B0", Length = "0x1D6")]
+	private void CommonsZeroPointOneSecond()
+	{
+	}
+
+	[Token(Token = "0x600692A")]
+	[Address(RVA = "0x1067800", Offset = "0x1066800", Length = "0x6D")]
+	public void SpellEffectChecksServer()
+	{
+	}
+
+	[Token(Token = "0x600692B")]
+	[Address(RVA = "0x1068F80", Offset = "0x1067F80", Length = "0x239")]
+	public void UpdateNetworkVariableEffects()
+	{
+	}
+
+	[Token(Token = "0x600692C")]
+	[Address(RVA = "0x1067680", Offset = "0x1066680", Length = "0x170")]
+	public void SpellEffectChecksOwner()
+	{
+	}
+
+	[Token(Token = "0x600692D")]
+	[Address(RVA = "0x10696C0", Offset = "0x10686C0", Length = "0x55")]
+	public void UpdatePunish()
+	{
+	}
+
+	[Token(Token = "0x600692E")]
+	[Address(RVA = "0x1069720", Offset = "0x1068720", Length = "0x1BD")]
+	private void UpdateSilence()
+	{
+	}
+
+	[Token(Token = "0x600692F")]
+	[Address(RVA = "0x1069D90", Offset = "0x1068D90", Length = "0xA5")]
+	private void UpdateStun()
+	{
+	}
+
+	[Token(Token = "0x6006930")]
+	[Address(RVA = "0x1068EE0", Offset = "0x1067EE0", Length = "0x99")]
+	private void UpdateInvisible()
+	{
+	}
+
+	[Token(Token = "0x6006931")]
+	[Address(RVA = "0x1068E40", Offset = "0x1067E40", Length = "0x99")]
+	private void UpdateInvincibility()
+	{
+	}
+
+	[Token(Token = "0x6006932")]
+	[Address(RVA = "0x1068D80", Offset = "0x1067D80", Length = "0xBD")]
+	private void UpdateImmobilization()
+	{
+	}
+
+	[Token(Token = "0x6006933")]
+	[Address(RVA = "0x1068CE0", Offset = "0x1067CE0", Length = "0x99")]
+	private void UpdateCommand()
+	{
+	}
+
+	[Token(Token = "0x6006934")]
+	[Address(RVA = "0x10698E0", Offset = "0x10688E0", Length = "0xD6")]
+	private void UpdateSizeCheck()
+	{
+	}
+
+	[Token(Token = "0x6006935")]
+	[Address(RVA = "0x10691C0", Offset = "0x10681C0", Length = "0x4F1")]
+	private void UpdateOverclock()
+	{
+	}
+
+	[Token(Token = "0x6006936")]
+	[Address(RVA = "0x10699C0", Offset = "0x10689C0", Length = "0x3CD")]
+	public void UpdateSpeed()
+	{
+	}
+
+	[Token(Token = "0x6006937")]
+	[Address(RVA = "0x1060C50", Offset = "0x105FC50", Length = "0x16B")]
+	private void CheckForSpeedDecay()
+	{
+	}
+
+	[Token(Token = "0x6006938")]
+	[Address(RVA = "0x1060DC0", Offset = "0x105FDC0", Length = "0x417")]
+	private void CheckForSprintSpeedIncrease()
+	{
+	}
+
+	[Token(Token = "0x6006939")]
+	[Address(RVA = "0x10611E0", Offset = "0x10601E0", Length = "0xD2")]
+	private void CleanupOldDamage()
+	{
+	}
+
+	[Token(Token = "0x600693A")]
+	[Address(RVA = "0x10664F0", Offset = "0x10654F0", Length = "0x1E")]
+	private void OnIsRangedChanged(bool previousValue, bool newValue)
+	{
+	}
+
+	[Token(Token = "0x600693B")]
+	[Address(RVA = "0x1063270", Offset = "0x1062270", Length = "0x8A")]
+	public bool GetEffectiveIsRanged(float freshnessThreshold = 1f, bool isSpellOwner = true)
+	{
+		return false;
+	}
+
+	[Token(Token = "0x600693C")]
+	[Address(RVA = "0x1067220", Offset = "0x1066220", Length = "0xCC")]
+	public void SetHealth(float health)
+	{
+	}
+
+	[Token(Token = "0x600693D")]
+	[Address(RVA = "0x10671A0", Offset = "0x10661A0", Length = "0x7B")]
+	public void SetConcentration(float concentration)
+	{
+	}
+
+	[Token(Token = "0x600693E")]
+	[Address(RVA = "0x1067320", Offset = "0x1066320", Length = "0x7B")]
+	public void SetStamina(float stamina)
+	{
+	}
+
+	[Token(Token = "0x600693F")]
+	[Address(RVA = "0x1064850", Offset = "0x1063850", Length = "0x335")]
+	private void HealthRegenTick()
+	{
+	}
+
+	[Token(Token = "0x6006940")]
+	[Address(RVA = "0x1061860", Offset = "0x1060860", Length = "0x1A9")]
+	private void ConcentrationRegenTick()
+	{
+	}
+
+	[Token(Token = "0x6006941")]
+	[Address(RVA = "0x1061790", Offset = "0x1060790", Length = "0xC5")]
+	public void ConcentrationRegenOnHit()
+	{
+	}
+
+	[Token(Token = "0x6006942")]
+	[Address(RVA = "0x1067870", Offset = "0x1066870", Length = "0x2F1")]
+	private void StaminaRegenTick()
+	{
+	}
+
+	[Token(Token = "0x6006943")]
+	[Address(RVA = "0x1068B60", Offset = "0x1067B60", Length = "0x172")]
+	private void StunRegenTick()
+	{
+	}
+
+	[Token(Token = "0x6006944")]
+	[Address(RVA = "0x10673A0", Offset = "0x10663A0", Length = "0x98")]
+	public void SetStunBuildUp(float stunBuildUp)
+	{
+	}
+
+	[Token(Token = "0x6006945")]
+	[Address(RVA = "0x106C0B0", Offset = "0x106B0B0", Length = "0x8FD")]
+	protected ObjectsCommon()
+	{
+	}
+
+	[Token(Token = "0x6006947")]
+	[Address(RVA = "0x106A430", Offset = "0x1069430", Length = "0x1297")]
+	protected override void __initializeVariables()
+	{
+	}
+
+	[Token(Token = "0x6006948")]
+	[Address(RVA = "0x106A1D0", Offset = "0x10691D0", Length = "0x257")]
+	protected override void __initializeRpcs()
+	{
+	}
+
+	[Token(Token = "0x6006949")]
+	[Address(RVA = "0x106BC00", Offset = "0x106AC00", Length = "0x21E")]
+	private static void __rpc_handler_3819978750(NetworkBehaviour target, FastBufferReader reader, __RpcParams rpcParams)
+	{
+	}
+
+	[Token(Token = "0x600694A")]
+	[Address(RVA = "0x106BE20", Offset = "0x106AE20", Length = "0x1F6")]
+	private static void __rpc_handler_4127968675(NetworkBehaviour target, FastBufferReader reader, __RpcParams rpcParams)
+	{
+	}
+
+	[Token(Token = "0x600694B")]
+	[Address(RVA = "0x106B7F0", Offset = "0x106A7F0", Length = "0xCD")]
+	private static void __rpc_handler_183792997(NetworkBehaviour target, FastBufferReader reader, __RpcParams rpcParams)
+	{
+	}
+
+	[Token(Token = "0x600694C")]
+	[Address(RVA = "0x106B8C0", Offset = "0x106A8C0", Length = "0x1C4")]
+	private static void __rpc_handler_2073894886(NetworkBehaviour target, FastBufferReader reader, __RpcParams rpcParams)
+	{
+	}
+
+	[Token(Token = "0x600694D")]
+	[Address(RVA = "0x106B6D0", Offset = "0x106A6D0", Length = "0x11B")]
+	private static void __rpc_handler_1008653944(NetworkBehaviour target, FastBufferReader reader, __RpcParams rpcParams)
+	{
+	}
+
+	[Token(Token = "0x600694E")]
+	[Address(RVA = "0x106BA90", Offset = "0x106AA90", Length = "0x163")]
+	private static void __rpc_handler_2285695384(NetworkBehaviour target, FastBufferReader reader, __RpcParams rpcParams)
+	{
+	}
+
+	[Token(Token = "0x600694F")]
+	[Address(RVA = "0x106A1A0", Offset = "0x10691A0", Length = "0x2C")]
+	protected internal override string __getTypeName()
+	{
+		return null;
+	}
+}

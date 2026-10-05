@@ -1,0 +1,1502 @@
+using System;
+using System.Collections;
+using System.Collections.Generic;
+using System.Diagnostics;
+using System.Runtime.CompilerServices;
+using Cpp2ILInjected;
+using Unity.Netcode;
+using UnityEngine;
+using UnityEngine.AI;
+
+[Token(Token = "0x20002E8")]
+public class PlayerMap : NetworkBehaviour
+{
+	[Token(Token = "0x20002E9")]
+	private sealed class FarLegCacheEntry
+	{
+		[Token(Token = "0x4001B46")]
+		[FieldOffset(Offset = "0x10")]
+		public Vector3 TargetPos;
+
+		[Token(Token = "0x4001B47")]
+		[FieldOffset(Offset = "0x1C")]
+		public int Version;
+
+		[Token(Token = "0x4001B48")]
+		[FieldOffset(Offset = "0x20")]
+		public readonly List<Vector3> Points;
+
+		[Token(Token = "0x4001B49")]
+		[FieldOffset(Offset = "0x28")]
+		public bool Valid;
+
+		[Token(Token = "0x6001C08")]
+		[Address(RVA = "0x9762E0", Offset = "0x9752E0", Length = "0x7E")]
+		public FarLegCacheEntry()
+		{
+		}
+	}
+
+	[Token(Token = "0x20002EA")]
+	private class UnspawnedNPCMapEntry
+	{
+		[Token(Token = "0x4001B4A")]
+		[FieldOffset(Offset = "0x10")]
+		public Vector3 Position;
+
+		[Token(Token = "0x4001B4B")]
+		[FieldOffset(Offset = "0x1C")]
+		public Areas.Scene Scene;
+
+		[Token(Token = "0x4001B4C")]
+		[FieldOffset(Offset = "0x20")]
+		public int NPCIndexInScene;
+
+		[Token(Token = "0x4001B4D")]
+		[FieldOffset(Offset = "0x24")]
+		public bool Indoors;
+
+		[Token(Token = "0x4001B4E")]
+		[FieldOffset(Offset = "0x28")]
+		public Vector2 IndoorMapMiddleCoords;
+
+		[Token(Token = "0x4001B4F")]
+		[FieldOffset(Offset = "0x30")]
+		public List<string> PlayerTags;
+
+		[Token(Token = "0x4001B50")]
+		[FieldOffset(Offset = "0x38")]
+		public List<string> InstanceTags;
+
+		[Token(Token = "0x4001B51")]
+		[FieldOffset(Offset = "0x40")]
+		public List<string> WorldTags;
+
+		[Token(Token = "0x4001B52")]
+		[FieldOffset(Offset = "0x48")]
+		public List<string> ConvoPlayerTags;
+
+		[Token(Token = "0x4001B53")]
+		[FieldOffset(Offset = "0x50")]
+		public List<string> ConvoInstanceTags;
+
+		[Token(Token = "0x4001B54")]
+		[FieldOffset(Offset = "0x58")]
+		public List<string> ConvoWorldTags;
+
+		[Token(Token = "0x4001B55")]
+		[FieldOffset(Offset = "0x60")]
+		public bool LocalQuestFound;
+
+		[Token(Token = "0x4001B56")]
+		[FieldOffset(Offset = "0x61")]
+		public bool LocalConvoFound;
+
+		[Token(Token = "0x4001B57")]
+		[FieldOffset(Offset = "0x64")]
+		public NpcMapIconType ServerIcon;
+
+		[Token(Token = "0x4001B58")]
+		[FieldOffset(Offset = "0x68")]
+		public bool HasScheduling;
+
+		[Token(Token = "0x4001B59")]
+		[FieldOffset(Offset = "0x69")]
+		public bool HideDuringSpecifiedTimes;
+
+		[Token(Token = "0x4001B5A")]
+		[FieldOffset(Offset = "0x70")]
+		public ScheduleSettings ScheduleSettings;
+
+		[Token(Token = "0x4001B5B")]
+		[FieldOffset(Offset = "0x78")]
+		public Kingdom Kingdom;
+
+		[Token(Token = "0x4001B5C")]
+		[FieldOffset(Offset = "0x7C")]
+		public bool ServerSchedulingVisible;
+
+		[Token(Token = "0x6001C09")]
+		[Address(RVA = "0x993450", Offset = "0x992450", Length = "0x46")]
+		public UnspawnedNPCMapEntry()
+		{
+		}
+	}
+
+	[CompilerGenerated]
+	[Token(Token = "0x20002F9")]
+	private sealed class <UnspawnedNPCServerIconRoutine>d__200 : IEnumerator<object>, IEnumerator, IDisposable
+	{
+		[Token(Token = "0x4001B71")]
+		[FieldOffset(Offset = "0x10")]
+		private int <>1__state;
+
+		[Token(Token = "0x4001B72")]
+		[FieldOffset(Offset = "0x18")]
+		private object <>2__current;
+
+		[Token(Token = "0x4001B73")]
+		[FieldOffset(Offset = "0x20")]
+		public PlayerMap <>4__this;
+
+		[Token(Token = "0x4001B74")]
+		[FieldOffset(Offset = "0x28")]
+		private WaitForSeconds <quickWait>5__2;
+
+		[Token(Token = "0x4001B75")]
+		[FieldOffset(Offset = "0x30")]
+		private WaitForSeconds <slowWait>5__3;
+
+		[Token(Token = "0x17000415")]
+		object IEnumerator<object>.Current
+		{
+			[DebuggerHidden]
+			[Token(Token = "0x6001C2F")]
+			[Address(RVA = "0x6B1E50", Offset = "0x6B0E50", Length = "0x5")]
+			get
+			{
+				return null;
+			}
+		}
+
+		[Token(Token = "0x17000416")]
+		object IEnumerator.Current
+		{
+			[DebuggerHidden]
+			[Token(Token = "0x6001C31")]
+			[Address(RVA = "0x6B1E50", Offset = "0x6B0E50", Length = "0x5")]
+			get
+			{
+				return null;
+			}
+		}
+
+		[DebuggerHidden]
+		[Token(Token = "0x6001C2C")]
+		[Address(RVA = "0x6B1EA0", Offset = "0x6B0EA0", Length = "0x24")]
+		public <UnspawnedNPCServerIconRoutine>d__200(int <>1__state)
+		{
+		}
+
+		[DebuggerHidden]
+		[Token(Token = "0x6001C2D")]
+		[Address(RVA = "0x6AAC60", Offset = "0x6A9C60", Length = "0x3")]
+		void IDisposable.Dispose()
+		{
+		}
+
+		[Token(Token = "0x6001C2E")]
+		[Address(RVA = "0x992380", Offset = "0x991380", Length = "0xD67")]
+		private bool MoveNext()
+		{
+			return false;
+		}
+
+		bool IEnumerator.MoveNext()
+		{
+			//ILSpy generated this explicit interface implementation from .override directive in MoveNext
+			return this.MoveNext();
+		}
+
+		[DebuggerHidden]
+		[Token(Token = "0x6001C30")]
+		[Address(RVA = "0x9930F0", Offset = "0x9920F0", Length = "0x3E")]
+		void IEnumerator.Reset()
+		{
+		}
+	}
+
+	[CompilerGenerated]
+	[Token(Token = "0x20002FA")]
+	private sealed class <WarpAndEnsureOnNavMesh>d__178 : IEnumerator<object>, IEnumerator, IDisposable
+	{
+		[Token(Token = "0x4001B76")]
+		[FieldOffset(Offset = "0x10")]
+		private int <>1__state;
+
+		[Token(Token = "0x4001B77")]
+		[FieldOffset(Offset = "0x18")]
+		private object <>2__current;
+
+		[Token(Token = "0x4001B78")]
+		[FieldOffset(Offset = "0x20")]
+		public Vector3 targetPosition;
+
+		[Token(Token = "0x4001B79")]
+		[FieldOffset(Offset = "0x2C")]
+		public bool showArrivalVFX;
+
+		[Token(Token = "0x4001B7A")]
+		[FieldOffset(Offset = "0x30")]
+		private Player <player>5__2;
+
+		[Token(Token = "0x4001B7B")]
+		[FieldOffset(Offset = "0x38")]
+		private NavMeshAgent <agent>5__3;
+
+		[Token(Token = "0x17000417")]
+		object IEnumerator<object>.Current
+		{
+			[DebuggerHidden]
+			[Token(Token = "0x6001C35")]
+			[Address(RVA = "0x6B1E50", Offset = "0x6B0E50", Length = "0x5")]
+			get
+			{
+				return null;
+			}
+		}
+
+		[Token(Token = "0x17000418")]
+		object IEnumerator.Current
+		{
+			[DebuggerHidden]
+			[Token(Token = "0x6001C37")]
+			[Address(RVA = "0x6B1E50", Offset = "0x6B0E50", Length = "0x5")]
+			get
+			{
+				return null;
+			}
+		}
+
+		[DebuggerHidden]
+		[Token(Token = "0x6001C32")]
+		[Address(RVA = "0x6B1EA0", Offset = "0x6B0EA0", Length = "0x24")]
+		public <WarpAndEnsureOnNavMesh>d__178(int <>1__state)
+		{
+		}
+
+		[DebuggerHidden]
+		[Token(Token = "0x6001C33")]
+		[Address(RVA = "0x6AAC60", Offset = "0x6A9C60", Length = "0x3")]
+		void IDisposable.Dispose()
+		{
+		}
+
+		[Token(Token = "0x6001C34")]
+		[Address(RVA = "0x993130", Offset = "0x992130", Length = "0x2DC")]
+		private bool MoveNext()
+		{
+			return false;
+		}
+
+		bool IEnumerator.MoveNext()
+		{
+			//ILSpy generated this explicit interface implementation from .override directive in MoveNext
+			return this.MoveNext();
+		}
+
+		[DebuggerHidden]
+		[Token(Token = "0x6001C36")]
+		[Address(RVA = "0x993410", Offset = "0x992410", Length = "0x3E")]
+		void IEnumerator.Reset()
+		{
+		}
+	}
+
+	[Token(Token = "0x4001B02")]
+	[FieldOffset(Offset = "0x88")]
+	private Player _player;
+
+	[Token(Token = "0x4001B03")]
+	[FieldOffset(Offset = "0x90")]
+	private PlayerStateMachine psm;
+
+	[Token(Token = "0x4001B04")]
+	[FieldOffset(Offset = "0x98")]
+	private Party partyComponent;
+
+	[Token(Token = "0x4001B05")]
+	[FieldOffset(Offset = "0xA0")]
+	private bool _loaded;
+
+	[Token(Token = "0x4001B06")]
+	[FieldOffset(Offset = "0xA8")]
+	private List<POIMarker> _POIMapMarkers;
+
+	[Token(Token = "0x4001B07")]
+	[FieldOffset(Offset = "0xB0")]
+	private List<MapMarker> _mapFragmentMarkers;
+
+	[Token(Token = "0x4001B08")]
+	[FieldOffset(Offset = "0xB8")]
+	private readonly List<RewardMarker> _rewardMarkers;
+
+	[Token(Token = "0x4001B09")]
+	[FieldOffset(Offset = "0xC0")]
+	private readonly List<NPCQuest> _activeQuestNPCs;
+
+	[Token(Token = "0x4001B0A")]
+	[FieldOffset(Offset = "0xC8")]
+	private Dictionary<MapFilterCategory, bool> _activeFilters;
+
+	[Token(Token = "0x4001B0B")]
+	[FieldOffset(Offset = "0xD0")]
+	private string _lastPannedToWaypointName;
+
+	[Token(Token = "0x4001B0C")]
+	public const string LostCavernsTutorialWaypoint = "TheLostCavernsTutorial";
+
+	[Token(Token = "0x4001B0D")]
+	public const string LostCavernsWaypoint = "TheLostCaverns";
+
+	[Token(Token = "0x4001B0E")]
+	public const string SanctumWaypoint = "The Sanctum Waygate";
+
+	[Token(Token = "0x4001B0F")]
+	public const string EarlwoodVillageWaypoint = "Earlwood Village Waygate";
+
+	[Token(Token = "0x4001B10")]
+	private const float DefaultSpotlightZoomSteps = 4f;
+
+	[Token(Token = "0x4001B11")]
+	private const float EarlwoodSpotlightZoomSteps = 2f;
+
+	[Token(Token = "0x4001B13")]
+	[FieldOffset(Offset = "0xE0")]
+	private readonly Dictionary<MapDataAsset, string> _subTabLabelKeys;
+
+	[Token(Token = "0x4001B14")]
+	[FieldOffset(Offset = "0xE8")]
+	private readonly List<MapSubTabEntry> _subTabCache;
+
+	[Token(Token = "0x4001B15")]
+	[FieldOffset(Offset = "0xF0")]
+	private int _subTabCacheFrame;
+
+	[Token(Token = "0x4001B16")]
+	[FieldOffset(Offset = "0xF8")]
+	private readonly Dictionary<MapDataAsset, Areas.Scene> _lastSceneByMap;
+
+	[Token(Token = "0x4001B17")]
+	[FieldOffset(Offset = "0x100")]
+	private string _fogRevealRegion;
+
+	[Token(Token = "0x4001B18")]
+	[FieldOffset(Offset = "0x108")]
+	private readonly List<PoiMarkerSnapshot> _poiScratch;
+
+	[Token(Token = "0x4001B19")]
+	[FieldOffset(Offset = "0x110")]
+	private readonly List<FragmentMarkerSnapshot> _fragmentScratch;
+
+	[Token(Token = "0x4001B1A")]
+	[FieldOffset(Offset = "0x118")]
+	private readonly List<CustomMarkerSnapshot> _customScratch;
+
+	[Token(Token = "0x4001B1B")]
+	[FieldOffset(Offset = "0x120")]
+	private readonly List<PartyIconSnapshot> _partyScratch;
+
+	[Token(Token = "0x4001B1C")]
+	[FieldOffset(Offset = "0x128")]
+	private readonly List<PetIconSnapshot> _petScratch;
+
+	[Token(Token = "0x4001B1D")]
+	[FieldOffset(Offset = "0x130")]
+	private readonly List<QuestNpcSnapshot> _npcScratch;
+
+	[Token(Token = "0x4001B1E")]
+	[FieldOffset(Offset = "0x138")]
+	private readonly List<QuestPinSnapshot> _pinScratch;
+
+	[Token(Token = "0x4001B1F")]
+	[FieldOffset(Offset = "0x140")]
+	private readonly List<QuestTaskState> _pinTaskScratch;
+
+	[Token(Token = "0x4001B20")]
+	[FieldOffset(Offset = "0x148")]
+	private readonly List<WaypointItemSnapshot> _waypointScratch;
+
+	[Token(Token = "0x4001B21")]
+	[FieldOffset(Offset = "0x150")]
+	private readonly List<Player> _playersToDisplayScratch;
+
+	[Token(Token = "0x4001B22")]
+	[FieldOffset(Offset = "0x158")]
+	private readonly List<RouteEntry> _bannerRouteScratch;
+
+	[Token(Token = "0x4001B23")]
+	[FieldOffset(Offset = "0x160")]
+	private readonly List<RouteEntry> _questRouteScratch;
+
+	[Token(Token = "0x4001B24")]
+	[FieldOffset(Offset = "0x168")]
+	private readonly Dictionary<string, MaskRouteFollower> _beaconFollowers;
+
+	[Token(Token = "0x4001B25")]
+	[FieldOffset(Offset = "0x170")]
+	private readonly List<string> _beaconFollowerScratch;
+
+	[Token(Token = "0x4001B26")]
+	[FieldOffset(Offset = "0x178")]
+	private readonly Dictionary<string, FarLegCacheEntry> _farLegCache;
+
+	[Token(Token = "0x4001B27")]
+	[FieldOffset(Offset = "0x180")]
+	private readonly List<Vector3> _farLegScratch;
+
+	[Token(Token = "0x4001B28")]
+	[FieldOffset(Offset = "0x188")]
+	private readonly List<Areas.Scene> _farLegSceneScratch;
+
+	[Token(Token = "0x4001B29")]
+	[FieldOffset(Offset = "0x190")]
+	private readonly HashSet<string> _farLegTouched;
+
+	[Token(Token = "0x4001B2A")]
+	[FieldOffset(Offset = "0x198")]
+	private readonly List<string> _farLegPruneScratch;
+
+	[Token(Token = "0x4001B2B")]
+	[FieldOffset(Offset = "0x1A0")]
+	private readonly HashSet<string> _beaconRoutedScratch;
+
+	[Token(Token = "0x4001B2C")]
+	[FieldOffset(Offset = "0x1A8")]
+	private readonly Dictionary<string, string> _loreCache;
+
+	[Token(Token = "0x4001B2D")]
+	[FieldOffset(Offset = "0x1B0")]
+	private MapMarkerIndicator _markerIndicator;
+
+	[Token(Token = "0x4001B2E")]
+	[FieldOffset(Offset = "0x1B8")]
+	private QuestIndicator _questIndicator;
+
+	[Token(Token = "0x4001B2F")]
+	[FieldOffset(Offset = "0x1C0")]
+	private SceneHandler _scrapedHandler;
+
+	[Token(Token = "0x4001B30")]
+	[FieldOffset(Offset = "0x1C8")]
+	private readonly List<UnspawnedNPCMapEntry> _unspawnedNPCEntries;
+
+	[Token(Token = "0x4001B31")]
+	[FieldOffset(Offset = "0x1D0")]
+	private Coroutine _unspawnedNPCServerCoroutine;
+
+	[Token(Token = "0x4001B32")]
+	[FieldOffset(Offset = "0x1D8")]
+	private bool _unspawnedNPCDirty;
+
+	[Token(Token = "0x4001B33")]
+	[FieldOffset(Offset = "0x1DC")]
+	private Vector2? _pendingZoomMapPos;
+
+	[Token(Token = "0x4001B34")]
+	[FieldOffset(Offset = "0x1E8")]
+	private (MapDataAsset map, Vector2 world)? _pendingViewMapFocus;
+
+	[CompilerGenerated]
+	[Token(Token = "0x4001B36")]
+	[FieldOffset(Offset = "0x208")]
+	private Action<Vector2> m_ZoomToMapPositionRequested;
+
+	[CompilerGenerated]
+	[Token(Token = "0x4001B37")]
+	[FieldOffset(Offset = "0x210")]
+	private Action<string> m_ZoomToPoiRequested;
+
+	[CompilerGenerated]
+	[Token(Token = "0x4001B38")]
+	[FieldOffset(Offset = "0x218")]
+	private Action<string> m_ViewOtherMapAndFocusRequested;
+
+	[CompilerGenerated]
+	[Token(Token = "0x4001B39")]
+	[FieldOffset(Offset = "0x220")]
+	private Action<MapDataAsset, Vector2> m_ViewMapAndFocusWorldRequested;
+
+	[Token(Token = "0x4001B3B")]
+	[FieldOffset(Offset = "0x228")]
+	private bool _holdsTravelLock;
+
+	[Token(Token = "0x4001B3C")]
+	[FieldOffset(Offset = "0x229")]
+	private bool _postTutorialWaypointsEnsured;
+
+	[Token(Token = "0x4001B3D")]
+	[FieldOffset(Offset = "0x230")]
+	private readonly List<RewardMarkerSnapshot> _rewardScratch;
+
+	[Token(Token = "0x4001B3E")]
+	[FieldOffset(Offset = "0x238")]
+	private MapDataAsset _lostCavernsMap;
+
+	[Token(Token = "0x4001B3F")]
+	private const float WaypointRouteSnapRange = 20f;
+
+	[Token(Token = "0x4001B40")]
+	private const float WaypointRouteRecoverySnapRange = 150f;
+
+	[Token(Token = "0x4001B41")]
+	[FieldOffset(Offset = "0x240")]
+	private Areas.Scene _serverViewedScene;
+
+	[Token(Token = "0x4001B42")]
+	[FieldOffset(Offset = "0x248")]
+	private int[] _lastSentScenes;
+
+	[Token(Token = "0x4001B43")]
+	[FieldOffset(Offset = "0x250")]
+	private int[] _lastSentNpcIndices;
+
+	[Token(Token = "0x4001B44")]
+	[FieldOffset(Offset = "0x258")]
+	private byte[] _lastSentIcons;
+
+	[Token(Token = "0x4001B45")]
+	[FieldOffset(Offset = "0x260")]
+	private bool[] _lastSentScheduling;
+
+	[Token(Token = "0x17000405")]
+	[field: Token(Token = "0x4001B12")]
+	[field: FieldOffset(Offset = "0xD8")]
+	public Areas.Scene ViewedScene
+	{
+		[Token(Token = "0x6001B83")]
+		[Address(RVA = "0x974340", Offset = "0x973340", Length = "0x7")]
+		get;
+		[Token(Token = "0x6001B84")]
+		[Address(RVA = "0x974870", Offset = "0x973870", Length = "0x7")]
+		private set;
+	}
+
+	[Token(Token = "0x17000406")]
+	private SceneHandler ViewedHandler
+	{
+		[Token(Token = "0x6001B85")]
+		[Address(RVA = "0x9740D0", Offset = "0x9730D0", Length = "0xFA")]
+		get
+		{
+			return null;
+		}
+	}
+
+	[Token(Token = "0x17000407")]
+	public MapDataAsset ActiveSubTabMap
+	{
+		[Token(Token = "0x6001B86")]
+		[Address(RVA = "0x9735A0", Offset = "0x9725A0", Length = "0xA0")]
+		get
+		{
+			return null;
+		}
+	}
+
+	[Token(Token = "0x17000408")]
+	public List<MapSubTabEntry> SubTabs
+	{
+		[Token(Token = "0x6001B87")]
+		[Address(RVA = "0x973A60", Offset = "0x972A60", Length = "0x4D5")]
+		get
+		{
+			return null;
+		}
+	}
+
+	[Token(Token = "0x17000409")]
+	public MapDataAsset SpotlitSubTabMap
+	{
+		[Token(Token = "0x6001B8C")]
+		[Address(RVA = "0x973960", Offset = "0x972960", Length = "0xF7")]
+		get
+		{
+			return null;
+		}
+	}
+
+	[Token(Token = "0x1700040A")]
+	public bool ShowSubTabs
+	{
+		[Token(Token = "0x6001B8E")]
+		[Address(RVA = "0x9738B0", Offset = "0x9728B0", Length = "0xA3")]
+		get
+		{
+			return false;
+		}
+	}
+
+	[Token(Token = "0x1700040B")]
+	public bool ViewingOwnMap
+	{
+		[Token(Token = "0x6001B91")]
+		[Address(RVA = "0x974350", Offset = "0x973350", Length = "0xB1")]
+		get
+		{
+			return false;
+		}
+	}
+
+	[Token(Token = "0x1700040C")]
+	public string ViewedMapFocusWaypoint
+	{
+		[Token(Token = "0x6001B92")]
+		[Address(RVA = "0x9741D0", Offset = "0x9731D0", Length = "0x16F")]
+		get
+		{
+			return null;
+		}
+	}
+
+	[Token(Token = "0x1700040D")]
+	private Areas.Scene DrawnScene
+	{
+		[Token(Token = "0x6001B96")]
+		[Address(RVA = "0x973650", Offset = "0x972650", Length = "0xE4")]
+		get
+		{
+			return default(Areas.Scene);
+		}
+	}
+
+	[Token(Token = "0x1700040E")]
+	[field: Token(Token = "0x4001B35")]
+	[field: FieldOffset(Offset = "0x200")]
+	public bool MapActive
+	{
+		[Token(Token = "0x6001B97")]
+		[Address(RVA = "0x9737D0", Offset = "0x9727D0", Length = "0x8")]
+		get;
+		[Token(Token = "0x6001B98")]
+		[Address(RVA = "0x974820", Offset = "0x973820", Length = "0x7")]
+		set;
+	}
+
+	[Token(Token = "0x1700040F")]
+	private bool WorldTutorialComplete
+	{
+		[Token(Token = "0x6001BB3")]
+		[Address(RVA = "0x974410", Offset = "0x973410", Length = "0x142")]
+		get
+		{
+			return false;
+		}
+	}
+
+	[Token(Token = "0x17000410")]
+	[field: Token(Token = "0x4001B3A")]
+	public static bool TravelTutorialLocksInput
+	{
+		[Token(Token = "0x6001BB4")]
+		[Address(RVA = "0x974090", Offset = "0x973090", Length = "0x36")]
+		get;
+		[Token(Token = "0x6001BB5")]
+		[Address(RVA = "0x974830", Offset = "0x973830", Length = "0x3B")]
+		private set;
+	}
+
+	[Token(Token = "0x17000411")]
+	private bool TravelTutorialEnforced
+	{
+		[Token(Token = "0x6001BB9")]
+		[Address(RVA = "0x974070", Offset = "0x973070", Length = "0x12")]
+		get
+		{
+			return false;
+		}
+	}
+
+	[Token(Token = "0x17000412")]
+	private bool TravelTutorialActive
+	{
+		[Token(Token = "0x6001BBA")]
+		[Address(RVA = "0x973F40", Offset = "0x972F40", Length = "0x124")]
+		get
+		{
+			return false;
+		}
+	}
+
+	[Token(Token = "0x17000413")]
+	private MapDataAsset LostCavernsMap
+	{
+		[Token(Token = "0x6001BDA")]
+		[Address(RVA = "0x973740", Offset = "0x972740", Length = "0x8A")]
+		get
+		{
+			return null;
+		}
+	}
+
+	[Token(Token = "0x17000414")]
+	private static bool SheetDrivenIcons
+	{
+		[Token(Token = "0x6001BF4")]
+		[Address(RVA = "0x9737E0", Offset = "0x9727E0", Length = "0xC3")]
+		get
+		{
+			return false;
+		}
+	}
+
+	[Token(Token = "0x14000035")]
+	public event Action<Vector2> ZoomToMapPositionRequested
+	{
+		[CompilerGenerated]
+		[Token(Token = "0x6001B99")]
+		[Address(RVA = "0x973440", Offset = "0x972440", Length = "0xA4")]
+		add
+		{
+		}
+		[CompilerGenerated]
+		[Token(Token = "0x6001B9A")]
+		[Address(RVA = "0x9746C0", Offset = "0x9736C0", Length = "0xA4")]
+		remove
+		{
+		}
+	}
+
+	[Token(Token = "0x14000036")]
+	public event Action<string> ZoomToPoiRequested
+	{
+		[CompilerGenerated]
+		[Token(Token = "0x6001B9B")]
+		[Address(RVA = "0x9734F0", Offset = "0x9724F0", Length = "0xA4")]
+		add
+		{
+		}
+		[CompilerGenerated]
+		[Token(Token = "0x6001B9C")]
+		[Address(RVA = "0x974770", Offset = "0x973770", Length = "0xA4")]
+		remove
+		{
+		}
+	}
+
+	[Token(Token = "0x14000037")]
+	public event Action<string> ViewOtherMapAndFocusRequested
+	{
+		[CompilerGenerated]
+		[Token(Token = "0x6001B9D")]
+		[Address(RVA = "0x973390", Offset = "0x972390", Length = "0xA4")]
+		add
+		{
+		}
+		[CompilerGenerated]
+		[Token(Token = "0x6001B9E")]
+		[Address(RVA = "0x974610", Offset = "0x973610", Length = "0xA4")]
+		remove
+		{
+		}
+	}
+
+	[Token(Token = "0x14000038")]
+	public event Action<MapDataAsset, Vector2> ViewMapAndFocusWorldRequested
+	{
+		[CompilerGenerated]
+		[Token(Token = "0x6001B9F")]
+		[Address(RVA = "0x9732E0", Offset = "0x9722E0", Length = "0xA4")]
+		add
+		{
+		}
+		[CompilerGenerated]
+		[Token(Token = "0x6001BA0")]
+		[Address(RVA = "0x974560", Offset = "0x973560", Length = "0xA4")]
+		remove
+		{
+		}
+	}
+
+	[Token(Token = "0x6001B88")]
+	[Address(RVA = "0x96F0D0", Offset = "0x96E0D0", Length = "0x26F")]
+	private bool SubTabUnlocked(MapDataAsset map)
+	{
+		return false;
+	}
+
+	[Token(Token = "0x6001B89")]
+	[Address(RVA = "0x961150", Offset = "0x960150", Length = "0x1F1")]
+	public bool AnyWaypointDiscoveredIn(HashSet<Areas.Scene> scenes)
+	{
+		return false;
+	}
+
+	[Token(Token = "0x6001B8A")]
+	[Address(RVA = "0x96A460", Offset = "0x969460", Length = "0xCB")]
+	private static MapDataAsset MapForScene(Areas.Scene scene)
+	{
+		return null;
+	}
+
+	[Token(Token = "0x6001B8B")]
+	[Address(RVA = "0x96EE10", Offset = "0x96DE10", Length = "0x2BE")]
+	private string SubTabLabelFor(MapDataAsset map)
+	{
+		return null;
+	}
+
+	[Token(Token = "0x6001B8D")]
+	[Address(RVA = "0x96A300", Offset = "0x969300", Length = "0x15A")]
+	public MapDataAsset MapForPoi(string markerName)
+	{
+		return null;
+	}
+
+	[Token(Token = "0x6001B8F")]
+	[Address(RVA = "0x96E3D0", Offset = "0x96D3D0", Length = "0xD7")]
+	public void SelectSubTab(MapDataAsset map)
+	{
+	}
+
+	[Token(Token = "0x6001B90")]
+	[Address(RVA = "0x96D6B0", Offset = "0x96C6B0", Length = "0x38D")]
+	private Areas.Scene SceneForMap(MapDataAsset map)
+	{
+		return default(Areas.Scene);
+	}
+
+	[Token(Token = "0x6001B93")]
+	[Address(RVA = "0x96A610", Offset = "0x969610", Length = "0x3E4")]
+	private string NewestBuiltWaypointOn(MapDataAsset map)
+	{
+		return null;
+	}
+
+	[Token(Token = "0x6001B94")]
+	[Address(RVA = "0x96E570", Offset = "0x96D570", Length = "0x28")]
+	public void SetViewedScene(Areas.Scene scene)
+	{
+	}
+
+	[Token(Token = "0x6001B95")]
+	[Address(RVA = "0x96A120", Offset = "0x969120", Length = "0xC9")]
+	private bool IsOnDrawnMap(Areas.Scene scene)
+	{
+		return false;
+	}
+
+	[Token(Token = "0x6001BA1")]
+	[Address(RVA = "0x962040", Offset = "0x961040", Length = "0xB1")]
+	private void Awake()
+	{
+	}
+
+	[Token(Token = "0x6001BA2")]
+	[Address(RVA = "0x9699A0", Offset = "0x9689A0", Length = "0x271")]
+	public void InitialLoad()
+	{
+	}
+
+	[Token(Token = "0x6001BA3")]
+	[Address(RVA = "0x96AAA0", Offset = "0x969AA0", Length = "0x260")]
+	public void OnMapOpened()
+	{
+	}
+
+	[Token(Token = "0x6001BA4")]
+	[Address(RVA = "0x96AA50", Offset = "0x969A50", Length = "0x4E")]
+	public void OnEarlwoodButton()
+	{
+	}
+
+	[Token(Token = "0x6001BA5")]
+	[Address(RVA = "0x96AD10", Offset = "0x969D10", Length = "0x4E")]
+	public void OnSanctumButton()
+	{
+	}
+
+	[Token(Token = "0x6001BA6")]
+	[Address(RVA = "0x96C440", Offset = "0x96B440", Length = "0xDD")]
+	public void RegisterQuestNPC(NPCQuest npc)
+	{
+	}
+
+	[Token(Token = "0x6001BA7")]
+	[Address(RVA = "0x967B40", Offset = "0x966B40", Length = "0x56")]
+	public void DeregisterQuestNPC(NPCQuest npc)
+	{
+	}
+
+	[Token(Token = "0x6001BA8")]
+	[Address(RVA = "0x96C040", Offset = "0x96B040", Length = "0x186")]
+	public void RegisterMapFragment(MapMarker marker)
+	{
+	}
+
+	[Token(Token = "0x6001BA9")]
+	[Address(RVA = "0x967800", Offset = "0x966800", Length = "0x10F")]
+	public void DeregisterMapFragment(string markerName)
+	{
+	}
+
+	[Token(Token = "0x6001BAA")]
+	[Address(RVA = "0x96C520", Offset = "0x96B520", Length = "0x473")]
+	public void RegisterRewardMarker(RewardMarker marker)
+	{
+	}
+
+	[Token(Token = "0x6001BAB")]
+	[Address(RVA = "0x967BA0", Offset = "0x966BA0", Length = "0xD9")]
+	public void DeregisterRewardMarker(string markerName)
+	{
+	}
+
+	[Token(Token = "0x6001BAC")]
+	[Address(RVA = "0x96C1D0", Offset = "0x96B1D0", Length = "0x26F")]
+	public void RegisterPOIMarker(POIMarker marker)
+	{
+	}
+
+	[Token(Token = "0x6001BAD")]
+	[Address(RVA = "0x96CFB0", Offset = "0x96BFB0", Length = "0xC6")]
+	private static Areas.Scene ResolveOwnerScene(GameObject marker)
+	{
+		return default(Areas.Scene);
+	}
+
+	[Token(Token = "0x6001BAE")]
+	[Address(RVA = "0x967A30", Offset = "0x966A30", Length = "0x10F")]
+	public void DeregisterPOIMarker(string markerName)
+	{
+	}
+
+	[Token(Token = "0x6001BAF")]
+	[Address(RVA = "0x967910", Offset = "0x966910", Length = "0x114")]
+	public void DeregisterPOIMarkerFor(GameObject markerObject)
+	{
+	}
+
+	[Token(Token = "0x6001BB0")]
+	[Address(RVA = "0x969540", Offset = "0x968540", Length = "0x12D")]
+	public GameObject FindPOIMarkerObject(string markerName)
+	{
+		return null;
+	}
+
+	[Token(Token = "0x6001BB1")]
+	[Address(RVA = "0x96AEF0", Offset = "0x969EF0", Length = "0x23C")]
+	public void OnWaypointRelocked(string POIName)
+	{
+	}
+
+	[Token(Token = "0x6001BB2")]
+	[Address(RVA = "0x967780", Offset = "0x966780", Length = "0x40")]
+	public void ClearFogReveal(string region)
+	{
+	}
+
+	[Token(Token = "0x6001BB6")]
+	[Address(RVA = "0x96AA00", Offset = "0x969A00", Length = "0x46")]
+	private void OnDisable()
+	{
+	}
+
+	[Token(Token = "0x6001BB7")]
+	[Address(RVA = "0x970EF0", Offset = "0x96FEF0", Length = "0x2B")]
+	private void Update()
+	{
+	}
+
+	[Token(Token = "0x6001BB8")]
+	[Address(RVA = "0x968D10", Offset = "0x967D10", Length = "0x1EE")]
+	private void EnsurePostTutorialWaypoints()
+	{
+	}
+
+	[Token(Token = "0x6001BBB")]
+	[Address(RVA = "0x968AA0", Offset = "0x967AA0", Length = "0x266")]
+	private void DriveTravelTutorial()
+	{
+	}
+
+	[Token(Token = "0x6001BBC")]
+	[Address(RVA = "0x96E520", Offset = "0x96D520", Length = "0x49")]
+	private void SetTravelLock(bool locked)
+	{
+	}
+
+	[Token(Token = "0x6001BBD")]
+	[Address(RVA = "0x9677C0", Offset = "0x9667C0", Length = "0x40")]
+	private static void CloseMapScreen()
+	{
+	}
+
+	[Token(Token = "0x6001BBE")]
+	[Address(RVA = "0x968030", Offset = "0x967030", Length = "0x304")]
+	public void DiscoverPOIMarker(string POIName)
+	{
+	}
+
+	[ServerRpc]
+	[Token(Token = "0x6001BBF")]
+	[Address(RVA = "0x968340", Offset = "0x967340", Length = "0x3A6")]
+	private void DiscoverPOIServerRpc(string playerHash, string poi)
+	{
+	}
+
+	[Token(Token = "0x6001BC0")]
+	[Address(RVA = "0x967C80", Offset = "0x966C80", Length = "0x3A0")]
+	public void DiscoverMapMarker(string value)
+	{
+	}
+
+	[ServerRpc]
+	[Token(Token = "0x6001BC1")]
+	[Address(RVA = "0x9686F0", Offset = "0x9676F0", Length = "0x3A6")]
+	private void DiscoverRegionServerRpc(string playerHash, string region)
+	{
+	}
+
+	[Token(Token = "0x6001BC2")]
+	[Address(RVA = "0x961D00", Offset = "0x960D00", Length = "0x333")]
+	public void ApplyWorldGrantedRegion(string region, bool announce, bool showBanner = true, bool personal = false)
+	{
+	}
+
+	[Token(Token = "0x6001BC3")]
+	[Address(RVA = "0x961810", Offset = "0x960810", Length = "0x4EF")]
+	public void ApplyWorldGrantedPOI(string poiName, bool announce, bool personal = false)
+	{
+	}
+
+	[Token(Token = "0x6001BC4")]
+	[Address(RVA = "0x969C20", Offset = "0x968C20", Length = "0x63")]
+	private bool IsCategoryActive(MapFilterCategory category)
+	{
+		return false;
+	}
+
+	[Token(Token = "0x6001BC5")]
+	[Address(RVA = "0x96E4B0", Offset = "0x96D4B0", Length = "0x66")]
+	public void SetFilterActive(MapFilterCategory category, bool active)
+	{
+	}
+
+	[Token(Token = "0x6001BC6")]
+	[Address(RVA = "0x963880", Offset = "0x962880", Length = "0x869")]
+	public MapState BuildMapSnapshot()
+	{
+		return default(MapState);
+	}
+
+	[Token(Token = "0x6001BC7")]
+	[Address(RVA = "0x969870", Offset = "0x968870", Length = "0x128")]
+	private string GetCachedPoiLore(string markerName, string lore)
+	{
+		return null;
+	}
+
+	[Token(Token = "0x6001BC8")]
+	[Address(RVA = "0x964FE0", Offset = "0x963FE0", Length = "0x435")]
+	private PoiMarkerSnapshot[] BuildPoi()
+	{
+		return null;
+	}
+
+	[Token(Token = "0x6001BC9")]
+	[Address(RVA = "0x963360", Offset = "0x962360", Length = "0x51B")]
+	private FragmentMarkerSnapshot[] BuildFragments()
+	{
+		return null;
+	}
+
+	[Token(Token = "0x6001BCA")]
+	[Address(RVA = "0x966270", Offset = "0x965270", Length = "0x5F9")]
+	private RewardMarkerSnapshot[] BuildRewards()
+	{
+		return null;
+	}
+
+	[Token(Token = "0x6001BCB")]
+	[Address(RVA = "0x96D2D0", Offset = "0x96C2D0", Length = "0x71")]
+	private static string RewardTooltipKey(RewardMarkerKind kind)
+	{
+		return null;
+	}
+
+	[Token(Token = "0x6001BCC")]
+	[Address(RVA = "0x96D240", Offset = "0x96C240", Length = "0x8A")]
+	private static string RewardTooltipFallback(RewardMarkerKind kind)
+	{
+		return null;
+	}
+
+	[Token(Token = "0x6001BCD")]
+	[Address(RVA = "0x962BC0", Offset = "0x961BC0", Length = "0x793")]
+	private CustomMarkerSnapshot[] BuildCustom()
+	{
+		return null;
+	}
+
+	[Token(Token = "0x6001BCE")]
+	[Address(RVA = "0x9640F0", Offset = "0x9630F0", Length = "0x848")]
+	private PartyIconSnapshot[] BuildParty(out List<Player> displayedPlayers)
+	{
+		displayedPlayers = null;
+		return null;
+	}
+
+	[Token(Token = "0x6001BCF")]
+	[Address(RVA = "0x964940", Offset = "0x963940", Length = "0x4AE")]
+	private PetIconSnapshot[] BuildPets(List<Player> displayedPlayers)
+	{
+		return null;
+	}
+
+	[Token(Token = "0x6001BD0")]
+	[Address(RVA = "0x965420", Offset = "0x964420", Length = "0x52E")]
+	private QuestNpcSnapshot[] BuildQuestNpcs()
+	{
+		return null;
+	}
+
+	[Token(Token = "0x6001BD1")]
+	[Address(RVA = "0x961350", Offset = "0x960350", Length = "0x4BD")]
+	private void AppendUnspawnedNpcs()
+	{
+	}
+
+	[Token(Token = "0x6001BD2")]
+	[Address(RVA = "0x969C90", Offset = "0x968C90", Length = "0x23E")]
+	private bool IsCoveredBySpawnedMarker(UnspawnedNPCMapEntry entry)
+	{
+		return false;
+	}
+
+	[Token(Token = "0x6001BD3")]
+	[Address(RVA = "0x96A530", Offset = "0x969530", Length = "0xC0")]
+	private static Sprite MapSpriteForIcon(NpcMapIconType icon)
+	{
+		return null;
+	}
+
+	[Token(Token = "0x6001BD4")]
+	[Address(RVA = "0x96D080", Offset = "0x96C080", Length = "0x4C")]
+	private static NpcMapIconType ResolveUnspawnedIcon(UnspawnedNPCMapEntry entry)
+	{
+		return default(NpcMapIconType);
+	}
+
+	[Token(Token = "0x6001BD5")]
+	[Address(RVA = "0x965950", Offset = "0x964950", Length = "0x91F")]
+	private QuestPinSnapshot[] BuildQuestPins()
+	{
+		return null;
+	}
+
+	[Token(Token = "0x6001BD6")]
+	[Address(RVA = "0x964DF0", Offset = "0x963DF0", Length = "0x1E9")]
+	private QuestTaskState[] BuildPinTasks(QuestDefinition questDef, QuestProgressData progress, QuestTaskGroup group, string mapActivation)
+	{
+		return null;
+	}
+
+	[Token(Token = "0x6001BD7")]
+	[Address(RVA = "0x967170", Offset = "0x966170", Length = "0x2BB")]
+	private WaypointItemSnapshot[] BuildWaypoints()
+	{
+		return null;
+	}
+
+	[Token(Token = "0x6001BD8")]
+	[Address(RVA = "0x96A2B0", Offset = "0x9692B0", Length = "0x4E")]
+	private bool ListedWhileTutorialRuns(POIMarker marker)
+	{
+		return false;
+	}
+
+	[Token(Token = "0x6001BD9")]
+	[Address(RVA = "0x969ED0", Offset = "0x968ED0", Length = "0x131")]
+	private bool IsLostCavernsScene(Areas.Scene scene)
+	{
+		return false;
+	}
+
+	[Token(Token = "0x6001BDB")]
+	[Address(RVA = "0x966870", Offset = "0x965870", Length = "0x8FA")]
+	private RouteSnapshot BuildRoutes()
+	{
+		return default(RouteSnapshot);
+	}
+
+	[Token(Token = "0x6001BDC")]
+	[Address(RVA = "0x962100", Offset = "0x961100", Length = "0xAB3")]
+	private void BuildBeaconRoutes()
+	{
+	}
+
+	[Token(Token = "0x6001BDD")]
+	[Address(RVA = "0x96D350", Offset = "0x96C350", Length = "0x35B")]
+	private void RouteBeacon(in CustomMarkerData data, Vector3 playerPos, Areas.Scene playerScene, Color colour, float dashPhase)
+	{
+	}
+
+	[Token(Token = "0x6001BDE")]
+	[Address(RVA = "0x960C60", Offset = "0x95FC60", Length = "0x4E5")]
+	private void AddCrossMapFarLeg(List<RouteEntry> outList, string key, Vector3 targetPos, Areas.Scene targetScene, Areas.Scene playerScene, Color colour, float dashPhase)
+	{
+	}
+
+	[Token(Token = "0x6001BDF")]
+	[Address(RVA = "0x96BCF0", Offset = "0x96ACF0", Length = "0x348")]
+	private void PruneFarLegCache()
+	{
+	}
+
+	[Token(Token = "0x6001BE0")]
+	[Address(RVA = "0x96AD60", Offset = "0x969D60", Length = "0x187")]
+	public void OnWaypointListEntryClicked(string poiName)
+	{
+	}
+
+	[Token(Token = "0x6001BE1")]
+	[Address(RVA = "0x96F340", Offset = "0x96E340", Length = "0x7EC")]
+	public void TeleportToWaypoint(string poiName)
+	{
+	}
+
+	[Token(Token = "0x6001BE2")]
+	[Address(RVA = "0x96E5A0", Offset = "0x96D5A0", Length = "0x6A7")]
+	public void SpawnAtNearestWaypoint()
+	{
+	}
+
+	[Token(Token = "0x6001BE3")]
+	[Address(RVA = "0x96B130", Offset = "0x96A130", Length = "0x5A3")]
+	private POIMarker PickNearestWaypointByWalkablePath(List<POIMarker> candidates)
+	{
+		return null;
+	}
+
+	[Token(Token = "0x6001BE4")]
+	[Address(RVA = "0x970F20", Offset = "0x96FF20", Length = "0x150")]
+	private static float WalkablePathLength(List<Vector3> path)
+	{
+		return 0f;
+	}
+
+	[Token(Token = "0x6001BE5")]
+	[Address(RVA = "0x96D0D0", Offset = "0x96C0D0", Length = "0x16A")]
+	private void RespawnInPlace()
+	{
+	}
+
+	[IteratorStateMachine(typeof(<WarpAndEnsureOnNavMesh>d__178))]
+	[Token(Token = "0x6001BE6")]
+	[Address(RVA = "0x971080", Offset = "0x970080", Length = "0x7E")]
+	private IEnumerator WarpAndEnsureOnNavMesh(Vector3 targetPosition, bool showArrivalVFX = false)
+	{
+		return null;
+	}
+
+	[Token(Token = "0x6001BE7")]
+	[Address(RVA = "0x96B6E0", Offset = "0x96A6E0", Length = "0x606")]
+	public void PlaceCustomMarker(Vector2 mapLocalPoint)
+	{
+	}
+
+	[Token(Token = "0x6001BE8")]
+	[Address(RVA = "0x96C9A0", Offset = "0x96B9A0", Length = "0x365")]
+	public void RemoveCustomMarkerById(string markerId)
+	{
+	}
+
+	[Token(Token = "0x6001BE9")]
+	[Address(RVA = "0x96A010", Offset = "0x969010", Length = "0x105")]
+	private bool IsMarkerFromMeOrMyParty(ulong ownerId)
+	{
+		return false;
+	}
+
+	[Token(Token = "0x6001BEA")]
+	[Address(RVA = "0x96FFF0", Offset = "0x96EFF0", Length = "0x32")]
+	public bool TryGetQuestPinWorldTarget(string mapActivationName, out Vector2 worldPos, out float worldRadius)
+	{
+		worldPos = default(Vector2);
+		worldRadius = default(float);
+		return false;
+	}
+
+	[Token(Token = "0x6001BEB")]
+	[Address(RVA = "0x96FCA0", Offset = "0x96ECA0", Length = "0x349")]
+	private bool TryFindQuestPinAnyMap(string mapActivationName, out MapDataAsset pinMap, out Vector2 mapContentPos, out Vector2 worldPos, out float worldRadius)
+	{
+		pinMap = null;
+		mapContentPos = default(Vector2);
+		worldPos = default(Vector2);
+		worldRadius = default(float);
+		return false;
+	}
+
+	[Token(Token = "0x6001BEC")]
+	[Address(RVA = "0x970030", Offset = "0x96F030", Length = "0x15E")]
+	private static bool TryResolvePinOnMap(MapDataAsset map, string mapActivationName, out Vector2 mapContentPos, out Vector2 worldPos, out float worldRadius)
+	{
+		mapContentPos = default(Vector2);
+		worldPos = default(Vector2);
+		worldRadius = default(float);
+		return false;
+	}
+
+	[Token(Token = "0x6001BED")]
+	[Address(RVA = "0x971100", Offset = "0x970100", Length = "0x100")]
+	public void ZoomToQuestMarker(string mapActivationName)
+	{
+	}
+
+	[Token(Token = "0x6001BEE")]
+	[Address(RVA = "0x971200", Offset = "0x970200", Length = "0x48B")]
+	public void ZoomToQuestPin(Quest quest)
+	{
+	}
+
+	[Token(Token = "0x6001BEF")]
+	[Address(RVA = "0x971690", Offset = "0x970690", Length = "0xE9")]
+	public void ZoomToTrackedQuestPin()
+	{
+	}
+
+	[Token(Token = "0x6001BF0")]
+	[Address(RVA = "0x969670", Offset = "0x968670", Length = "0x1F7")]
+	private void FocusQuestPin(MapDataAsset pinMap, Vector2 mapContentPos, Vector2 worldPos)
+	{
+	}
+
+	[Token(Token = "0x6001BF1")]
+	[Address(RVA = "0x96CF20", Offset = "0x96BF20", Length = "0x8F")]
+	private void RequestZoomToMapPosition(Vector2 mapPos)
+	{
+	}
+
+	[Token(Token = "0x6001BF2")]
+	[Address(RVA = "0x96FC10", Offset = "0x96EC10", Length = "0x83")]
+	public bool TryConsumePendingZoom(out Vector2 mapPos)
+	{
+		mapPos = default(Vector2);
+		return false;
+	}
+
+	[Token(Token = "0x6001BF3")]
+	[Address(RVA = "0x96FB30", Offset = "0x96EB30", Length = "0xDE")]
+	public bool TryConsumePendingViewMapFocus(out MapDataAsset map, out Vector2 world)
+	{
+		map = null;
+		world = default(Vector2);
+		return false;
+	}
+
+	[Token(Token = "0x6001BF5")]
+	[Address(RVA = "0x96DA40", Offset = "0x96CA40", Length = "0x988")]
+	private void ScrapeConglomerateNPCData()
+	{
+	}
+
+	[ServerRpc]
+	[Token(Token = "0x6001BF6")]
+	[Address(RVA = "0x96CD10", Offset = "0x96BD10", Length = "0x201")]
+	private void RequestUnspawnedNPCIconCheckServerRpc(bool start, Areas.Scene viewedScene)
+	{
+	}
+
+	[Token(Token = "0x6001BF7")]
+	[Address(RVA = "0x96EC50", Offset = "0x96DC50", Length = "0x1B5")]
+	private void StartOrStopUnspawnedNPCServerCoroutine(bool start, Areas.Scene viewedScene = Areas.Scene.None)
+	{
+	}
+
+	[Token(Token = "0x6001BF8")]
+	[Address(RVA = "0x96A600", Offset = "0x969600", Length = "0x8")]
+	private void MarkUnspawnedNPCDirty()
+	{
+	}
+
+	[IteratorStateMachine(typeof(<UnspawnedNPCServerIconRoutine>d__200))]
+	[Token(Token = "0x6001BF9")]
+	[Address(RVA = "0x970E80", Offset = "0x96FE80", Length = "0x6D")]
+	private IEnumerator UnspawnedNPCServerIconRoutine()
+	{
+		return null;
+	}
+
+	[Token(Token = "0x6001BFA")]
+	[Address(RVA = "0x96A1F0", Offset = "0x9691F0", Length = "0xB8")]
+	private static NpcMapIconType LegacyIconFromTagArrays(NPCQuest quest, ICollection<string> worldTags, ICollection<string> instanceTags)
+	{
+		return default(NpcMapIconType);
+	}
+
+	[Token(Token = "0x6001BFB")]
+	[Address(RVA = "0x970190", Offset = "0x96F190", Length = "0x2CA")]
+	private bool UnspawnedIconResultsChanged(List<int> scenes, List<int> npcIndices, List<byte> icons, List<bool> scheduling)
+	{
+		return false;
+	}
+
+	[ClientRpc]
+	[Token(Token = "0x6001BFC")]
+	[Address(RVA = "0x970460", Offset = "0x96F460", Length = "0xA18")]
+	private void UnspawnedNPCIconResultsClientRpc(int[] scenes, int[] npcIndices, byte[] icons, bool[] schedulingVisible, ClientRpcParams rpcParams = default(ClientRpcParams))
+	{
+	}
+
+	[Token(Token = "0x6001BFD")]
+	[Address(RVA = "0x967430", Offset = "0x966430", Length = "0x154")]
+	private static bool CanEverShowIcon(NetworkObject prefab, NPCQuest quest)
+	{
+		return false;
+	}
+
+	[Token(Token = "0x6001BFE")]
+	[Address(RVA = "0x967590", Offset = "0x966590", Length = "0x1E2")]
+	private static bool CheckAnyTagMatch(List<string> npcTags, ICollection<string> activeTags)
+	{
+		return false;
+	}
+
+	[Token(Token = "0x6001BFF")]
+	[Address(RVA = "0x968F00", Offset = "0x967F00", Length = "0x637")]
+	private static bool EvaluateSchedulingQuestVisibility(NPCScheduling scheduling, List<QuestProgressData> questsInProgress, List<Quest> completedWorldQuests)
+	{
+		return false;
+	}
+
+	[Token(Token = "0x6001C00")]
+	[Address(RVA = "0x972990", Offset = "0x971990", Length = "0x94C")]
+	public PlayerMap()
+	{
+	}
+
+	[Token(Token = "0x6001C01")]
+	[Address(RVA = "0x6B2110", Offset = "0x6B1110", Length = "0x7")]
+	protected override void __initializeVariables()
+	{
+	}
+
+	[Token(Token = "0x6001C02")]
+	[Address(RVA = "0x9717B0", Offset = "0x9707B0", Length = "0x1A5")]
+	protected override void __initializeRpcs()
+	{
+	}
+
+	[Token(Token = "0x6001C03")]
+	[Address(RVA = "0x9726B0", Offset = "0x9716B0", Length = "0x2D8")]
+	private static void __rpc_handler_1501857716(NetworkBehaviour target, FastBufferReader reader, __RpcParams rpcParams)
+	{
+	}
+
+	[Token(Token = "0x6001C04")]
+	[Address(RVA = "0x9723D0", Offset = "0x9713D0", Length = "0x2D8")]
+	private static void __rpc_handler_1314562199(NetworkBehaviour target, FastBufferReader reader, __RpcParams rpcParams)
+	{
+	}
+
+	[Token(Token = "0x6001C05")]
+	[Address(RVA = "0x972140", Offset = "0x971140", Length = "0x28B")]
+	private static void __rpc_handler_1275701253(NetworkBehaviour target, FastBufferReader reader, __RpcParams rpcParams)
+	{
+	}
+
+	[Token(Token = "0x6001C06")]
+	[Address(RVA = "0x971960", Offset = "0x970960", Length = "0x7DB")]
+	private static void __rpc_handler_1161828172(NetworkBehaviour target, FastBufferReader reader, __RpcParams rpcParams)
+	{
+	}
+
+	[Token(Token = "0x6001C07")]
+	[Address(RVA = "0x971780", Offset = "0x970780", Length = "0x2C")]
+	protected internal override string __getTypeName()
+	{
+		return null;
+	}
+}

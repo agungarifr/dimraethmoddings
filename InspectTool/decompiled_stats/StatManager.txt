@@ -1,0 +1,417 @@
+using System;
+using System.Runtime.CompilerServices;
+using Il2CppInterop.Common.Attributes;
+using Il2CppInterop.Runtime;
+using Il2CppInterop.Runtime.Runtime;
+using Il2CppSystem.Collections.Generic;
+using UnityEngine;
+
+public class StatManager : MonoBehaviour
+{
+	private static readonly IntPtr NativeFieldInfoPtr__Singleton_k__BackingField;
+
+	private static readonly IntPtr NativeFieldInfoPtr__headerPrefab;
+
+	private static readonly IntPtr NativeFieldInfoPtr__statRowPrefab;
+
+	private static readonly IntPtr NativeFieldInfoPtr__statCategories;
+
+	private static readonly IntPtr NativeFieldInfoPtr__statDescriptions;
+
+	private static readonly IntPtr NativeFieldInfoPtr__descriptionLookup;
+
+	private static readonly IntPtr NativeFieldInfoPtr_StatDisplayNameOverrides;
+
+	private static readonly IntPtr NativeMethodInfoPtr_get_Singleton_Public_Static_get_StatManager_0;
+
+	private static readonly IntPtr NativeMethodInfoPtr_set_Singleton_Private_Static_set_Void_StatManager_0;
+
+	private static readonly IntPtr NativeMethodInfoPtr_get_StatCategories_Public_get_List_1_StatCategory_0;
+
+	private static readonly IntPtr NativeMethodInfoPtr_get_StatDescriptions_Public_get_List_1_StatDescription_0;
+
+	private static readonly IntPtr NativeMethodInfoPtr_get_HeaderPrefab_Public_get_GameObject_0;
+
+	private static readonly IntPtr NativeMethodInfoPtr_get_StatRowPrefab_Public_get_GameObject_0;
+
+	private static readonly IntPtr NativeMethodInfoPtr_Awake_Private_Void_0;
+
+	private static readonly IntPtr NativeMethodInfoPtr_BuildDescriptionLookup_Private_Void_0;
+
+	private static readonly IntPtr NativeMethodInfoPtr_GetStatDescription_Public_StatDescription_StatType_0;
+
+	private static readonly IntPtr NativeMethodInfoPtr_GetLocalizedDescription_Public_String_StatType_0;
+
+	private static readonly IntPtr NativeMethodInfoPtr_GetReadableStatName_Public_Static_String_StatType_0;
+
+	private static readonly IntPtr NativeMethodInfoPtr_GetLocalizedName_Public_String_StatType_0;
+
+	private static readonly IntPtr NativeMethodInfoPtr_GetStatValue_Public_Static_String_StatType_Player_0;
+
+	private static readonly IntPtr NativeMethodInfoPtr_GetStatBonus_Public_Static_Single_StatType_Player_0;
+
+	private static readonly IntPtr NativeMethodInfoPtr_HasBonusDisplay_Public_Static_Boolean_StatType_0;
+
+	private static readonly IntPtr NativeMethodInfoPtr_GetTotalBonus_Private_Static_Single_Player_Stat_0;
+
+	private static readonly IntPtr NativeMethodInfoPtr__ctor_Public_Void_0;
+
+	public unsafe static StatManager _Singleton_k__BackingField
+	{
+		get
+		{
+			Unsafe.SkipInit(out IntPtr intPtr);
+			IL2CPP.il2cpp_field_static_get_value(NativeFieldInfoPtr__Singleton_k__BackingField, &intPtr);
+			IntPtr intPtr2 = intPtr;
+			return (intPtr2 != (IntPtr)0) ? Il2CppObjectPool.Get<StatManager>(intPtr2) : null;
+		}
+		set
+		{
+			IL2CPP.il2cpp_field_static_set_value(NativeFieldInfoPtr__Singleton_k__BackingField, (void*)IL2CPP.Il2CppObjectBaseToPtr(obj));
+		}
+	}
+
+	public unsafe GameObject _headerPrefab
+	{
+		get
+		{
+			nint num = (nint)IL2CPP.Il2CppObjectBaseToPtrNotNull(this) + (int)IL2CPP.il2cpp_field_get_offset(NativeFieldInfoPtr__headerPrefab);
+			IntPtr intPtr = *(IntPtr*)num;
+			return (intPtr != (IntPtr)0) ? Il2CppObjectPool.Get<GameObject>(intPtr) : null;
+		}
+		set
+		{
+			IntPtr num = IL2CPP.Il2CppObjectBaseToPtrNotNull(this);
+			IL2CPP.il2cpp_gc_wbarrier_set_field(num, (nint)num + (int)IL2CPP.il2cpp_field_get_offset(NativeFieldInfoPtr__headerPrefab), IL2CPP.Il2CppObjectBaseToPtr(obj));
+		}
+	}
+
+	public unsafe GameObject _statRowPrefab
+	{
+		get
+		{
+			nint num = (nint)IL2CPP.Il2CppObjectBaseToPtrNotNull(this) + (int)IL2CPP.il2cpp_field_get_offset(NativeFieldInfoPtr__statRowPrefab);
+			IntPtr intPtr = *(IntPtr*)num;
+			return (intPtr != (IntPtr)0) ? Il2CppObjectPool.Get<GameObject>(intPtr) : null;
+		}
+		set
+		{
+			IntPtr num = IL2CPP.Il2CppObjectBaseToPtrNotNull(this);
+			IL2CPP.il2cpp_gc_wbarrier_set_field(num, (nint)num + (int)IL2CPP.il2cpp_field_get_offset(NativeFieldInfoPtr__statRowPrefab), IL2CPP.Il2CppObjectBaseToPtr(obj));
+		}
+	}
+
+	public unsafe List<StatCategory> _statCategories
+	{
+		get
+		{
+			nint num = (nint)IL2CPP.Il2CppObjectBaseToPtrNotNull(this) + (int)IL2CPP.il2cpp_field_get_offset(NativeFieldInfoPtr__statCategories);
+			IntPtr intPtr = *(IntPtr*)num;
+			return (intPtr != (IntPtr)0) ? Il2CppObjectPool.Get<List<StatCategory>>(intPtr) : null;
+		}
+		set
+		{
+			IntPtr num = IL2CPP.Il2CppObjectBaseToPtrNotNull(this);
+			IL2CPP.il2cpp_gc_wbarrier_set_field(num, (nint)num + (int)IL2CPP.il2cpp_field_get_offset(NativeFieldInfoPtr__statCategories), IL2CPP.Il2CppObjectBaseToPtr(obj));
+		}
+	}
+
+	public unsafe List<StatDescription> _statDescriptions
+	{
+		get
+		{
+			nint num = (nint)IL2CPP.Il2CppObjectBaseToPtrNotNull(this) + (int)IL2CPP.il2cpp_field_get_offset(NativeFieldInfoPtr__statDescriptions);
+			IntPtr intPtr = *(IntPtr*)num;
+			return (intPtr != (IntPtr)0) ? Il2CppObjectPool.Get<List<StatDescription>>(intPtr) : null;
+		}
+		set
+		{
+			IntPtr num = IL2CPP.Il2CppObjectBaseToPtrNotNull(this);
+			IL2CPP.il2cpp_gc_wbarrier_set_field(num, (nint)num + (int)IL2CPP.il2cpp_field_get_offset(NativeFieldInfoPtr__statDescriptions), IL2CPP.Il2CppObjectBaseToPtr(obj));
+		}
+	}
+
+	public unsafe Dictionary<StatType, StatDescription> _descriptionLookup
+	{
+		get
+		{
+			nint num = (nint)IL2CPP.Il2CppObjectBaseToPtrNotNull(this) + (int)IL2CPP.il2cpp_field_get_offset(NativeFieldInfoPtr__descriptionLookup);
+			IntPtr intPtr = *(IntPtr*)num;
+			return (intPtr != (IntPtr)0) ? Il2CppObjectPool.Get<Dictionary<StatType, StatDescription>>(intPtr) : null;
+		}
+		set
+		{
+			IntPtr num = IL2CPP.Il2CppObjectBaseToPtrNotNull(this);
+			IL2CPP.il2cpp_gc_wbarrier_set_field(num, (nint)num + (int)IL2CPP.il2cpp_field_get_offset(NativeFieldInfoPtr__descriptionLookup), IL2CPP.Il2CppObjectBaseToPtr(obj));
+		}
+	}
+
+	public unsafe static Dictionary<StatType, string> StatDisplayNameOverrides
+	{
+		get
+		{
+			Unsafe.SkipInit(out IntPtr intPtr);
+			IL2CPP.il2cpp_field_static_get_value(NativeFieldInfoPtr_StatDisplayNameOverrides, &intPtr);
+			IntPtr intPtr2 = intPtr;
+			return (intPtr2 != (IntPtr)0) ? Il2CppObjectPool.Get<Dictionary<StatType, string>>(intPtr2) : null;
+		}
+		set
+		{
+			IL2CPP.il2cpp_field_static_set_value(NativeFieldInfoPtr_StatDisplayNameOverrides, (void*)IL2CPP.Il2CppObjectBaseToPtr(obj));
+		}
+	}
+
+	public unsafe static StatManager Singleton
+	{
+		[CallerCount(0)]
+		[CachedScanResults(RefRangeStart = 0, RefRangeEnd = 0, XrefRangeStart = 456686, XrefRangeEnd = 456690, MetadataInitTokenRva = 0L, MetadataInitFlagRva = 0L)]
+		get
+		{
+			IntPtr* param = null;
+			Unsafe.SkipInit(out IntPtr exc);
+			IntPtr intPtr = IL2CPP.il2cpp_runtime_invoke(NativeMethodInfoPtr_get_Singleton_Public_Static_get_StatManager_0, (IntPtr)0, (void**)param, ref exc);
+			Il2CppInterop.Runtime.Il2CppException.RaiseExceptionIfNecessary(exc);
+			return (intPtr != (IntPtr)0) ? Il2CppObjectPool.Get<StatManager>(intPtr) : null;
+		}
+		[CallerCount(0)]
+		[CachedScanResults(RefRangeStart = 0, RefRangeEnd = 0, XrefRangeStart = 456690, XrefRangeEnd = 456696, MetadataInitTokenRva = 0L, MetadataInitFlagRva = 0L)]
+		set
+		{
+			IntPtr* ptr = stackalloc IntPtr[1];
+			*ptr = IL2CPP.Il2CppObjectBaseToPtr(value);
+			Unsafe.SkipInit(out IntPtr exc);
+			IntPtr intPtr = IL2CPP.il2cpp_runtime_invoke(NativeMethodInfoPtr_set_Singleton_Private_Static_set_Void_StatManager_0, (IntPtr)0, (void**)ptr, ref exc);
+			Il2CppInterop.Runtime.Il2CppException.RaiseExceptionIfNecessary(exc);
+		}
+	}
+
+	public unsafe List<StatCategory> StatCategories
+	{
+		[CallerCount(14)]
+		[CachedScanResults(RefRangeStart = 145, RefRangeEnd = 159, XrefRangeStart = 145, XrefRangeEnd = 159, MetadataInitTokenRva = 0L, MetadataInitFlagRva = 0L)]
+		get
+		{
+			IL2CPP.Il2CppObjectBaseToPtrNotNull(this);
+			IntPtr* param = null;
+			Unsafe.SkipInit(out IntPtr exc);
+			IntPtr intPtr = IL2CPP.il2cpp_runtime_invoke(NativeMethodInfoPtr_get_StatCategories_Public_get_List_1_StatCategory_0, IL2CPP.Il2CppObjectBaseToPtrNotNull(this), (void**)param, ref exc);
+			Il2CppInterop.Runtime.Il2CppException.RaiseExceptionIfNecessary(exc);
+			return (intPtr != (IntPtr)0) ? Il2CppObjectPool.Get<List<StatCategory>>(intPtr) : null;
+		}
+	}
+
+	public unsafe List<StatDescription> StatDescriptions
+	{
+		[CallerCount(21)]
+		[CachedScanResults(RefRangeStart = 191, RefRangeEnd = 212, XrefRangeStart = 191, XrefRangeEnd = 212, MetadataInitTokenRva = 0L, MetadataInitFlagRva = 0L)]
+		get
+		{
+			IL2CPP.Il2CppObjectBaseToPtrNotNull(this);
+			IntPtr* param = null;
+			Unsafe.SkipInit(out IntPtr exc);
+			IntPtr intPtr = IL2CPP.il2cpp_runtime_invoke(NativeMethodInfoPtr_get_StatDescriptions_Public_get_List_1_StatDescription_0, IL2CPP.Il2CppObjectBaseToPtrNotNull(this), (void**)param, ref exc);
+			Il2CppInterop.Runtime.Il2CppException.RaiseExceptionIfNecessary(exc);
+			return (intPtr != (IntPtr)0) ? Il2CppObjectPool.Get<List<StatDescription>>(intPtr) : null;
+		}
+	}
+
+	public unsafe GameObject HeaderPrefab
+	{
+		[CallerCount(1)]
+		[CachedScanResults(RefRangeStart = 187, RefRangeEnd = 188, XrefRangeStart = 187, XrefRangeEnd = 188, MetadataInitTokenRva = 0L, MetadataInitFlagRva = 0L)]
+		get
+		{
+			IL2CPP.Il2CppObjectBaseToPtrNotNull(this);
+			IntPtr* param = null;
+			Unsafe.SkipInit(out IntPtr exc);
+			IntPtr intPtr = IL2CPP.il2cpp_runtime_invoke(NativeMethodInfoPtr_get_HeaderPrefab_Public_get_GameObject_0, IL2CPP.Il2CppObjectBaseToPtrNotNull(this), (void**)param, ref exc);
+			Il2CppInterop.Runtime.Il2CppException.RaiseExceptionIfNecessary(exc);
+			return (intPtr != (IntPtr)0) ? Il2CppObjectPool.Get<GameObject>(intPtr) : null;
+		}
+	}
+
+	public unsafe GameObject StatRowPrefab
+	{
+		[CallerCount(3)]
+		[CachedScanResults(RefRangeStart = 188, RefRangeEnd = 191, XrefRangeStart = 188, XrefRangeEnd = 191, MetadataInitTokenRva = 0L, MetadataInitFlagRva = 0L)]
+		get
+		{
+			IL2CPP.Il2CppObjectBaseToPtrNotNull(this);
+			IntPtr* param = null;
+			Unsafe.SkipInit(out IntPtr exc);
+			IntPtr intPtr = IL2CPP.il2cpp_runtime_invoke(NativeMethodInfoPtr_get_StatRowPrefab_Public_get_GameObject_0, IL2CPP.Il2CppObjectBaseToPtrNotNull(this), (void**)param, ref exc);
+			Il2CppInterop.Runtime.Il2CppException.RaiseExceptionIfNecessary(exc);
+			return (intPtr != (IntPtr)0) ? Il2CppObjectPool.Get<GameObject>(intPtr) : null;
+		}
+	}
+
+	static StatManager()
+	{
+		Il2CppClassPointerStore<StatManager>.NativeClassPtr = IL2CPP.GetIl2CppClass("Assembly-CSharp.dll", "", "StatManager");
+		IL2CPP.il2cpp_runtime_class_init(Il2CppClassPointerStore<StatManager>.NativeClassPtr);
+		NativeFieldInfoPtr__Singleton_k__BackingField = IL2CPP.GetIl2CppField(Il2CppClassPointerStore<StatManager>.NativeClassPtr, "<Singleton>k__BackingField");
+		NativeFieldInfoPtr__headerPrefab = IL2CPP.GetIl2CppField(Il2CppClassPointerStore<StatManager>.NativeClassPtr, "_headerPrefab");
+		NativeFieldInfoPtr__statRowPrefab = IL2CPP.GetIl2CppField(Il2CppClassPointerStore<StatManager>.NativeClassPtr, "_statRowPrefab");
+		NativeFieldInfoPtr__statCategories = IL2CPP.GetIl2CppField(Il2CppClassPointerStore<StatManager>.NativeClassPtr, "_statCategories");
+		NativeFieldInfoPtr__statDescriptions = IL2CPP.GetIl2CppField(Il2CppClassPointerStore<StatManager>.NativeClassPtr, "_statDescriptions");
+		NativeFieldInfoPtr__descriptionLookup = IL2CPP.GetIl2CppField(Il2CppClassPointerStore<StatManager>.NativeClassPtr, "_descriptionLookup");
+		NativeFieldInfoPtr_StatDisplayNameOverrides = IL2CPP.GetIl2CppField(Il2CppClassPointerStore<StatManager>.NativeClassPtr, "StatDisplayNameOverrides");
+		NativeMethodInfoPtr_get_Singleton_Public_Static_get_StatManager_0 = IL2CPP.GetIl2CppMethodByToken(Il2CppClassPointerStore<StatManager>.NativeClassPtr, 100691068);
+		NativeMethodInfoPtr_set_Singleton_Private_Static_set_Void_StatManager_0 = IL2CPP.GetIl2CppMethodByToken(Il2CppClassPointerStore<StatManager>.NativeClassPtr, 100691069);
+		NativeMethodInfoPtr_get_StatCategories_Public_get_List_1_StatCategory_0 = IL2CPP.GetIl2CppMethodByToken(Il2CppClassPointerStore<StatManager>.NativeClassPtr, 100691070);
+		NativeMethodInfoPtr_get_StatDescriptions_Public_get_List_1_StatDescription_0 = IL2CPP.GetIl2CppMethodByToken(Il2CppClassPointerStore<StatManager>.NativeClassPtr, 100691071);
+		NativeMethodInfoPtr_get_HeaderPrefab_Public_get_GameObject_0 = IL2CPP.GetIl2CppMethodByToken(Il2CppClassPointerStore<StatManager>.NativeClassPtr, 100691072);
+		NativeMethodInfoPtr_get_StatRowPrefab_Public_get_GameObject_0 = IL2CPP.GetIl2CppMethodByToken(Il2CppClassPointerStore<StatManager>.NativeClassPtr, 100691073);
+		NativeMethodInfoPtr_Awake_Private_Void_0 = IL2CPP.GetIl2CppMethodByToken(Il2CppClassPointerStore<StatManager>.NativeClassPtr, 100691074);
+		NativeMethodInfoPtr_BuildDescriptionLookup_Private_Void_0 = IL2CPP.GetIl2CppMethodByToken(Il2CppClassPointerStore<StatManager>.NativeClassPtr, 100691075);
+		NativeMethodInfoPtr_GetStatDescription_Public_StatDescription_StatType_0 = IL2CPP.GetIl2CppMethodByToken(Il2CppClassPointerStore<StatManager>.NativeClassPtr, 100691076);
+		NativeMethodInfoPtr_GetLocalizedDescription_Public_String_StatType_0 = IL2CPP.GetIl2CppMethodByToken(Il2CppClassPointerStore<StatManager>.NativeClassPtr, 100691077);
+		NativeMethodInfoPtr_GetReadableStatName_Public_Static_String_StatType_0 = IL2CPP.GetIl2CppMethodByToken(Il2CppClassPointerStore<StatManager>.NativeClassPtr, 100691078);
+		NativeMethodInfoPtr_GetLocalizedName_Public_String_StatType_0 = IL2CPP.GetIl2CppMethodByToken(Il2CppClassPointerStore<StatManager>.NativeClassPtr, 100691079);
+		NativeMethodInfoPtr_GetStatValue_Public_Static_String_StatType_Player_0 = IL2CPP.GetIl2CppMethodByToken(Il2CppClassPointerStore<StatManager>.NativeClassPtr, 100691080);
+		NativeMethodInfoPtr_GetStatBonus_Public_Static_Single_StatType_Player_0 = IL2CPP.GetIl2CppMethodByToken(Il2CppClassPointerStore<StatManager>.NativeClassPtr, 100691081);
+		NativeMethodInfoPtr_HasBonusDisplay_Public_Static_Boolean_StatType_0 = IL2CPP.GetIl2CppMethodByToken(Il2CppClassPointerStore<StatManager>.NativeClassPtr, 100691082);
+		NativeMethodInfoPtr_GetTotalBonus_Private_Static_Single_Player_Stat_0 = IL2CPP.GetIl2CppMethodByToken(Il2CppClassPointerStore<StatManager>.NativeClassPtr, 100691083);
+		NativeMethodInfoPtr__ctor_Public_Void_0 = IL2CPP.GetIl2CppMethodByToken(Il2CppClassPointerStore<StatManager>.NativeClassPtr, 100691084);
+	}
+
+	[CallerCount(0)]
+	[CachedScanResults(RefRangeStart = 0, RefRangeEnd = 0, XrefRangeStart = 456696, XrefRangeEnd = 456729, MetadataInitTokenRva = 0L, MetadataInitFlagRva = 0L)]
+	public unsafe void Awake()
+	{
+		IL2CPP.Il2CppObjectBaseToPtrNotNull(this);
+		IntPtr* param = null;
+		Unsafe.SkipInit(out IntPtr exc);
+		IntPtr intPtr = IL2CPP.il2cpp_runtime_invoke(NativeMethodInfoPtr_Awake_Private_Void_0, IL2CPP.Il2CppObjectBaseToPtrNotNull(this), (void**)param, ref exc);
+		Il2CppInterop.Runtime.Il2CppException.RaiseExceptionIfNecessary(exc);
+	}
+
+	[CallerCount(3)]
+	[CachedScanResults(RefRangeStart = 456756, RefRangeEnd = 456759, XrefRangeStart = 456729, XrefRangeEnd = 456756, MetadataInitTokenRva = 0L, MetadataInitFlagRva = 0L)]
+	public unsafe void BuildDescriptionLookup()
+	{
+		IL2CPP.Il2CppObjectBaseToPtrNotNull(this);
+		IntPtr* param = null;
+		Unsafe.SkipInit(out IntPtr exc);
+		IntPtr intPtr = IL2CPP.il2cpp_runtime_invoke(NativeMethodInfoPtr_BuildDescriptionLookup_Private_Void_0, IL2CPP.Il2CppObjectBaseToPtrNotNull(this), (void**)param, ref exc);
+		Il2CppInterop.Runtime.Il2CppException.RaiseExceptionIfNecessary(exc);
+	}
+
+	[CallerCount(0)]
+	[CachedScanResults(RefRangeStart = 0, RefRangeEnd = 0, XrefRangeStart = 456759, XrefRangeEnd = 456763, MetadataInitTokenRva = 0L, MetadataInitFlagRva = 0L)]
+	public unsafe StatDescription GetStatDescription(StatType statType)
+	{
+		IL2CPP.Il2CppObjectBaseToPtrNotNull(this);
+		IntPtr* ptr = stackalloc IntPtr[1];
+		*ptr = (nint)(&statType);
+		Unsafe.SkipInit(out IntPtr exc);
+		IntPtr intPtr = IL2CPP.il2cpp_runtime_invoke(NativeMethodInfoPtr_GetStatDescription_Public_StatDescription_StatType_0, IL2CPP.Il2CppObjectBaseToPtrNotNull(this), (void**)ptr, ref exc);
+		Il2CppInterop.Runtime.Il2CppException.RaiseExceptionIfNecessary(exc);
+		return (intPtr != (IntPtr)0) ? Il2CppObjectPool.Get<StatDescription>(intPtr) : null;
+	}
+
+	[CallerCount(1)]
+	[CachedScanResults(RefRangeStart = 456798, RefRangeEnd = 456799, XrefRangeStart = 456763, XrefRangeEnd = 456798, MetadataInitTokenRva = 0L, MetadataInitFlagRva = 0L)]
+	public unsafe string GetLocalizedDescription(StatType statType)
+	{
+		IL2CPP.Il2CppObjectBaseToPtrNotNull(this);
+		IntPtr* ptr = stackalloc IntPtr[1];
+		*ptr = (nint)(&statType);
+		Unsafe.SkipInit(out IntPtr exc);
+		IntPtr il2CppString = IL2CPP.il2cpp_runtime_invoke(NativeMethodInfoPtr_GetLocalizedDescription_Public_String_StatType_0, IL2CPP.Il2CppObjectBaseToPtrNotNull(this), (void**)ptr, ref exc);
+		Il2CppInterop.Runtime.Il2CppException.RaiseExceptionIfNecessary(exc);
+		return IL2CPP.Il2CppStringToManaged(il2CppString);
+	}
+
+	[CallerCount(0)]
+	[CachedScanResults(RefRangeStart = 0, RefRangeEnd = 0, XrefRangeStart = 456799, XrefRangeEnd = 456817, MetadataInitTokenRva = 0L, MetadataInitFlagRva = 0L)]
+	public unsafe static string GetReadableStatName(StatType statType)
+	{
+		IntPtr* ptr = stackalloc IntPtr[1];
+		*ptr = (nint)(&statType);
+		Unsafe.SkipInit(out IntPtr exc);
+		IntPtr il2CppString = IL2CPP.il2cpp_runtime_invoke(NativeMethodInfoPtr_GetReadableStatName_Public_Static_String_StatType_0, (IntPtr)0, (void**)ptr, ref exc);
+		Il2CppInterop.Runtime.Il2CppException.RaiseExceptionIfNecessary(exc);
+		return IL2CPP.Il2CppStringToManaged(il2CppString);
+	}
+
+	[CallerCount(1)]
+	[CachedScanResults(RefRangeStart = 456849, RefRangeEnd = 456850, XrefRangeStart = 456817, XrefRangeEnd = 456849, MetadataInitTokenRva = 0L, MetadataInitFlagRva = 0L)]
+	public unsafe string GetLocalizedName(StatType statType)
+	{
+		IL2CPP.Il2CppObjectBaseToPtrNotNull(this);
+		IntPtr* ptr = stackalloc IntPtr[1];
+		*ptr = (nint)(&statType);
+		Unsafe.SkipInit(out IntPtr exc);
+		IntPtr il2CppString = IL2CPP.il2cpp_runtime_invoke(NativeMethodInfoPtr_GetLocalizedName_Public_String_StatType_0, IL2CPP.Il2CppObjectBaseToPtrNotNull(this), (void**)ptr, ref exc);
+		Il2CppInterop.Runtime.Il2CppException.RaiseExceptionIfNecessary(exc);
+		return IL2CPP.Il2CppStringToManaged(il2CppString);
+	}
+
+	[CallerCount(1)]
+	[CachedScanResults(RefRangeStart = 456875, RefRangeEnd = 456876, XrefRangeStart = 456850, XrefRangeEnd = 456875, MetadataInitTokenRva = 0L, MetadataInitFlagRva = 0L)]
+	public unsafe static string GetStatValue(StatType statType, Player player)
+	{
+		IntPtr* ptr = stackalloc IntPtr[2];
+		*ptr = (nint)(&statType);
+		*(IntPtr*)((byte*)ptr + checked((nuint)1u * unchecked((nuint)sizeof(IntPtr)))) = IL2CPP.Il2CppObjectBaseToPtr(player);
+		Unsafe.SkipInit(out IntPtr exc);
+		IntPtr il2CppString = IL2CPP.il2cpp_runtime_invoke(NativeMethodInfoPtr_GetStatValue_Public_Static_String_StatType_Player_0, (IntPtr)0, (void**)ptr, ref exc);
+		Il2CppInterop.Runtime.Il2CppException.RaiseExceptionIfNecessary(exc);
+		return IL2CPP.Il2CppStringToManaged(il2CppString);
+	}
+
+	[CallerCount(1)]
+	[CachedScanResults(RefRangeStart = 456885, RefRangeEnd = 456886, XrefRangeStart = 456876, XrefRangeEnd = 456885, MetadataInitTokenRva = 0L, MetadataInitFlagRva = 0L)]
+	public unsafe static float GetStatBonus(StatType statType, Player player)
+	{
+		IntPtr* ptr = stackalloc IntPtr[2];
+		*ptr = (nint)(&statType);
+		*(IntPtr*)((byte*)ptr + checked((nuint)1u * unchecked((nuint)sizeof(IntPtr)))) = IL2CPP.Il2CppObjectBaseToPtr(player);
+		Unsafe.SkipInit(out IntPtr exc);
+		IntPtr obj = IL2CPP.il2cpp_runtime_invoke(NativeMethodInfoPtr_GetStatBonus_Public_Static_Single_StatType_Player_0, (IntPtr)0, (void**)ptr, ref exc);
+		Il2CppInterop.Runtime.Il2CppException.RaiseExceptionIfNecessary(exc);
+		return *(float*)IL2CPP.il2cpp_object_unbox(obj);
+	}
+
+	[CallerCount(2)]
+	[CachedScanResults(RefRangeStart = 456886, RefRangeEnd = 456888, XrefRangeStart = 456886, XrefRangeEnd = 456886, MetadataInitTokenRva = 0L, MetadataInitFlagRva = 0L)]
+	public unsafe static bool HasBonusDisplay(StatType statType)
+	{
+		IntPtr* ptr = stackalloc IntPtr[1];
+		*ptr = (nint)(&statType);
+		Unsafe.SkipInit(out IntPtr exc);
+		IntPtr obj = IL2CPP.il2cpp_runtime_invoke(NativeMethodInfoPtr_HasBonusDisplay_Public_Static_Boolean_StatType_0, (IntPtr)0, (void**)ptr, ref exc);
+		Il2CppInterop.Runtime.Il2CppException.RaiseExceptionIfNecessary(exc);
+		return *(bool*)IL2CPP.il2cpp_object_unbox(obj);
+	}
+
+	[CallerCount(0)]
+	[CachedScanResults(RefRangeStart = 0, RefRangeEnd = 0, XrefRangeStart = 456888, XrefRangeEnd = 456909, MetadataInitTokenRva = 0L, MetadataInitFlagRva = 0L)]
+	public unsafe static float GetTotalBonus(Player player, Runes.Stat stat)
+	{
+		IntPtr* ptr = stackalloc IntPtr[2];
+		*ptr = IL2CPP.Il2CppObjectBaseToPtr(player);
+		*(Runes.Stat**)((byte*)ptr + checked((nuint)1u * unchecked((nuint)sizeof(IntPtr)))) = &stat;
+		Unsafe.SkipInit(out IntPtr exc);
+		IntPtr obj = IL2CPP.il2cpp_runtime_invoke(NativeMethodInfoPtr_GetTotalBonus_Private_Static_Single_Player_Stat_0, (IntPtr)0, (void**)ptr, ref exc);
+		Il2CppInterop.Runtime.Il2CppException.RaiseExceptionIfNecessary(exc);
+		return *(float*)IL2CPP.il2cpp_object_unbox(obj);
+	}
+
+	[CallerCount(0)]
+	[CachedScanResults(RefRangeStart = 0, RefRangeEnd = 0, XrefRangeStart = 456909, XrefRangeEnd = 456924, MetadataInitTokenRva = 0L, MetadataInitFlagRva = 0L)]
+	public unsafe StatManager()
+		: this(IL2CPP.il2cpp_object_new(Il2CppClassPointerStore<StatManager>.NativeClassPtr))
+	{
+		IntPtr* param = null;
+		Unsafe.SkipInit(out IntPtr exc);
+		IntPtr intPtr = IL2CPP.il2cpp_runtime_invoke(NativeMethodInfoPtr__ctor_Public_Void_0, IL2CPP.Il2CppObjectBaseToPtrNotNull(this), (void**)param, ref exc);
+		Il2CppInterop.Runtime.Il2CppException.RaiseExceptionIfNecessary(exc);
+	}
+
+	public StatManager(IntPtr pointer)
+		: base(pointer)
+	{
+	}
+}

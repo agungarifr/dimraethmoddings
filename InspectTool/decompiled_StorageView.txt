@@ -1,0 +1,1644 @@
+using System;
+using System.Collections;
+using System.Collections.Generic;
+using System.Diagnostics;
+using System.Runtime.CompilerServices;
+using Cpp2ILInjected;
+using TMPro;
+using Unity.Collections;
+using Unity.Netcode;
+using UnityEngine;
+using UnityEngine.EventSystems;
+using UnityEngine.UI;
+
+[Token(Token = "0x200039A")]
+public abstract class StorageView : MonoBehaviour, ISortableContainer
+{
+	[Token(Token = "0x200039B")]
+	private readonly struct BulkMatchSet(HashSet<ItemType> types, HashSet<Runes.RuneSet> runeSets, bool hasPet)
+	{
+		[Token(Token = "0x40021FA")]
+		[FieldOffset(Offset = "0x0")]
+		private readonly HashSet<ItemType> _types = null;
+
+		[Token(Token = "0x40021FB")]
+		[FieldOffset(Offset = "0x8")]
+		private readonly HashSet<Runes.RuneSet> _runeSets = null;
+
+		[Token(Token = "0x40021FC")]
+		[FieldOffset(Offset = "0x10")]
+		private readonly bool _hasPet = false;
+
+		[Token(Token = "0x600237D")]
+		[Address(RVA = "0xA3D0C0", Offset = "0xA3C0C0", Length = "0x1F5")]
+		public bool Matches(in InventoryEntry entry, Runes.RuneSet runeSet)
+		{
+			return false;
+		}
+	}
+
+	[CompilerGenerated]
+	[Token(Token = "0x20003A0")]
+	private sealed class <CoalescedRefreshNextFrame>d__97 : IEnumerator<object>, IEnumerator, IDisposable
+	{
+		[Token(Token = "0x4002203")]
+		[FieldOffset(Offset = "0x10")]
+		private int <>1__state;
+
+		[Token(Token = "0x4002204")]
+		[FieldOffset(Offset = "0x18")]
+		private object <>2__current;
+
+		[Token(Token = "0x4002205")]
+		[FieldOffset(Offset = "0x20")]
+		public StorageView <>4__this;
+
+		[Token(Token = "0x1700049D")]
+		object IEnumerator<object>.Current
+		{
+			[DebuggerHidden]
+			[Token(Token = "0x6002389")]
+			[Address(RVA = "0x6B1E50", Offset = "0x6B0E50", Length = "0x5")]
+			get
+			{
+				return null;
+			}
+		}
+
+		[Token(Token = "0x1700049E")]
+		object IEnumerator.Current
+		{
+			[DebuggerHidden]
+			[Token(Token = "0x600238B")]
+			[Address(RVA = "0x6B1E50", Offset = "0x6B0E50", Length = "0x5")]
+			get
+			{
+				return null;
+			}
+		}
+
+		[DebuggerHidden]
+		[Token(Token = "0x6002386")]
+		[Address(RVA = "0x6B1EA0", Offset = "0x6B0EA0", Length = "0x24")]
+		public <CoalescedRefreshNextFrame>d__97(int <>1__state)
+		{
+		}
+
+		[DebuggerHidden]
+		[Token(Token = "0x6002387")]
+		[Address(RVA = "0x6AAC60", Offset = "0x6A9C60", Length = "0x3")]
+		void IDisposable.Dispose()
+		{
+		}
+
+		[Token(Token = "0x6002388")]
+		[Address(RVA = "0xA5A5E0", Offset = "0xA595E0", Length = "0x8E")]
+		private bool MoveNext()
+		{
+			return false;
+		}
+
+		bool IEnumerator.MoveNext()
+		{
+			//ILSpy generated this explicit interface implementation from .override directive in MoveNext
+			return this.MoveNext();
+		}
+
+		[DebuggerHidden]
+		[Token(Token = "0x600238A")]
+		[Address(RVA = "0xA5A670", Offset = "0xA59670", Length = "0x3E")]
+		void IEnumerator.Reset()
+		{
+		}
+	}
+
+	[CompilerGenerated]
+	[Token(Token = "0x20003A1")]
+	private sealed class <FlashButtonHover>d__143 : IEnumerator<object>, IEnumerator, IDisposable
+	{
+		[Token(Token = "0x4002206")]
+		[FieldOffset(Offset = "0x10")]
+		private int <>1__state;
+
+		[Token(Token = "0x4002207")]
+		[FieldOffset(Offset = "0x18")]
+		private object <>2__current;
+
+		[Token(Token = "0x4002208")]
+		[FieldOffset(Offset = "0x20")]
+		public Button button;
+
+		[Token(Token = "0x4002209")]
+		[FieldOffset(Offset = "0x28")]
+		private PointerEventData <pointer>5__2;
+
+		[Token(Token = "0x1700049F")]
+		object IEnumerator<object>.Current
+		{
+			[DebuggerHidden]
+			[Token(Token = "0x600238F")]
+			[Address(RVA = "0x6B1E50", Offset = "0x6B0E50", Length = "0x5")]
+			get
+			{
+				return null;
+			}
+		}
+
+		[Token(Token = "0x170004A0")]
+		object IEnumerator.Current
+		{
+			[DebuggerHidden]
+			[Token(Token = "0x6002391")]
+			[Address(RVA = "0x6B1E50", Offset = "0x6B0E50", Length = "0x5")]
+			get
+			{
+				return null;
+			}
+		}
+
+		[DebuggerHidden]
+		[Token(Token = "0x600238C")]
+		[Address(RVA = "0x6B1EA0", Offset = "0x6B0EA0", Length = "0x24")]
+		public <FlashButtonHover>d__143(int <>1__state)
+		{
+		}
+
+		[DebuggerHidden]
+		[Token(Token = "0x600238D")]
+		[Address(RVA = "0x6AAC60", Offset = "0x6A9C60", Length = "0x3")]
+		void IDisposable.Dispose()
+		{
+		}
+
+		[Token(Token = "0x600238E")]
+		[Address(RVA = "0xA5A6B0", Offset = "0xA596B0", Length = "0x2F6")]
+		private bool MoveNext()
+		{
+			return false;
+		}
+
+		bool IEnumerator.MoveNext()
+		{
+			//ILSpy generated this explicit interface implementation from .override directive in MoveNext
+			return this.MoveNext();
+		}
+
+		[DebuggerHidden]
+		[Token(Token = "0x6002390")]
+		[Address(RVA = "0xA5A9B0", Offset = "0xA599B0", Length = "0x3E")]
+		void IEnumerator.Reset()
+		{
+		}
+	}
+
+	[SerializeField]
+	[Token(Token = "0x40021AD")]
+	[FieldOffset(Offset = "0x20")]
+	protected PlayerStateMachine _stateMachine;
+
+	[SerializeField]
+	[Token(Token = "0x40021AE")]
+	[FieldOffset(Offset = "0x28")]
+	protected Inventory _inventory;
+
+	[SerializeField]
+	[Token(Token = "0x40021AF")]
+	[FieldOffset(Offset = "0x30")]
+	public List<GameObject> _storageSlots;
+
+	[SerializeField]
+	[Token(Token = "0x40021B0")]
+	[FieldOffset(Offset = "0x38")]
+	protected Sprite _emptyStorage;
+
+	[SerializeField]
+	[Token(Token = "0x40021B1")]
+	[FieldOffset(Offset = "0x40")]
+	protected Backpack _backpack;
+
+	[NonSerialized]
+	[Token(Token = "0x40021B2")]
+	[FieldOffset(Offset = "0x48")]
+	protected GameObject _panelRoot;
+
+	[NonSerialized]
+	[Token(Token = "0x40021B3")]
+	[FieldOffset(Offset = "0x50")]
+	private GameObject _emptyFilterMessage;
+
+	[NonSerialized]
+	[Token(Token = "0x40021B4")]
+	[FieldOffset(Offset = "0x58")]
+	private Sprite _slotBackgroundSmall;
+
+	[NonSerialized]
+	[Token(Token = "0x40021B5")]
+	[FieldOffset(Offset = "0x60")]
+	private Sprite _slotBackgroundMedium;
+
+	[NonSerialized]
+	[Token(Token = "0x40021B6")]
+	[FieldOffset(Offset = "0x68")]
+	private Sprite _slotBackgroundLarge;
+
+	[Token(Token = "0x40021B7")]
+	private static readonly InventoryFilter[] StorageFilterTabOrder;
+
+	[Token(Token = "0x40021B8")]
+	[FieldOffset(Offset = "0x70")]
+	private List<Toggle> _filterToggles;
+
+	[Token(Token = "0x40021B9")]
+	[FieldOffset(Offset = "0x78")]
+	private InventoryFilter _storageFilter;
+
+	[NonSerialized]
+	[Token(Token = "0x40021BA")]
+	[FieldOffset(Offset = "0x80")]
+	private readonly Dictionary<Toggle, CanvasGroup> _filterTabDimGroups;
+
+	[Token(Token = "0x40021BB")]
+	private const float EmptyFilterTabAlpha = 0.6f;
+
+	[Token(Token = "0x40021BC")]
+	private const int MaxSmallSlateRows = 3;
+
+	[Token(Token = "0x40021BD")]
+	private const int MaxMediumSlateRows = 5;
+
+	[Token(Token = "0x40021BE")]
+	[FieldOffset(Offset = "0x88")]
+	private TMP_InputField _chestNameField;
+
+	[Token(Token = "0x40021BF")]
+	[FieldOffset(Offset = "0x90")]
+	private UITextInputPresenter _chestNamePresenter;
+
+	[Token(Token = "0x40021C0")]
+	[FieldOffset(Offset = "0x98")]
+	private GameObject _lockRoot;
+
+	[Token(Token = "0x40021C1")]
+	[FieldOffset(Offset = "0xA0")]
+	private Button _lockButton;
+
+	[Token(Token = "0x40021C2")]
+	[FieldOffset(Offset = "0xA8")]
+	private Button _depositAllButton;
+
+	[Token(Token = "0x40021C3")]
+	[FieldOffset(Offset = "0xB0")]
+	private Button _takeAllButton;
+
+	[Token(Token = "0x40021C4")]
+	[FieldOffset(Offset = "0xB8")]
+	private Button _depositMatchingButton;
+
+	[Token(Token = "0x40021C5")]
+	[FieldOffset(Offset = "0xC0")]
+	private Button _takeMatchingButton;
+
+	[Token(Token = "0x40021C6")]
+	[FieldOffset(Offset = "0xC8")]
+	private TMP_Text _lockLabel;
+
+	[Token(Token = "0x40021C7")]
+	[FieldOffset(Offset = "0xD0")]
+	private GameObject _lockCheckmark;
+
+	[Token(Token = "0x40021C8")]
+	[FieldOffset(Offset = "0xD8")]
+	private CanvasGroup _lockGroup;
+
+	[Token(Token = "0x40021C9")]
+	[FieldOffset(Offset = "0xE0")]
+	private TMP_Text _capacityText;
+
+	[Token(Token = "0x40021CA")]
+	private static Color _colorVisible;
+
+	[Token(Token = "0x40021CB")]
+	private static Color _colorInvisible;
+
+	[HideInInspector]
+	[Token(Token = "0x40021CC")]
+	[FieldOffset(Offset = "0xE8")]
+	public Storage Storage;
+
+	[Token(Token = "0x40021CD")]
+	[FieldOffset(Offset = "0xF0")]
+	protected StorageContainers Container;
+
+	[Token(Token = "0x40021CE")]
+	[FieldOffset(Offset = "0xF4")]
+	protected int _baseStorageIndex;
+
+	[Token(Token = "0x40021CF")]
+	[FieldOffset(Offset = "0xF8")]
+	protected int _maxStorage;
+
+	[Token(Token = "0x40021D0")]
+	[FieldOffset(Offset = "0xFC")]
+	protected int _hoverCounter;
+
+	[Token(Token = "0x40021D1")]
+	[FieldOffset(Offset = "0x100")]
+	protected int _chestHoverIndex;
+
+	[Token(Token = "0x40021D2")]
+	[FieldOffset(Offset = "0x104")]
+	protected bool _isHovering;
+
+	[Token(Token = "0x40021D3")]
+	[FieldOffset(Offset = "0x108")]
+	protected float _refreshTimer;
+
+	[Token(Token = "0x40021D4")]
+	[FieldOffset(Offset = "0x10C")]
+	private bool _subscribed;
+
+	[Token(Token = "0x40021D5")]
+	[FieldOffset(Offset = "0x110")]
+	private float _uiHeartbeat;
+
+	[Token(Token = "0x40021D6")]
+	[FieldOffset(Offset = "0x114")]
+	private bool _refreshScheduled;
+
+	[Token(Token = "0x40021D7")]
+	[FieldOffset(Offset = "0x118")]
+	private Coroutine _refreshCo;
+
+	[NonSerialized]
+	[Token(Token = "0x40021D8")]
+	[FieldOffset(Offset = "0x120")]
+	private InventorySortMenu _sortMenu;
+
+	[NonSerialized]
+	[Token(Token = "0x40021DB")]
+	[FieldOffset(Offset = "0x130")]
+	private Storage _subscribedStorage;
+
+	[Token(Token = "0x40021DC")]
+	private const float TransferButtonFlashSeconds = 0.15f;
+
+	[Token(Token = "0x40021DD")]
+	private const float TriggerBadgeShakeDistance = 1f;
+
+	[Token(Token = "0x40021DE")]
+	private const float TriggerBadgeShakeTilt = 0.6f;
+
+	[Token(Token = "0x40021DF")]
+	private const float TriggerBadgeShakeSeconds = 0.25f;
+
+	[Token(Token = "0x40021E0")]
+	[FieldOffset(Offset = "0x138")]
+	private TriggerPressTracker _ltBadgeTracker;
+
+	[Token(Token = "0x40021E1")]
+	[FieldOffset(Offset = "0x148")]
+	private TriggerPressTracker _rtBadgeTracker;
+
+	[Token(Token = "0x40021E2")]
+	[FieldOffset(Offset = "0x158")]
+	private bool _triggerBadgesLive;
+
+	[Token(Token = "0x40021E3")]
+	[FieldOffset(Offset = "0x160")]
+	private RectTransform _ltDoubleTapBadge;
+
+	[Token(Token = "0x40021E4")]
+	[FieldOffset(Offset = "0x168")]
+	private RectTransform _rtDoubleTapBadge;
+
+	[Token(Token = "0x40021E5")]
+	[FieldOffset(Offset = "0x170")]
+	private GameObject _triggerBadgesResolvedFor;
+
+	[Token(Token = "0x40021E6")]
+	[FieldOffset(Offset = "0x178")]
+	private InventoryEntry[] _depositProjection;
+
+	[Token(Token = "0x40021E7")]
+	[FieldOffset(Offset = "0x180")]
+	private bool _depositProjectionRefused;
+
+	[Token(Token = "0x40021E8")]
+	[FieldOffset(Offset = "0x188")]
+	private readonly Dictionary<int, GameObject> _runeSetBadges;
+
+	[Token(Token = "0x40021E9")]
+	[FieldOffset(Offset = "0x190")]
+	private Runes.RuneSet _shownRuneSetBadges;
+
+	[Token(Token = "0x40021EA")]
+	protected const string EmptyChargeIconChildName = "EmptyChargeIcon";
+
+	[Token(Token = "0x40021EB")]
+	protected const string ChargeCountTextChildName = "ChargeCountText";
+
+	[Token(Token = "0x40021EC")]
+	private const float BulkTapWindow = 0.25f;
+
+	[Token(Token = "0x40021ED")]
+	private const float BulkTapCooldown = 0.25f;
+
+	[Token(Token = "0x40021EE")]
+	private const int BulkTapContainerKeyOffset = 100000;
+
+	[Token(Token = "0x40021EF")]
+	[FieldOffset(Offset = "0x194")]
+	private int _bulkTapSlot;
+
+	[Token(Token = "0x40021F0")]
+	[FieldOffset(Offset = "0x198")]
+	private bool _bulkTapMatching;
+
+	[Token(Token = "0x40021F1")]
+	[FieldOffset(Offset = "0x19C")]
+	private float _bulkTapTime;
+
+	[Token(Token = "0x40021F2")]
+	[FieldOffset(Offset = "0x1A0")]
+	private float _lastBulkTransferTime;
+
+	[Token(Token = "0x40021F3")]
+	[FieldOffset(Offset = "0x1A4")]
+	private PlayerUIState _bulkTapState;
+
+	[Token(Token = "0x40021F4")]
+	[FieldOffset(Offset = "0x1A8")]
+	private InventoryFilter _bulkTapFilter;
+
+	[Token(Token = "0x40021F5")]
+	[FieldOffset(Offset = "0x1AC")]
+	private int _bulkTapCellClickFrame;
+
+	[Token(Token = "0x40021F6")]
+	[FieldOffset(Offset = "0x1B0")]
+	private Vector2 _bulkTapScreenPos;
+
+	[Token(Token = "0x40021F7")]
+	[FieldOffset(Offset = "0x1B8")]
+	private Transform _bulkTapGridRoot;
+
+	[Token(Token = "0x40021F8")]
+	[FieldOffset(Offset = "0x1C0")]
+	private PointerEventData _bulkRaycastPointer;
+
+	[Token(Token = "0x40021F9")]
+	[FieldOffset(Offset = "0x1C8")]
+	private readonly List<RaycastResult> _bulkRaycastHits;
+
+	[Token(Token = "0x17000490")]
+	public InventoryFilter CurrentStorageFilter
+	{
+		[Token(Token = "0x60022C9")]
+		[Address(RVA = "0xA58650", Offset = "0xA57650", Length = "0x4")]
+		get
+		{
+			return default(InventoryFilter);
+		}
+	}
+
+	[Token(Token = "0x17000491")]
+	public Button ChestLockButton
+	{
+		[Token(Token = "0x60022DB")]
+		[Address(RVA = "0x8F4BC0", Offset = "0x8F3BC0", Length = "0x8")]
+		get
+		{
+			return null;
+		}
+	}
+
+	[Token(Token = "0x17000492")]
+	public TMP_InputField ChestNameField
+	{
+		[Token(Token = "0x60022DC")]
+		[Address(RVA = "0x6C4210", Offset = "0x6C3210", Length = "0x8")]
+		get
+		{
+			return null;
+		}
+	}
+
+	[Token(Token = "0x17000493")]
+	public Button DepositAllButton
+	{
+		[Token(Token = "0x60022DD")]
+		[Address(RVA = "0x76EED0", Offset = "0x76DED0", Length = "0x8")]
+		get
+		{
+			return null;
+		}
+	}
+
+	[Token(Token = "0x17000494")]
+	public Button TakeAllButton
+	{
+		[Token(Token = "0x60022DE")]
+		[Address(RVA = "0x8F4B10", Offset = "0x8F3B10", Length = "0x8")]
+		get
+		{
+			return null;
+		}
+	}
+
+	[Token(Token = "0x17000495")]
+	public Button DepositMatchingButton
+	{
+		[Token(Token = "0x60022DF")]
+		[Address(RVA = "0x8F4B20", Offset = "0x8F3B20", Length = "0x8")]
+		get
+		{
+			return null;
+		}
+	}
+
+	[Token(Token = "0x17000496")]
+	public Button TakeMatchingButton
+	{
+		[Token(Token = "0x60022E0")]
+		[Address(RVA = "0x717FC0", Offset = "0x716FC0", Length = "0x8")]
+		get
+		{
+			return null;
+		}
+	}
+
+	[Token(Token = "0x17000497")]
+	private string BenchDisallowedErrorMessage
+	{
+		[Token(Token = "0x60022EE")]
+		[Address(RVA = "0xA58590", Offset = "0xA57590", Length = "0xBF")]
+		get
+		{
+			return null;
+		}
+	}
+
+	[Token(Token = "0x17000498")]
+	public int HoveredLocalSlot
+	{
+		[Token(Token = "0x60022EF")]
+		[Address(RVA = "0xA58660", Offset = "0xA57660", Length = "0x1C")]
+		get
+		{
+			return 0;
+		}
+	}
+
+	[Token(Token = "0x17000499")]
+	public virtual bool AllowsDropFromContainer
+	{
+		[Token(Token = "0x60022F0")]
+		[Address(RVA = "0x6AE880", Offset = "0x6AD880", Length = "0x3")]
+		get
+		{
+			return false;
+		}
+	}
+
+	[Token(Token = "0x1700049A")]
+	[field: Token(Token = "0x40021D9")]
+	[field: FieldOffset(Offset = "0x128")]
+	public InventorySortMethod CurrentSortMethod
+	{
+		[Token(Token = "0x60022FD")]
+		[Address(RVA = "0x7109E0", Offset = "0x70F9E0", Length = "0x7")]
+		get;
+		[Token(Token = "0x60022FE")]
+		[Address(RVA = "0x710A10", Offset = "0x70FA10", Length = "0x7")]
+		private set;
+	}
+
+	[Token(Token = "0x1700049B")]
+	[field: Token(Token = "0x40021DA")]
+	[field: FieldOffset(Offset = "0x12C")]
+	public bool SortDescending
+	{
+		[Token(Token = "0x60022FF")]
+		[Address(RVA = "0xA58680", Offset = "0xA57680", Length = "0x8")]
+		get;
+		[Token(Token = "0x6002300")]
+		[Address(RVA = "0xA58690", Offset = "0xA57690", Length = "0x7")]
+		private set;
+	}
+
+	[Token(Token = "0x1700049C")]
+	private bool ArmedOnCurrentScreen
+	{
+		[Token(Token = "0x6002363")]
+		[Address(RVA = "0xA58500", Offset = "0xA57500", Length = "0x86")]
+		get
+		{
+			return false;
+		}
+	}
+
+	[Token(Token = "0x60022C8")]
+	[Address(RVA = "0xA41EB0", Offset = "0xA40EB0", Length = "0x1D6")]
+	public virtual void BindStorageView(StorageUIView v)
+	{
+	}
+
+	[Token(Token = "0x60022CA")]
+	[Address(RVA = "0xA49080", Offset = "0xA48080", Length = "0x25D")]
+	public bool IsSlotVisibleUnderFilter(int localIndex)
+	{
+		return false;
+	}
+
+	[Token(Token = "0x60022CB")]
+	[Address(RVA = "0xA4DCD0", Offset = "0xA4CCD0", Length = "0x22")]
+	public void SetStorageFilter(InventoryFilter filter)
+	{
+	}
+
+	[Token(Token = "0x60022CC")]
+	[Address(RVA = "0xA4BC10", Offset = "0xA4AC10", Length = "0x124")]
+	private void ResetStorageScroll()
+	{
+	}
+
+	[Token(Token = "0x60022CD")]
+	[Address(RVA = "0xA439B0", Offset = "0xA429B0", Length = "0x21E")]
+	public void CycleStorageFilter(int direction)
+	{
+	}
+
+	[Token(Token = "0x60022CE")]
+	[Address(RVA = "0xA485A0", Offset = "0xA475A0", Length = "0x25C")]
+	private bool HasAnyStorageMatch(InventoryFilter filter)
+	{
+		return false;
+	}
+
+	[Token(Token = "0x60022CF")]
+	[Address(RVA = "0xA57FD0", Offset = "0xA56FD0", Length = "0x248")]
+	private void WireStorageFilterTabs(List<Toggle> toggles)
+	{
+	}
+
+	[Token(Token = "0x60022D0")]
+	[Address(RVA = "0xA4BB00", Offset = "0xA4AB00", Length = "0x101")]
+	private void ResetStorageFilter()
+	{
+	}
+
+	[Token(Token = "0x60022D1")]
+	[Address(RVA = "0xA4AAD0", Offset = "0xA49AD0", Length = "0x174")]
+	public void RefreshFilterTabAvailability()
+	{
+	}
+
+	[Token(Token = "0x60022D2")]
+	[Address(RVA = "0xA4D7D0", Offset = "0xA4C7D0", Length = "0x1D6")]
+	private void SetFilterTabDimmed(Toggle toggle, bool dim)
+	{
+	}
+
+	[Token(Token = "0x60022D3")]
+	[Address(RVA = "0xA42F60", Offset = "0xA41F60", Length = "0x160")]
+	protected List<int> ComputeVisibleStorageLocals()
+	{
+		return null;
+	}
+
+	[Token(Token = "0x60022D4")]
+	[Address(RVA = "0xA40A60", Offset = "0xA3FA60", Length = "0x355")]
+	protected void ApplyStorageSlotLayout(List<int> visibleLocals)
+	{
+	}
+
+	[Token(Token = "0x60022D5")]
+	[Address(RVA = "0xA406D0", Offset = "0xA3F6D0", Length = "0x383")]
+	private void ApplySlotBackgroundSprite()
+	{
+	}
+
+	[Token(Token = "0x60022D6")]
+	[Address(RVA = "0xA4C2F0", Offset = "0xA4B2F0", Length = "0x10E")]
+	private static Image ResolveSlotBackgroundImage(GameObject slot)
+	{
+		return null;
+	}
+
+	[Token(Token = "0x60022D7")]
+	[Address(RVA = "0xA4F3F0", Offset = "0xA4E3F0", Length = "0x200")]
+	private static int SlotGridRowsFor(GameObject slot, int cellCount)
+	{
+		return 0;
+	}
+
+	[Token(Token = "0x60022D8")]
+	[Address(RVA = "0xA4BAC0", Offset = "0xA4AAC0", Length = "0x35")]
+	public void ResetStorageFilterToAll()
+	{
+	}
+
+	[Token(Token = "0x60022D9")]
+	[Address(RVA = "0xA57690", Offset = "0xA56690", Length = "0x632")]
+	private void WireChestHeader(StorageUIView v)
+	{
+	}
+
+	[Token(Token = "0x60022DA")]
+	[Address(RVA = "0xA57CD0", Offset = "0xA56CD0", Length = "0x2F8")]
+	protected void WireLockSwitch(GameObject lockRoot, TMP_Text lockLabel, GameObject lockCheckmark)
+	{
+	}
+
+	[Token(Token = "0x60022E1")]
+	[Address(RVA = "0xA41B80", Offset = "0xA40B80", Length = "0xDE")]
+	public bool BeginChestRename()
+	{
+		return false;
+	}
+
+	[Token(Token = "0x60022E2")]
+	[Address(RVA = "0xA4A610", Offset = "0xA49610", Length = "0x2BD")]
+	protected void RefreshChestHeader()
+	{
+	}
+
+	[Token(Token = "0x60022E3")]
+	[Address(RVA = "0xA4A8D0", Offset = "0xA498D0", Length = "0x1F5")]
+	protected void RefreshChestSettingsAccess()
+	{
+	}
+
+	[Token(Token = "0x60022E4")]
+	[Address(RVA = "0xA4A370", Offset = "0xA49370", Length = "0x295")]
+	protected void RefreshCapacityCounter()
+	{
+	}
+
+	[Token(Token = "0x60022E5")]
+	[Address(RVA = "0xA50650", Offset = "0xA4F650", Length = "0x360")]
+	private void SubmitChestRename(string text)
+	{
+	}
+
+	[Token(Token = "0x60022E6")]
+	[Address(RVA = "0xA49AA0", Offset = "0xA48AA0", Length = "0xE0")]
+	private void OnPublicToggleClicked()
+	{
+	}
+
+	[Token(Token = "0x60022E7")]
+	[Address(RVA = "0xA40490", Offset = "0xA3F490", Length = "0x235")]
+	protected void ApplyPublicToggleVisual(bool isPublic)
+	{
+	}
+
+	[Token(Token = "0x60022E8")]
+	[Address(RVA = "0xA4B730", Offset = "0xA4A730", Length = "0x2BB")]
+	protected void RepairStorageSlotWiring()
+	{
+	}
+
+	[Token(Token = "0x60022E9")]
+	[Address(RVA = "0xA4D600", Offset = "0xA4C600", Length = "0x1C5")]
+	public void SetDragUnmaskedLayer(GameObject layer)
+	{
+	}
+
+	[Token(Token = "0x60022EA")]
+	[Address(RVA = "0xA4DD00", Offset = "0xA4CD00", Length = "0x166")]
+	protected void SetStorageSlotDragEnabled(int localIndex, bool enabled)
+	{
+	}
+
+	[Token(Token = "0x60022EB")]
+	[Address(RVA = "0xA4C820", Offset = "0xA4B820", Length = "0x6DC")]
+	private void RewireStorageButtons()
+	{
+	}
+
+	[Token(Token = "0x60022EC")]
+	[Address(RVA = "0xA4D9B0", Offset = "0xA4C9B0", Length = "0x9B")]
+	public void SetPanelActive(bool active)
+	{
+	}
+
+	[Token(Token = "0x60022ED")]
+	[Address(RVA = "0xA4DE70", Offset = "0xA4CE70", Length = "0xD7")]
+	public void SetStorageTitle(string title)
+	{
+	}
+
+	[Token(Token = "0x60022F1")]
+	[Address(RVA = "0xA49B90", Offset = "0xA48B90", Length = "0x7")]
+	private void OnStorageChanged(NetworkListEvent<InventoryEntry> _)
+	{
+	}
+
+	[Token(Token = "0x60022F2")]
+	[Address(RVA = "0xA49B90", Offset = "0xA48B90", Length = "0x7")]
+	private void OnStorageRunesChanged(NetworkListEvent<Rune> _)
+	{
+	}
+
+	[Token(Token = "0x60022F3")]
+	[Address(RVA = "0xA4B9F0", Offset = "0xA4A9F0", Length = "0x9D")]
+	private void RequestCoalescedRefresh()
+	{
+	}
+
+	[IteratorStateMachine(typeof(<CoalescedRefreshNextFrame>d__97))]
+	[Token(Token = "0x60022F4")]
+	[Address(RVA = "0xA428C0", Offset = "0xA418C0", Length = "0x67")]
+	private IEnumerator CoalescedRefreshNextFrame()
+	{
+		return null;
+	}
+
+	[Token(Token = "0x60022F5")]
+	[Address(RVA = "0xA57570", Offset = "0xA56570", Length = "0x115")]
+	protected virtual void Update()
+	{
+	}
+
+	[Token(Token = "0x60022F6")]
+	[Address(RVA = "0xA494F0", Offset = "0xA484F0", Length = "0xD2")]
+	protected virtual void LateUpdate()
+	{
+	}
+
+	[Token(Token = "0x60022F7")]
+	[Address(RVA = "0xA45CC0", Offset = "0xA44CC0", Length = "0x77")]
+	protected virtual void FixedUpdate()
+	{
+	}
+
+	[Token(Token = "0x60022F8")]
+	[Address(RVA = "0xA49A00", Offset = "0xA48A00", Length = "0x41")]
+	private void OnDestroy()
+	{
+	}
+
+	[Token(Token = "0x60022F9")]
+	[Address(RVA = "0xA49A60", Offset = "0xA48A60", Length = "0x34")]
+	protected virtual void OnEnable()
+	{
+	}
+
+	[Token(Token = "0x60022FA")]
+	[Address(RVA = "0xA49A50", Offset = "0xA48A50", Length = "0x7")]
+	protected virtual void OnDisable()
+	{
+	}
+
+	[Token(Token = "0x60022FB")]
+	[Address(RVA = "0xA574B0", Offset = "0xA564B0", Length = "0xB2")]
+	public void UpdateStorage()
+	{
+	}
+
+	[Token(Token = "0x60022FC")]
+	[Address(RVA = "0xA4DF50", Offset = "0xA4CF50", Length = "0x68")]
+	public void SetStorage(Storage storage)
+	{
+	}
+
+	[Token(Token = "0x6002301")]
+	[Address(RVA = "0xA4C400", Offset = "0xA4B400", Length = "0xE5")]
+	private void ResolveSortMenu(StorageUIView v)
+	{
+	}
+
+	[Token(Token = "0x6002302")]
+	[Address(RVA = "0xA4DCC0", Offset = "0xA4CCC0", Length = "0xD")]
+	public void SetSortMethod(InventorySortMethod method)
+	{
+	}
+
+	[Token(Token = "0x6002303")]
+	[Address(RVA = "0xA4DCB0", Offset = "0xA4CCB0", Length = "0xD")]
+	public void SetSortDescending(bool descending)
+	{
+	}
+
+	[Token(Token = "0x6002304")]
+	[Address(RVA = "0xA4F9E0", Offset = "0xA4E9E0", Length = "0xFF")]
+	public void SortStorage()
+	{
+	}
+
+	[Token(Token = "0x6002305")]
+	[Address(RVA = "0x6AAC60", Offset = "0x6A9C60", Length = "0x3")]
+	public virtual void SwapContainerItems(int dragIndex, int dropIndex)
+	{
+	}
+
+	[Token(Token = "0x6002306")]
+	[Address(RVA = "0x6AAC60", Offset = "0x6A9C60", Length = "0x3")]
+	public virtual void PopulateStorageView()
+	{
+	}
+
+	[Token(Token = "0x6002307")]
+	[Address(RVA = "0x6BBA80", Offset = "0x6BAA80", Length = "0x3")]
+	public virtual bool IsSlotPlaceable()
+	{
+		return false;
+	}
+
+	[Token(Token = "0x6002308")]
+	[Address(RVA = "0xA509C0", Offset = "0xA4F9C0", Length = "0x3A6")]
+	private void SubscribeToStorage()
+	{
+	}
+
+	[Token(Token = "0x6002309")]
+	[Address(RVA = "0xA560B0", Offset = "0xA550B0", Length = "0x3CA")]
+	private void UnsubscribeFromStorage()
+	{
+	}
+
+	[Token(Token = "0x600230A")]
+	[Address(RVA = "0xA499F0", Offset = "0xA489F0", Length = "0x7")]
+	private void OnChestHeaderValueChanged(FixedString128Bytes previous, FixedString128Bytes current)
+	{
+	}
+
+	[Token(Token = "0x600230B")]
+	[Address(RVA = "0xA499F0", Offset = "0xA489F0", Length = "0x7")]
+	private void OnChestHeaderPublicChanged(bool previous, bool current)
+	{
+	}
+
+	[Token(Token = "0x600230C")]
+	[Address(RVA = "0xA53500", Offset = "0xA52500", Length = "0x43")]
+	public bool TransferAllVisibleItems(string direction, bool flashButton = false)
+	{
+		return false;
+	}
+
+	[Token(Token = "0x600230D")]
+	[Address(RVA = "0xA54DB0", Offset = "0xA53DB0", Length = "0x43")]
+	public bool TransferMatchingItems(string direction, bool flashButton = false)
+	{
+		return false;
+	}
+
+	[Token(Token = "0x600230E")]
+	[Address(RVA = "0xA4A0A0", Offset = "0xA490A0", Length = "0x213")]
+	private void PollTriggerBadgeShake()
+	{
+	}
+
+	[Token(Token = "0x600230F")]
+	[Address(RVA = "0xA4DFC0", Offset = "0xA4CFC0", Length = "0xEB")]
+	private void ShakeTriggerBadge(ControllerButton trigger)
+	{
+	}
+
+	[Token(Token = "0x6002310")]
+	[Address(RVA = "0xA4C4F0", Offset = "0xA4B4F0", Length = "0x327")]
+	private void ResolveTriggerBadges()
+	{
+	}
+
+	[Token(Token = "0x6002311")]
+	[Address(RVA = "0xA45E80", Offset = "0xA44E80", Length = "0x177")]
+	public void FlashTransferButton(string direction, bool matching)
+	{
+	}
+
+	[IteratorStateMachine(typeof(<FlashButtonHover>d__143))]
+	[Token(Token = "0x6002312")]
+	[Address(RVA = "0xA45D40", Offset = "0xA44D40", Length = "0x67")]
+	private IEnumerator FlashButtonHover(Button button)
+	{
+		return null;
+	}
+
+	[Token(Token = "0x6002313")]
+	[Address(RVA = "0xA53550", Offset = "0xA52550", Length = "0xC25")]
+	private bool TransferBulk(string direction, bool matchingOnly)
+	{
+		return false;
+	}
+
+	[Token(Token = "0x6002314")]
+	[Address(RVA = "0xA4E520", Offset = "0xA4D520", Length = "0x1F2")]
+	public static void ShowNoMatchingItems()
+	{
+	}
+
+	[Token(Token = "0x6002315")]
+	[Address(RVA = "0xA4E720", Offset = "0xA4D720", Length = "0x1F2")]
+	public static void ShowNothingToTransfer()
+	{
+	}
+
+	[Token(Token = "0x6002316")]
+	[Address(RVA = "0xA42930", Offset = "0xA41930", Length = "0x62D")]
+	private BulkMatchSet CollectDestinationMatchSet(bool toStorage)
+	{
+		return default(BulkMatchSet);
+	}
+
+	[Token(Token = "0x6002317")]
+	[Address(RVA = "0xA49900", Offset = "0xA48900", Length = "0xE1")]
+	private static void NoteDestinationEntry(HashSet<ItemType> types, HashSet<Runes.RuneSet> runeSets, ref bool hasPet, InventoryEntry entry, Runes.RuneSet runeSet)
+	{
+	}
+
+	[Token(Token = "0x6002318")]
+	[Address(RVA = "0xA503B0", Offset = "0xA4F3B0", Length = "0x13C")]
+	private Runes.RuneSet StorageRuneSetAt(int localIndex)
+	{
+		return default(Runes.RuneSet);
+	}
+
+	[Token(Token = "0x6002319")]
+	[Address(RVA = "0xA418E0", Offset = "0xA408E0", Length = "0x1C9")]
+	private Runes.RuneSet BackpackRuneSetOf(InventoryEntry entry)
+	{
+		return default(Runes.RuneSet);
+	}
+
+	[Token(Token = "0x600231A")]
+	[Address(RVA = "0x6AE880", Offset = "0x6AD880", Length = "0x3")]
+	protected virtual bool RefusesDeposit(InventoryEntry entry)
+	{
+		return false;
+	}
+
+	[Token(Token = "0x600231B")]
+	[Address(RVA = "0xA4AC50", Offset = "0xA49C50", Length = "0x29D")]
+	protected virtual bool RefusesBulkDeposit(InventoryEntry entry)
+	{
+		return false;
+	}
+
+	[Token(Token = "0x600231C")]
+	[Address(RVA = "0xA493C0", Offset = "0xA483C0", Length = "0x125")]
+	private bool IsVisibleUnderBackpackFilter(InventoryEntry entry)
+	{
+		return false;
+	}
+
+	[Token(Token = "0x600231D")]
+	[Address(RVA = "0xA43BD0", Offset = "0xA42BD0", Length = "0x3C8")]
+	private bool DepositAllIntoContainer(List<int> inventoryIndices)
+	{
+		return false;
+	}
+
+	[Token(Token = "0x600231E")]
+	[Address(RVA = "0xA41C60", Offset = "0xA40C60", Length = "0x241")]
+	private void BeginDepositProjection()
+	{
+	}
+
+	[Token(Token = "0x600231F")]
+	[Address(RVA = "0xA44E70", Offset = "0xA43E70", Length = "0x2F")]
+	private void EndDepositProjection()
+	{
+	}
+
+	[Token(Token = "0x6002320")]
+	[Address(RVA = "0xA431B0", Offset = "0xA421B0", Length = "0x228")]
+	private InventoryEntry ContainerEntryAt(int local)
+	{
+		return default(InventoryEntry);
+	}
+
+	[Token(Token = "0x6002321")]
+	[Address(RVA = "0xA4A2C0", Offset = "0xA492C0", Length = "0xAD")]
+	private void ProjectContainerWrite(int local, InventoryEntry entry)
+	{
+	}
+
+	[Token(Token = "0x6002322")]
+	[Address(RVA = "0xA498E0", Offset = "0xA488E0", Length = "0x12")]
+	private void NoteDepositRefused()
+	{
+	}
+
+	[Token(Token = "0x6002323")]
+	[Address(RVA = "0xA53040", Offset = "0xA52040", Length = "0x4A7")]
+	private bool TakeAllWithinCarryCapacity(List<int> storageIndices)
+	{
+		return false;
+	}
+
+	[Token(Token = "0x6002324")]
+	[Address(RVA = "0xA495D0", Offset = "0xA485D0", Length = "0x30F")]
+	private int MaxUnitsWithinCapacity(InventoryEntry entry, float remainingCapacity)
+	{
+		return 0;
+	}
+
+	[Token(Token = "0x6002325")]
+	[Address(RVA = "0xA3E270", Offset = "0xA3D270", Length = "0x567")]
+	protected int AddToInventory(InventoryEntry entry)
+	{
+		return 0;
+	}
+
+	[Token(Token = "0x6002326")]
+	[Address(RVA = "0xA4AEF0", Offset = "0xA49EF0", Length = "0x169")]
+	protected static void RegisterStorageWithdrawalAsPickup(ItemType item, int amount)
+	{
+	}
+
+	[Token(Token = "0x6002327")]
+	[Address(RVA = "0xA452A0", Offset = "0xA442A0", Length = "0x168")]
+	private int FindIndexOfFirstEmptyInventorySlot()
+	{
+		return 0;
+	}
+
+	[Token(Token = "0x6002328")]
+	[Address(RVA = "0xA3DD10", Offset = "0xA3CD10", Length = "0x554")]
+	private int AddToExistingStacksInInventory(InventoryEntry entry, int amount)
+	{
+		return 0;
+	}
+
+	[Token(Token = "0x6002329")]
+	[Address(RVA = "0xA43FA0", Offset = "0xA42FA0", Length = "0x211")]
+	protected void DetermineDraggedItemReset(int dragIndex)
+	{
+	}
+
+	[Token(Token = "0x600232A")]
+	[Address(RVA = "0xA441C0", Offset = "0xA431C0", Length = "0xCA6")]
+	public void DropItemOnSlot(int dragIndex, int dropIndex)
+	{
+	}
+
+	[Token(Token = "0x600232B")]
+	[Address(RVA = "0xA56480", Offset = "0xA55480", Length = "0x2A")]
+	protected void UpdateContainerAndInventory()
+	{
+	}
+
+	[Token(Token = "0x600232C")]
+	[Address(RVA = "0xA4B360", Offset = "0xA4A360", Length = "0x190")]
+	private bool RejectPetTransfer(InventoryEntry entry)
+	{
+		return false;
+	}
+
+	[Token(Token = "0x600232D")]
+	[Address(RVA = "0xA4B060", Offset = "0xA4A060", Length = "0x1BC")]
+	private bool RejectBenchDisallowedTransfer(InventoryEntry entry)
+	{
+		return false;
+	}
+
+	[Token(Token = "0x600232E")]
+	[Address(RVA = "0xA489C0", Offset = "0xA479C0", Length = "0x54")]
+	private static bool IsBenchDisallowedEntry(InventoryEntry entry)
+	{
+		return false;
+	}
+
+	[Token(Token = "0x600232F")]
+	[Address(RVA = "0xA3D8A0", Offset = "0xA3C8A0", Length = "0x46E")]
+	private static void AddRunePayloadToPlayer(Rune rune)
+	{
+	}
+
+	[Token(Token = "0x6002330")]
+	[Address(RVA = "0xA4B500", Offset = "0xA4A500", Length = "0x22D")]
+	private static void RemoveRunePayloadFromPlayer(Rune rune)
+	{
+	}
+
+	[Token(Token = "0x6002331")]
+	[Address(RVA = "0xA3E7E0", Offset = "0xA3D7E0", Length = "0x10E2")]
+	protected int AddToStorage(InventoryEntry entry)
+	{
+		return 0;
+	}
+
+	[Token(Token = "0x6002332")]
+	[Address(RVA = "0xA3F8D0", Offset = "0xA3E8D0", Length = "0xBB3")]
+	protected bool AddingInsteadOfSwapping(int dragIndex, int dropIndex)
+	{
+		return false;
+	}
+
+	[Token(Token = "0x6002333")]
+	[Address(RVA = "0xA534F0", Offset = "0xA524F0", Length = "0x9")]
+	public int ToLocalIndex(int globalIndex)
+	{
+		return 0;
+	}
+
+	[Token(Token = "0x6002334")]
+	[Address(RVA = "0xA465B0", Offset = "0xA455B0", Length = "0x2D3")]
+	public InventoryEntry GetItemForSlot(int idx)
+	{
+		return default(InventoryEntry);
+	}
+
+	[Token(Token = "0x6002335")]
+	[Address(RVA = "0xA4E0B0", Offset = "0xA4D0B0", Length = "0x46C")]
+	public bool ShiftClickTransfer(int button, int amount = 2147483647)
+	{
+		return false;
+	}
+
+	[Token(Token = "0x6002336")]
+	[Address(RVA = "0xA4F600", Offset = "0xA4E600", Length = "0x3D5")]
+	private InventoryEntry[] SnapshotContainer(bool toStorage)
+	{
+		return null;
+	}
+
+	[Token(Token = "0x6002337")]
+	[Address(RVA = "0xA46000", Offset = "0xA45000", Length = "0x5A9")]
+	private void FlashTransfer(int sourceGlobal, InventoryEntry moved, Sprite sourceIconBefore, InventoryEntry[] destinationBefore, bool toStorage)
+	{
+	}
+
+	[Token(Token = "0x6002338")]
+	[Address(RVA = "0xA45DB0", Offset = "0xA44DB0", Length = "0xC8")]
+	private void FlashStorageSlot(int localIndex, bool arriving, Sprite icon)
+	{
+	}
+
+	[Token(Token = "0x6002339")]
+	[Address(RVA = "0xA504F0", Offset = "0xA4F4F0", Length = "0x15D")]
+	private Sprite StorageSlotIconAt(int localIndex)
+	{
+		return null;
+	}
+
+	[Token(Token = "0x600233A")]
+	[Address(RVA = "0xA4CF00", Offset = "0xA4BF00", Length = "0x6F4")]
+	public Rune RuneAtLocalSlot(int localIndex)
+	{
+		return default(Rune);
+	}
+
+	[Token(Token = "0x600233B")]
+	[Address(RVA = "0xA43800", Offset = "0xA42800", Length = "0x1A6")]
+	public int CountVisibleRuneSetMatches(Runes.RuneSet set, FixedString64Bytes excludeUuid)
+	{
+		return 0;
+	}
+
+	[Token(Token = "0x600233C")]
+	[Address(RVA = "0xA4E920", Offset = "0xA4D920", Length = "0x3CF")]
+	public void ShowRuneSetBadges(Runes.RuneSet set)
+	{
+	}
+
+	[Token(Token = "0x600233D")]
+	[Address(RVA = "0xA42310", Offset = "0xA41310", Length = "0x2B5")]
+	public void ClearRuneSetBadges()
+	{
+	}
+
+	[Token(Token = "0x600233E")]
+	[Address(RVA = "0xA41AB0", Offset = "0xA40AB0", Length = "0xCD")]
+	private int BadgeSlotCount()
+	{
+		return 0;
+	}
+
+	[Token(Token = "0x600233F")]
+	[Address(RVA = "0xA48900", Offset = "0xA47900", Length = "0xBC")]
+	private bool IsBadgeableSlot(int localIndex)
+	{
+		return false;
+	}
+
+	[Token(Token = "0x6002340")]
+	[Address(RVA = "0xA54E00", Offset = "0xA53E00", Length = "0xE")]
+	public void TransferOneUnit(int button)
+	{
+	}
+
+	[Token(Token = "0x6002341")]
+	[Address(RVA = "0xA46EC0", Offset = "0xA45EC0", Length = "0x9C6")]
+	protected bool HandleTransferFromContainerToInventory(int button, int amount)
+	{
+		return false;
+	}
+
+	[Token(Token = "0x6002342")]
+	[Address(RVA = "0xA47890", Offset = "0xA46890", Length = "0xD0B")]
+	private bool HandleTransferFromInventoryToContainer(int button, int amount)
+	{
+		return false;
+	}
+
+	[Token(Token = "0x6002343")]
+	[Address(RVA = "0xA50D70", Offset = "0xA4FD70", Length = "0x348")]
+	protected void SwapContainerWithContainer(int dragIndex, int dropIndex)
+	{
+	}
+
+	[Token(Token = "0x6002344")]
+	[Address(RVA = "0xA4B220", Offset = "0xA4A220", Length = "0x13C")]
+	private bool RejectItemBarPlacement(InventoryEntry incoming, int playerSlotIndex)
+	{
+		return false;
+	}
+
+	[Token(Token = "0x6002345")]
+	[Address(RVA = "0xA48BF0", Offset = "0xA47BF0", Length = "0x11F")]
+	private static bool IsDirectlyWritablePlayerSlot(int index)
+	{
+		return false;
+	}
+
+	[Token(Token = "0x6002346")]
+	[Address(RVA = "0xA54180", Offset = "0xA53180", Length = "0xB23")]
+	private void TransferContainerEntryToRoutedSlot(int dragIndex, int dropIndex)
+	{
+	}
+
+	[Token(Token = "0x6002347")]
+	[Address(RVA = "0xA54E10", Offset = "0xA53E10", Length = "0xAF0")]
+	private void TransferRoutedSlotToContainer(int dragIndex, int dropIndex)
+	{
+	}
+
+	[Token(Token = "0x6002348")]
+	[Address(RVA = "0xA4C0C0", Offset = "0xA4B0C0", Length = "0x226")]
+	private int ResolveRoutedDepositSlot(int aimed)
+	{
+		return 0;
+	}
+
+	[Token(Token = "0x6002349")]
+	[Address(RVA = "0xA433E0", Offset = "0xA423E0", Length = "0x416")]
+	private int ContainerRoomFor(InventoryEntry entry)
+	{
+		return 0;
+	}
+
+	[Token(Token = "0x600234A")]
+	[Address(RVA = "0xA510C0", Offset = "0xA500C0", Length = "0xF10")]
+	protected void SwapContainerWithInventory(int dragIndex, int dropIndex)
+	{
+	}
+
+	[Token(Token = "0x600234B")]
+	[Address(RVA = "0xA49BA0", Offset = "0xA48BA0", Length = "0x4F4")]
+	protected bool PlayerWouldBeOverweight(InventoryEntry entry, int amountToAdd = -1)
+	{
+		return false;
+	}
+
+	[Token(Token = "0x600234C")]
+	[Address(RVA = "0xA51FE0", Offset = "0xA50FE0", Length = "0x1055")]
+	protected void SwapInventoryWithContainer(int dragIndex, int dropIndex)
+	{
+	}
+
+	[Token(Token = "0x600234D")]
+	[Address(RVA = "0xA44EA0", Offset = "0xA43EA0", Length = "0x1C8")]
+	public InventoryEntry ExtractContainerSlotInfo(int storageLocalIndex)
+	{
+		return default(InventoryEntry);
+	}
+
+	[Token(Token = "0x600234E")]
+	[Address(RVA = "0xA46890", Offset = "0xA45890", Length = "0x150")]
+	protected Rune GetRuneFromContainer(string uuid)
+	{
+		return default(Rune);
+	}
+
+	[Token(Token = "0x600234F")]
+	[Address(RVA = "0xA45070", Offset = "0xA44070", Length = "0x22D")]
+	private InventoryEntry ExtractInventorySlotInfo(int button)
+	{
+		return default(InventoryEntry);
+	}
+
+	[Token(Token = "0x6002350")]
+	[Address(RVA = "0xA469F0", Offset = "0xA459F0", Length = "0x8F")]
+	protected int GetStackLimitForItem(string item)
+	{
+		return 0;
+	}
+
+	[Token(Token = "0x6002351")]
+	[Address(RVA = "0xA4BD40", Offset = "0xA4AD40", Length = "0x374")]
+	protected virtual void ResetStorageSlotToEmpty(int index)
+	{
+	}
+
+	[Token(Token = "0x6002352")]
+	[Address(RVA = "0xA4DA50", Offset = "0xA4CA50", Length = "0x143")]
+	protected static void SetSlotChargeText(GameObject slot, string text)
+	{
+	}
+
+	[Token(Token = "0x6002353")]
+	[Address(RVA = "0xA4DBA0", Offset = "0xA4CBA0", Length = "0x10A")]
+	protected static void SetSlotEmptyChargeIcon(GameObject slot, bool active)
+	{
+	}
+
+	[Token(Token = "0x6002354")]
+	[Address(RVA = "0xA48E90", Offset = "0xA47E90", Length = "0x1AD")]
+	protected bool IsSimpleItem(int index)
+	{
+		return false;
+	}
+
+	[Token(Token = "0x6002355")]
+	[Address(RVA = "0xA56E30", Offset = "0xA55E30", Length = "0x672")]
+	protected virtual void UpdateSimpleItemSlot(int index)
+	{
+	}
+
+	[Token(Token = "0x6002356")]
+	[Address(RVA = "0xA492E0", Offset = "0xA482E0", Length = "0xD4")]
+	private bool IsStorageNull(int index)
+	{
+		return false;
+	}
+
+	[Token(Token = "0x6002357")]
+	[Address(RVA = "0xA48D10", Offset = "0xA47D10", Length = "0x170")]
+	protected bool IsRune(int index)
+	{
+		return false;
+	}
+
+	[Token(Token = "0x6002358")]
+	[Address(RVA = "0xA564B0", Offset = "0xA554B0", Length = "0x97C")]
+	protected virtual void UpdateRuneSlot(int index)
+	{
+	}
+
+	[Token(Token = "0x6002359")]
+	[Address(RVA = "0xA54CB0", Offset = "0xA53CB0", Length = "0xF7")]
+	private void TransferHalfStack(int button)
+	{
+	}
+
+	[Token(Token = "0x600235A")]
+	[Address(RVA = "0xA42090", Offset = "0xA41090", Length = "0x11B")]
+	private int BulkTapKeyFor(int button)
+	{
+		return 0;
+	}
+
+	[Token(Token = "0x600235B")]
+	[Address(RVA = "0xA48A20", Offset = "0xA47A20", Length = "0x1CA")]
+	private bool IsBulkTransferDoubleTap(int button, bool matching)
+	{
+		return false;
+	}
+
+	[Token(Token = "0x600235C")]
+	[Address(RVA = "0xA46C00", Offset = "0xA45C00", Length = "0x2B0")]
+	private Transform GridRootUnderPointer()
+	{
+		return null;
+	}
+
+	[Token(Token = "0x600235D")]
+	[Address(RVA = "0xA46B60", Offset = "0xA45B60", Length = "0x97")]
+	private InventoryFilter GridFilterFor(int key)
+	{
+		return default(InventoryFilter);
+	}
+
+	[Token(Token = "0x600235E")]
+	[Address(RVA = "0xA41690", Offset = "0xA40690", Length = "0x3E")]
+	private bool ArmedBulkTapTabClosed()
+	{
+		return false;
+	}
+
+	[Token(Token = "0x600235F")]
+	[Address(RVA = "0xA430D0", Offset = "0xA420D0", Length = "0xDA")]
+	private bool ConsumesSpentBulkTap(bool matching)
+	{
+		return false;
+	}
+
+	[Token(Token = "0x6002360")]
+	[Address(RVA = "0xA58220", Offset = "0xA57220", Length = "0xA3")]
+	public bool WouldCompleteBulkTap(int button, bool matching)
+	{
+		return false;
+	}
+
+	[Token(Token = "0x6002361")]
+	[Address(RVA = "0xA41590", Offset = "0xA40590", Length = "0xF8")]
+	private bool ArmedBulkTapCellAlive()
+	{
+		return false;
+	}
+
+	[Token(Token = "0x6002362")]
+	[Address(RVA = "0xA55910", Offset = "0xA54910", Length = "0x48D")]
+	private void TryCompleteOrphanedBulkTap()
+	{
+	}
+
+	[Token(Token = "0x6002364")]
+	[Address(RVA = "0xA425D0", Offset = "0xA415D0", Length = "0x2E1")]
+	private bool ClickedEmptyGridSpace()
+	{
+		return false;
+	}
+
+	[Token(Token = "0x6002365")]
+	[Address(RVA = "0xA421B0", Offset = "0xA411B0", Length = "0x151")]
+	private float BulkTapSlopPixels()
+	{
+		return 0f;
+	}
+
+	[Token(Token = "0x6002366")]
+	[Address(RVA = "0xA416D0", Offset = "0xA406D0", Length = "0x208")]
+	private Transform ArmedGridRoot()
+	{
+		return null;
+	}
+
+	[Token(Token = "0x6002367")]
+	[Address(RVA = "0xA4BA90", Offset = "0xA4AA90", Length = "0x2D")]
+	private void ResetBulkTap()
+	{
+	}
+
+	[Token(Token = "0x6002368")]
+	[Address(RVA = "0xA4FFF0", Offset = "0xA4EFF0", Length = "0x3B3")]
+	public void StorageOnMouseUp(int button)
+	{
+	}
+
+	[Token(Token = "0x6002369")]
+	[Address(RVA = "0xA4ECF0", Offset = "0xA4DCF0", Length = "0x6FB")]
+	protected void ShowStorageRarityHoverOverlay(GameObject parentSlot, string entry)
+	{
+	}
+
+	[Token(Token = "0x600236A")]
+	[Address(RVA = "0xA48800", Offset = "0xA47800", Length = "0xFB")]
+	protected void HideStorageRarityHoverOverlay()
+	{
+	}
+
+	[Token(Token = "0x600236B")]
+	[Address(RVA = "0xA40DC0", Offset = "0xA3FDC0", Length = "0x64B")]
+	public void ApplyStorageSlotRarityOverlay(int local)
+	{
+	}
+
+	[Token(Token = "0x600236C")]
+	[Address(RVA = "0xA4FAE0", Offset = "0xA4EAE0", Length = "0x2F4")]
+	public void StorageOnMouseEnter(int button)
+	{
+	}
+
+	[Token(Token = "0x600236D")]
+	[Address(RVA = "0xA4FDE0", Offset = "0xA4EDE0", Length = "0x209")]
+	public void StorageOnMouseExit()
+	{
+	}
+
+	[Token(Token = "0x600236E")]
+	[Address(RVA = "0xA45410", Offset = "0xA44410", Length = "0x8A8")]
+	private void FireChestToolTip()
+	{
+	}
+
+	[Token(Token = "0x600236F")]
+	[Address(RVA = "0xA49040", Offset = "0xA48040", Length = "0x35")]
+	private static bool IsSimpleStackableItem(InventoryEntry e)
+	{
+		return false;
+	}
+
+	[Token(Token = "0x6002370")]
+	[Address(RVA = "0xA46A80", Offset = "0xA45A80", Length = "0xDB")]
+	private static int GetStackLimit(InventoryEntry e)
+	{
+		return 0;
+	}
+
+	[Token(Token = "0x6002371")]
+	[Address(RVA = "0xA41410", Offset = "0xA40410", Length = "0x177")]
+	private static bool AreStackable(InventoryEntry a, InventoryEntry b)
+	{
+		return false;
+	}
+
+	[Token(Token = "0x6002372")]
+	[Address(RVA = "0xA583B0", Offset = "0xA573B0", Length = "0x147")]
+	protected StorageView()
+	{
+	}
+}

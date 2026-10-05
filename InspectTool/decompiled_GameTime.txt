@@ -1,0 +1,94 @@
+using System;
+using Cpp2ILInjected;
+using Unity.Netcode;
+
+[Serializable]
+[Token(Token = "0x2000B1C")]
+public class GameTime : INetworkSerializable, IEquatable<GameTime>
+{
+	[Token(Token = "0x40054CB")]
+	[FieldOffset(Offset = "0x10")]
+	public int Year;
+
+	[Token(Token = "0x40054CC")]
+	[FieldOffset(Offset = "0x14")]
+	public int Month;
+
+	[Token(Token = "0x40054CD")]
+	[FieldOffset(Offset = "0x18")]
+	public int Day;
+
+	[Token(Token = "0x40054CE")]
+	[FieldOffset(Offset = "0x1C")]
+	public int Hour;
+
+	[Token(Token = "0x40054CF")]
+	[FieldOffset(Offset = "0x20")]
+	public int Minute;
+
+	[Token(Token = "0x6005B19")]
+	[Address(RVA = "0x6B2110", Offset = "0x6B1110", Length = "0x7")]
+	public GameTime()
+	{
+	}
+
+	[Token(Token = "0x6005B1A")]
+	[Address(RVA = "0xEFBE80", Offset = "0xEFAE80", Length = "0x3B")]
+	public GameTime(int year, int month, int day, int hour, int minute)
+	{
+	}
+
+	[Token(Token = "0x6005B1B")]
+	[Address(RVA = "0xEFBE30", Offset = "0xEFAE30", Length = "0x4A")]
+	public GameTime(GameTime other)
+	{
+	}
+
+	[Token(Token = "0x6005B1C")]
+	[Address(RVA = "0xEFBBE0", Offset = "0xEFABE0", Length = "0x230")]
+	public string ToFormattedString()
+	{
+		return null;
+	}
+
+	[Token(Token = "0x6005B1D")]
+	[Address(RVA = "0xEFBA80", Offset = "0xEFAA80", Length = "0x38")]
+	public static int GameTimeToSeconds(GameTime gameTime)
+	{
+		return 0;
+	}
+
+	[Token(Token = "0x6005B1E")]
+	[Address(RVA = "0xEFBB40", Offset = "0xEFAB40", Length = "0x9F")]
+	public static int GetSecondsDifference(GameTime targetTime)
+	{
+		return 0;
+	}
+
+	[Token(Token = "0x6005B1F")]
+	[Address(RVA = "0x181F4A0", Offset = "0x181E4A0", Length = "0xAC")]
+	public void NetworkSerialize<T>(BufferSerializer<T> serializer) where T : IReaderWriter
+	{
+	}
+
+	[Token(Token = "0x6005B20")]
+	[Address(RVA = "0xEFBA40", Offset = "0xEFAA40", Length = "0x32")]
+	public bool Equals(GameTime other)
+	{
+		return false;
+	}
+
+	[Token(Token = "0x6005B21")]
+	[Address(RVA = "0xEFB9A0", Offset = "0xEFA9A0", Length = "0x9D")]
+	public override bool Equals(object obj)
+	{
+		return false;
+	}
+
+	[Token(Token = "0x6005B22")]
+	[Address(RVA = "0xEFBAC0", Offset = "0xEFAAC0", Length = "0x72")]
+	public override int GetHashCode()
+	{
+		return 0;
+	}
+}

@@ -1,0 +1,33 @@
+using System;
+using System.Runtime.CompilerServices;
+using Il2CppInterop.Common.Attributes;
+using Il2CppInterop.Runtime;
+using UnityEngine;
+
+public class CharacterWorldManager : MonoBehaviour
+{
+	private static readonly IntPtr NativeMethodInfoPtr__ctor_Public_Void_0;
+
+	static CharacterWorldManager()
+	{
+		Il2CppClassPointerStore<CharacterWorldManager>.NativeClassPtr = IL2CPP.GetIl2CppClass("Assembly-CSharp.dll", "", "CharacterWorldManager");
+		IL2CPP.il2cpp_runtime_class_init(Il2CppClassPointerStore<CharacterWorldManager>.NativeClassPtr);
+		NativeMethodInfoPtr__ctor_Public_Void_0 = IL2CPP.GetIl2CppMethodByToken(Il2CppClassPointerStore<CharacterWorldManager>.NativeClassPtr, 100682670);
+	}
+
+	[CallerCount(98)]
+	[CachedScanResults(RefRangeStart = 29921, RefRangeEnd = 30019, XrefRangeStart = 29921, XrefRangeEnd = 30019, MetadataInitTokenRva = 0L, MetadataInitFlagRva = 0L)]
+	public unsafe CharacterWorldManager()
+		: this(IL2CPP.il2cpp_object_new(Il2CppClassPointerStore<CharacterWorldManager>.NativeClassPtr))
+	{
+		IntPtr* param = null;
+		Unsafe.SkipInit(out IntPtr exc);
+		IntPtr intPtr = IL2CPP.il2cpp_runtime_invoke(NativeMethodInfoPtr__ctor_Public_Void_0, IL2CPP.Il2CppObjectBaseToPtrNotNull(this), (void**)param, ref exc);
+		Il2CppException.RaiseExceptionIfNecessary(exc);
+	}
+
+	public CharacterWorldManager(IntPtr pointer)
+		: base(pointer)
+	{
+	}
+}

@@ -1,0 +1,89 @@
+using Cpp2ILInjected;
+using UnityEngine;
+using UnityEngine.Rendering.Universal;
+using UnityEngine.SceneManagement;
+
+[Token(Token = "0x200099F")]
+public class LightManager : MonoBehaviour
+{
+	[SerializeField]
+	[Token(Token = "0x400490C")]
+	[FieldOffset(Offset = "0x20")]
+	public Light2D SunLight;
+
+	[SerializeField]
+	[Token(Token = "0x400490D")]
+	[FieldOffset(Offset = "0x28")]
+	public Light2D EnvironmentLight;
+
+	[Header("Orbit Settings")]
+	[Token(Token = "0x400490E")]
+	[FieldOffset(Offset = "0x30")]
+	public float orbitRadius;
+
+	[Token(Token = "0x17000899")]
+	[field: Token(Token = "0x400490B")]
+	public static LightManager Singleton
+	{
+		[Token(Token = "0x6004F1F")]
+		[Address(RVA = "0xD5D8E0", Offset = "0xD5C8E0", Length = "0x36")]
+		get;
+		[Token(Token = "0x6004F20")]
+		[Address(RVA = "0xD5D920", Offset = "0xD5C920", Length = "0x51")]
+		private set;
+	}
+
+	[Token(Token = "0x6004F21")]
+	[Address(RVA = "0xD5D060", Offset = "0xD5C060", Length = "0x12B")]
+	private void Awake()
+	{
+	}
+
+	[Token(Token = "0x6004F22")]
+	[Address(RVA = "0xD5D480", Offset = "0xD5C480", Length = "0x7")]
+	private void Start()
+	{
+	}
+
+	[Token(Token = "0x6004F23")]
+	[Address(RVA = "0xD5D2C0", Offset = "0xD5C2C0", Length = "0x96")]
+	private void MainMenuCheck()
+	{
+	}
+
+	[Token(Token = "0x6004F24")]
+	[Address(RVA = "0xD5D3F0", Offset = "0xD5C3F0", Length = "0x8E")]
+	private void OnEnable()
+	{
+	}
+
+	[Token(Token = "0x6004F25")]
+	[Address(RVA = "0xD5D360", Offset = "0xD5C360", Length = "0x8E")]
+	private void OnDisable()
+	{
+	}
+
+	[Token(Token = "0x6004F26")]
+	[Address(RVA = "0xD5D190", Offset = "0xD5C190", Length = "0x121")]
+	private void CheckIndoors(Scene scene, LoadSceneMode mode)
+	{
+	}
+
+	[Token(Token = "0x6004F27")]
+	[Address(RVA = "0xD5D8C0", Offset = "0xD5C8C0", Length = "0x7")]
+	private void Update()
+	{
+	}
+
+	[Token(Token = "0x6004F28")]
+	[Address(RVA = "0xD5D490", Offset = "0xD5C490", Length = "0x42D")]
+	private void UpdateSunPositionAndRotation()
+	{
+	}
+
+	[Token(Token = "0x6004F29")]
+	[Address(RVA = "0xD5D8D0", Offset = "0xD5C8D0", Length = "0xE")]
+	public LightManager()
+	{
+	}
+}

@@ -1,0 +1,325 @@
+using System.Collections.Generic;
+using Cpp2ILInjected;
+using Unity.Netcode;
+using UnityEngine;
+
+[Token(Token = "0x2000956")]
+public class DifficultyManager : NetworkBehaviour
+{
+	[Token(Token = "0x2000957")]
+	public class ResolvedDials
+	{
+		[Token(Token = "0x40044F4")]
+		public static readonly ResolvedDials Identity;
+
+		[Token(Token = "0x40044F5")]
+		[FieldOffset(Offset = "0x10")]
+		public float HealthMultiplier;
+
+		[Token(Token = "0x40044F6")]
+		[FieldOffset(Offset = "0x14")]
+		public float DamageDealtMultiplier;
+
+		[Token(Token = "0x40044F7")]
+		[FieldOffset(Offset = "0x18")]
+		public float DamageTakenMultiplier;
+
+		[Token(Token = "0x40044F8")]
+		[FieldOffset(Offset = "0x1C")]
+		public float SpeedMultiplier;
+
+		[Token(Token = "0x40044F9")]
+		[FieldOffset(Offset = "0x20")]
+		public int BonusLevel;
+
+		[Token(Token = "0x40044FA")]
+		[FieldOffset(Offset = "0x24")]
+		public float CooldownRecoveryMultiplier;
+
+		[Token(Token = "0x40044FB")]
+		[FieldOffset(Offset = "0x28")]
+		public float CombatPaceMultiplier;
+
+		[Token(Token = "0x40044FC")]
+		[FieldOffset(Offset = "0x2C")]
+		public float TokensPerTurnMultiplier;
+
+		[Token(Token = "0x40044FD")]
+		[FieldOffset(Offset = "0x30")]
+		public float EmpowermentChanceMultiplier;
+
+		[Token(Token = "0x40044FE")]
+		[FieldOffset(Offset = "0x34")]
+		public float RespawnTimeMultiplier;
+
+		[Token(Token = "0x40044FF")]
+		[FieldOffset(Offset = "0x38")]
+		public float XPMultiplier;
+
+		[Token(Token = "0x4004500")]
+		[FieldOffset(Offset = "0x3C")]
+		public float GoldMultiplier;
+
+		[Token(Token = "0x4004501")]
+		[FieldOffset(Offset = "0x40")]
+		public float LootChanceMultiplier;
+
+		[Token(Token = "0x4004502")]
+		[FieldOffset(Offset = "0x48")]
+		public List<MonsterStartingEffect> ExtraStartingEffects;
+
+		[Token(Token = "0x6004D42")]
+		[Address(RVA = "0xD38770", Offset = "0xD37770", Length = "0xC1")]
+		public static ResolvedDials From(DifficultyDials dials)
+		{
+			return null;
+		}
+
+		[Token(Token = "0x6004D43")]
+		[Address(RVA = "0xD38840", Offset = "0xD37840", Length = "0x251")]
+		public ResolvedDials Layer(DifficultyDials dials)
+		{
+			return null;
+		}
+
+		[Token(Token = "0x6004D44")]
+		[Address(RVA = "0xD38B60", Offset = "0xD37B60", Length = "0x5B")]
+		public ResolvedDials()
+		{
+		}
+	}
+
+	[Tooltip("All tier dial sheets. Auto-populated by MasterManagerUpdater from Assets/Design/Difficulties.")]
+	[Token(Token = "0x40044ED")]
+	[FieldOffset(Offset = "0x88")]
+	public List<DifficultyDefinition> Definitions;
+
+	[Tooltip("All per-monster overrides. Auto-populated by MasterManagerUpdater from Assets/Design/Difficulties.")]
+	[Token(Token = "0x40044EE")]
+	[FieldOffset(Offset = "0x90")]
+	public List<MonsterDifficultyOverride> Overrides;
+
+	[Token(Token = "0x40044EF")]
+	[FieldOffset(Offset = "0x98")]
+	private readonly NetworkVariable<int> _difficultySync;
+
+	[Token(Token = "0x40044F0")]
+	[FieldOffset(Offset = "0xA0")]
+	private readonly Dictionary<MonsterType, ResolvedDials> _resolvedByType;
+
+	[Token(Token = "0x40044F1")]
+	[FieldOffset(Offset = "0xA8")]
+	private ResolvedDials _baseResolved;
+
+	[Token(Token = "0x40044F2")]
+	[FieldOffset(Offset = "0xB0")]
+	private Difficulty _cachedDifficulty;
+
+	[Token(Token = "0x40044F3")]
+	[FieldOffset(Offset = "0xB4")]
+	private bool _cacheBuilt;
+
+	[Token(Token = "0x17000867")]
+	[field: Token(Token = "0x40044EC")]
+	public static DifficultyManager Singleton
+	{
+		[Token(Token = "0x6004D24")]
+		[Address(RVA = "0xD33F00", Offset = "0xD32F00", Length = "0x36")]
+		get;
+		[Token(Token = "0x6004D25")]
+		[Address(RVA = "0xD33F40", Offset = "0xD32F40", Length = "0x51")]
+		private set;
+	}
+
+	[Token(Token = "0x17000868")]
+	public Difficulty ActiveDifficulty
+	{
+		[Token(Token = "0x6004D26")]
+		[Address(RVA = "0xD33D10", Offset = "0xD32D10", Length = "0x1ED")]
+		get
+		{
+			return default(Difficulty);
+		}
+	}
+
+	[Token(Token = "0x6004D27")]
+	[Address(RVA = "0xD325B0", Offset = "0xD315B0", Length = "0x157")]
+	private void Awake()
+	{
+	}
+
+	[Token(Token = "0x6004D28")]
+	[Address(RVA = "0xD336B0", Offset = "0xD326B0", Length = "0xD4")]
+	public override void OnNetworkSpawn()
+	{
+	}
+
+	[Token(Token = "0x6004D29")]
+	[Address(RVA = "0xD335D0", Offset = "0xD325D0", Length = "0xD8")]
+	public override void OnDestroy()
+	{
+	}
+
+	[Token(Token = "0x6004D2A")]
+	[Address(RVA = "0xD33890", Offset = "0xD32890", Length = "0x151")]
+	private void Update()
+	{
+	}
+
+	[Token(Token = "0x6004D2B")]
+	[Address(RVA = "0xD333A0", Offset = "0xD323A0", Length = "0x1F")]
+	public static float GetMonsterHealthMultiplier(Monster monster)
+	{
+		return 0f;
+	}
+
+	[Token(Token = "0x6004D2C")]
+	[Address(RVA = "0xD33340", Offset = "0xD32340", Length = "0x1D")]
+	public static int GetMonsterBonusLevel(MonsterConfiguration config)
+	{
+		return 0;
+	}
+
+	[Token(Token = "0x6004D2D")]
+	[Address(RVA = "0xD332E0", Offset = "0xD322E0", Length = "0x1E")]
+	public static List<MonsterStartingEffect> GetExtraStartingEffects(MonsterConfiguration config)
+	{
+		return null;
+	}
+
+	[Token(Token = "0x6004D2E")]
+	[Address(RVA = "0xD332C0", Offset = "0xD322C0", Length = "0x1F")]
+	public static float GetEmpowermentChanceMultiplier(MonsterConfiguration config)
+	{
+		return 0f;
+	}
+
+	[Token(Token = "0x6004D2F")]
+	[Address(RVA = "0xD33450", Offset = "0xD32450", Length = "0x1F")]
+	public static float GetRespawnTimeMultiplier(MonsterConfiguration config)
+	{
+		return 0f;
+	}
+
+	[Token(Token = "0x6004D30")]
+	[Address(RVA = "0xD335B0", Offset = "0xD325B0", Length = "0x1F")]
+	public static float GetXPMultiplier(MonsterConfiguration config)
+	{
+		return 0f;
+	}
+
+	[Token(Token = "0x6004D31")]
+	[Address(RVA = "0xD33300", Offset = "0xD32300", Length = "0x1F")]
+	public static float GetGoldMultiplier(MonsterConfiguration config)
+	{
+		return 0f;
+	}
+
+	[Token(Token = "0x6004D32")]
+	[Address(RVA = "0xD33320", Offset = "0xD32320", Length = "0x1F")]
+	public static float GetLootChanceMultiplier(MonsterConfiguration config)
+	{
+		return 0f;
+	}
+
+	[Token(Token = "0x6004D33")]
+	[Address(RVA = "0xD33360", Offset = "0xD32360", Length = "0x1F")]
+	public static float GetMonsterDamageDealtMultiplier(Monster monster)
+	{
+		return 0f;
+	}
+
+	[Token(Token = "0x6004D34")]
+	[Address(RVA = "0xD33380", Offset = "0xD32380", Length = "0x1F")]
+	public static float GetMonsterDamageTakenMultiplier(Monster monster)
+	{
+		return 0f;
+	}
+
+	[Token(Token = "0x6004D35")]
+	[Address(RVA = "0xD332A0", Offset = "0xD322A0", Length = "0x1F")]
+	public static float GetCooldownRecoveryMultiplier(Monster monster)
+	{
+		return 0f;
+	}
+
+	[Token(Token = "0x6004D36")]
+	[Address(RVA = "0xD33160", Offset = "0xD32160", Length = "0x13A")]
+	public static float GetCombatPaceMultiplier()
+	{
+		return 0f;
+	}
+
+	[Token(Token = "0x6004D37")]
+	[Address(RVA = "0xD33470", Offset = "0xD32470", Length = "0x13A")]
+	public static float GetTokensPerTurnMultiplier()
+	{
+		return 0f;
+	}
+
+	[Token(Token = "0x6004D38")]
+	[Address(RVA = "0xD333C0", Offset = "0xD323C0", Length = "0x85")]
+	public static float GetMonsterSpeedMultiplier(ObjectsCommon obj)
+	{
+		return 0f;
+	}
+
+	[Token(Token = "0x6004D39")]
+	[Address(RVA = "0xD32B50", Offset = "0xD31B50", Length = "0x108")]
+	private static ResolvedDials DialsFor(MonsterConfiguration config)
+	{
+		return null;
+	}
+
+	[Token(Token = "0x6004D3A")]
+	[Address(RVA = "0xD32A00", Offset = "0xD31A00", Length = "0x14C")]
+	private static ResolvedDials DialsForHostile(Monster monster)
+	{
+		return null;
+	}
+
+	[Token(Token = "0x6004D3B")]
+	[Address(RVA = "0xD33790", Offset = "0xD32790", Length = "0xFE")]
+	private ResolvedDials ResolveFor(MonsterConfiguration config)
+	{
+		return null;
+	}
+
+	[Token(Token = "0x6004D3C")]
+	[Address(RVA = "0xD32C60", Offset = "0xD31C60", Length = "0x4F9")]
+	private void EnsureCache()
+	{
+	}
+
+	[Token(Token = "0x6004D3D")]
+	[Address(RVA = "0xD32710", Offset = "0xD31710", Length = "0x2EE")]
+	private ResolvedDials BuildResolved(MonsterType type)
+	{
+		return null;
+	}
+
+	[Token(Token = "0x6004D3E")]
+	[Address(RVA = "0xD33B70", Offset = "0xD32B70", Length = "0x192")]
+	public DifficultyManager()
+	{
+	}
+
+	[Token(Token = "0x6004D3F")]
+	[Address(RVA = "0xD33A20", Offset = "0xD32A20", Length = "0x144")]
+	protected override void __initializeVariables()
+	{
+	}
+
+	[Token(Token = "0x6004D40")]
+	[Address(RVA = "0x6B2110", Offset = "0x6B1110", Length = "0x7")]
+	protected override void __initializeRpcs()
+	{
+	}
+
+	[Token(Token = "0x6004D41")]
+	[Address(RVA = "0xD339F0", Offset = "0xD329F0", Length = "0x2C")]
+	protected internal override string __getTypeName()
+	{
+		return null;
+	}
+}

@@ -1,0 +1,15 @@
+## Build and output folders
+bin/
+obj/
+*.user
+*.suo
+.vs/
+.idea/
+.vscode/
+
+## OS generated
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+$RECYCLE.BIN/
+.DS_Store

@@ -1,0 +1,158 @@
+using System;
+using System.Collections;
+using System.Collections.Generic;
+using System.Diagnostics;
+using System.Runtime.CompilerServices;
+using Cpp2ILInjected;
+using NavMeshPlus.Components;
+using UnityEngine;
+
+[Token(Token = "0x20009D2")]
+public class NavMeshManager : MonoBehaviour
+{
+	[CompilerGenerated]
+	[Token(Token = "0x20009D3")]
+	private sealed class <ReactivateLastDestinationAfterNavMeshSwap>d__11 : IEnumerator<object>, IEnumerator, IDisposable
+	{
+		[Token(Token = "0x4004A66")]
+		[FieldOffset(Offset = "0x10")]
+		private int <>1__state;
+
+		[Token(Token = "0x4004A67")]
+		[FieldOffset(Offset = "0x18")]
+		private object <>2__current;
+
+		[Token(Token = "0x170008C5")]
+		object IEnumerator<object>.Current
+		{
+			[DebuggerHidden]
+			[Token(Token = "0x60050A7")]
+			[Address(RVA = "0x6B1E50", Offset = "0x6B0E50", Length = "0x5")]
+			get
+			{
+				return null;
+			}
+		}
+
+		[Token(Token = "0x170008C6")]
+		object IEnumerator.Current
+		{
+			[DebuggerHidden]
+			[Token(Token = "0x60050A9")]
+			[Address(RVA = "0x6B1E50", Offset = "0x6B0E50", Length = "0x5")]
+			get
+			{
+				return null;
+			}
+		}
+
+		[DebuggerHidden]
+		[Token(Token = "0x60050A4")]
+		[Address(RVA = "0x6B1EA0", Offset = "0x6B0EA0", Length = "0x24")]
+		public <ReactivateLastDestinationAfterNavMeshSwap>d__11(int <>1__state)
+		{
+		}
+
+		[DebuggerHidden]
+		[Token(Token = "0x60050A5")]
+		[Address(RVA = "0x6AAC60", Offset = "0x6A9C60", Length = "0x3")]
+		void IDisposable.Dispose()
+		{
+		}
+
+		[Token(Token = "0x60050A6")]
+		[Address(RVA = "0xD8A6B0", Offset = "0xD896B0", Length = "0x1BB")]
+		private bool MoveNext()
+		{
+			return false;
+		}
+
+		bool IEnumerator.MoveNext()
+		{
+			//ILSpy generated this explicit interface implementation from .override directive in MoveNext
+			return this.MoveNext();
+		}
+
+		[DebuggerHidden]
+		[Token(Token = "0x60050A8")]
+		[Address(RVA = "0xD8A870", Offset = "0xD89870", Length = "0x3E")]
+		void IEnumerator.Reset()
+		{
+		}
+	}
+
+	[Token(Token = "0x4004A63")]
+	public static NavMeshManager Singleton;
+
+	[Token(Token = "0x4004A64")]
+	[FieldOffset(Offset = "0x20")]
+	public Dictionary<Areas.Scene, List<NavMeshSurface>> _sceneNavMeshes;
+
+	[Token(Token = "0x4004A65")]
+	[FieldOffset(Offset = "0x28")]
+	public Dictionary<Areas.Scene, List<NavMeshSurface>> _sceneNavMeshLinks;
+
+	[Token(Token = "0x600509A")]
+	[Address(RVA = "0xD84E40", Offset = "0xD83E40", Length = "0x51")]
+	private void Awake()
+	{
+	}
+
+	[Token(Token = "0x600509B")]
+	[Address(RVA = "0xD84F50", Offset = "0xD83F50", Length = "0xA7")]
+	public NavMeshSurface GetNavMeshSurface(Areas.Scene scene)
+	{
+		return null;
+	}
+
+	[Token(Token = "0x600509C")]
+	[Address(RVA = "0xD84CD0", Offset = "0xD83CD0", Length = "0x164")]
+	public void AddNavMeshSurfaceToManager(Areas.Scene scene, NavMeshSurface navMesh)
+	{
+	}
+
+	[Token(Token = "0x600509D")]
+	[Address(RVA = "0xD84B60", Offset = "0xD83B60", Length = "0x164")]
+	public void AddNavMeshSurfaceLinkToManager(Areas.Scene scene, NavMeshSurface navMesh)
+	{
+	}
+
+	[Token(Token = "0x600509E")]
+	[Address(RVA = "0xD85050", Offset = "0xD84050", Length = "0x59C")]
+	public void SwapToNavMeshLinks(Areas.Scene scene)
+	{
+	}
+
+	[Token(Token = "0x600509F")]
+	[Address(RVA = "0xD85EC0", Offset = "0xD84EC0", Length = "0xD9")]
+	public void SwapToNavMeshes(Areas.Scene scene)
+	{
+	}
+
+	[Token(Token = "0x60050A0")]
+	[Address(RVA = "0xD855F0", Offset = "0xD845F0", Length = "0x8C3")]
+	public void SwapToNavMeshes(List<Areas.Scene> scenes)
+	{
+	}
+
+	[Token(Token = "0x60050A1")]
+	[Address(RVA = "0xD84EA0", Offset = "0xD83EA0", Length = "0xAC")]
+	public Areas.Scene GetNavMeshSceneForScene(Areas.Scene scene)
+	{
+		return default(Areas.Scene);
+	}
+
+	[IteratorStateMachine(typeof(<ReactivateLastDestinationAfterNavMeshSwap>d__11))]
+	[Token(Token = "0x60050A2")]
+	[Address(RVA = "0xD85000", Offset = "0xD84000", Length = "0x4B")]
+	public IEnumerator ReactivateLastDestinationAfterNavMeshSwap()
+	{
+		return null;
+	}
+
+	[Token(Token = "0x60050A3")]
+	[Address(RVA = "0xD85FA0", Offset = "0xD84FA0", Length = "0xA5")]
+	public NavMeshManager()
+	{
+	}
+}

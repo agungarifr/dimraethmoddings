@@ -1,0 +1,2931 @@
+using System;
+using System.Runtime.CompilerServices;
+using System.Runtime.InteropServices;
+using Il2CppInterop.Common.Attributes;
+using Il2CppInterop.Runtime;
+using Il2CppInterop.Runtime.Runtime;
+using Il2CppSystem;
+using Il2CppSystem.Collections;
+using Il2CppSystem.Collections.Generic;
+using TMPro;
+using UnityEngine;
+using UnityEngine.Events;
+using UnityEngine.UI;
+
+public class FinalSelection : MonoBehaviour
+{
+	[System.Serializable]
+	[ObfuscatedName("FinalSelection+<>c")]
+	public sealed class __c : Il2CppSystem.Object
+	{
+		private static readonly System.IntPtr NativeFieldInfoPtr___9;
+
+		private static readonly System.IntPtr NativeFieldInfoPtr___9__80_0;
+
+		private static readonly System.IntPtr NativeFieldInfoPtr___9__80_1;
+
+		private static readonly System.IntPtr NativeMethodInfoPtr__ctor_Public_Void_0;
+
+		private static readonly System.IntPtr NativeMethodInfoPtr__Awake_b__80_0_Internal_Void_0;
+
+		private static readonly System.IntPtr NativeMethodInfoPtr__Awake_b__80_1_Internal_Void_0;
+
+		public unsafe static __c __9
+		{
+			get
+			{
+				Unsafe.SkipInit(out System.IntPtr intPtr);
+				IL2CPP.il2cpp_field_static_get_value(NativeFieldInfoPtr___9, &intPtr);
+				System.IntPtr intPtr2 = intPtr;
+				return (intPtr2 != (System.IntPtr)0) ? Il2CppObjectPool.Get<__c>(intPtr2) : null;
+			}
+			set
+			{
+				IL2CPP.il2cpp_field_static_set_value(NativeFieldInfoPtr___9, (void*)IL2CPP.Il2CppObjectBaseToPtr(obj));
+			}
+		}
+
+		public unsafe static UnityAction __9__80_0
+		{
+			get
+			{
+				Unsafe.SkipInit(out System.IntPtr intPtr);
+				IL2CPP.il2cpp_field_static_get_value(NativeFieldInfoPtr___9__80_0, &intPtr);
+				System.IntPtr intPtr2 = intPtr;
+				return (intPtr2 != (System.IntPtr)0) ? Il2CppObjectPool.Get<UnityAction>(intPtr2) : null;
+			}
+			set
+			{
+				IL2CPP.il2cpp_field_static_set_value(NativeFieldInfoPtr___9__80_0, (void*)IL2CPP.Il2CppObjectBaseToPtr(obj));
+			}
+		}
+
+		public unsafe static UnityAction __9__80_1
+		{
+			get
+			{
+				Unsafe.SkipInit(out System.IntPtr intPtr);
+				IL2CPP.il2cpp_field_static_get_value(NativeFieldInfoPtr___9__80_1, &intPtr);
+				System.IntPtr intPtr2 = intPtr;
+				return (intPtr2 != (System.IntPtr)0) ? Il2CppObjectPool.Get<UnityAction>(intPtr2) : null;
+			}
+			set
+			{
+				IL2CPP.il2cpp_field_static_set_value(NativeFieldInfoPtr___9__80_1, (void*)IL2CPP.Il2CppObjectBaseToPtr(obj));
+			}
+		}
+
+		static __c()
+		{
+			Il2CppClassPointerStore<__c>.NativeClassPtr = IL2CPP.GetIl2CppNestedType(Il2CppClassPointerStore<FinalSelection>.NativeClassPtr, "<>c");
+			IL2CPP.il2cpp_runtime_class_init(Il2CppClassPointerStore<__c>.NativeClassPtr);
+			NativeFieldInfoPtr___9 = IL2CPP.GetIl2CppField(Il2CppClassPointerStore<__c>.NativeClassPtr, "<>9");
+			NativeFieldInfoPtr___9__80_0 = IL2CPP.GetIl2CppField(Il2CppClassPointerStore<__c>.NativeClassPtr, "<>9__80_0");
+			NativeFieldInfoPtr___9__80_1 = IL2CPP.GetIl2CppField(Il2CppClassPointerStore<__c>.NativeClassPtr, "<>9__80_1");
+			NativeMethodInfoPtr__ctor_Public_Void_0 = IL2CPP.GetIl2CppMethodByToken(Il2CppClassPointerStore<__c>.NativeClassPtr, 100687112);
+			NativeMethodInfoPtr__Awake_b__80_0_Internal_Void_0 = IL2CPP.GetIl2CppMethodByToken(Il2CppClassPointerStore<__c>.NativeClassPtr, 100687113);
+			NativeMethodInfoPtr__Awake_b__80_1_Internal_Void_0 = IL2CPP.GetIl2CppMethodByToken(Il2CppClassPointerStore<__c>.NativeClassPtr, 100687114);
+		}
+
+		[CallerCount(3573)]
+		[CachedScanResults(RefRangeStart = 24693, RefRangeEnd = 28266, XrefRangeStart = 24693, XrefRangeEnd = 28266, MetadataInitTokenRva = 0L, MetadataInitFlagRva = 0L)]
+		public unsafe __c()
+			: this(IL2CPP.il2cpp_object_new(Il2CppClassPointerStore<__c>.NativeClassPtr))
+		{
+			System.IntPtr* param = null;
+			Unsafe.SkipInit(out System.IntPtr exc);
+			System.IntPtr intPtr = IL2CPP.il2cpp_runtime_invoke(NativeMethodInfoPtr__ctor_Public_Void_0, IL2CPP.Il2CppObjectBaseToPtrNotNull(this), (void**)param, ref exc);
+			Il2CppInterop.Runtime.Il2CppException.RaiseExceptionIfNecessary(exc);
+		}
+
+		[CallerCount(0)]
+		[CachedScanResults(RefRangeStart = 0, RefRangeEnd = 0, XrefRangeStart = 379649, XrefRangeEnd = 379653, MetadataInitTokenRva = 0L, MetadataInitFlagRva = 0L)]
+		public unsafe void _Awake_b__80_0()
+		{
+			IL2CPP.Il2CppObjectBaseToPtrNotNull(this);
+			System.IntPtr* param = null;
+			Unsafe.SkipInit(out System.IntPtr exc);
+			System.IntPtr intPtr = IL2CPP.il2cpp_runtime_invoke(NativeMethodInfoPtr__Awake_b__80_0_Internal_Void_0, IL2CPP.Il2CppObjectBaseToPtrNotNull(this), (void**)param, ref exc);
+			Il2CppInterop.Runtime.Il2CppException.RaiseExceptionIfNecessary(exc);
+		}
+
+		[CallerCount(0)]
+		[CachedScanResults(RefRangeStart = 0, RefRangeEnd = 0, XrefRangeStart = 379653, XrefRangeEnd = 379657, MetadataInitTokenRva = 0L, MetadataInitFlagRva = 0L)]
+		public unsafe void _Awake_b__80_1()
+		{
+			IL2CPP.Il2CppObjectBaseToPtrNotNull(this);
+			System.IntPtr* param = null;
+			Unsafe.SkipInit(out System.IntPtr exc);
+			System.IntPtr intPtr = IL2CPP.il2cpp_runtime_invoke(NativeMethodInfoPtr__Awake_b__80_1_Internal_Void_0, IL2CPP.Il2CppObjectBaseToPtrNotNull(this), (void**)param, ref exc);
+			Il2CppInterop.Runtime.Il2CppException.RaiseExceptionIfNecessary(exc);
+		}
+
+		public __c(System.IntPtr pointer)
+			: base(pointer)
+		{
+		}
+	}
+
+	[ObfuscatedName("FinalSelection+<>c__DisplayClass111_0")]
+	public sealed class __c__DisplayClass111_0 : Il2CppSystem.Object
+	{
+		private static readonly System.IntPtr NativeFieldInfoPtr_name;
+
+		private static readonly System.IntPtr NativeMethodInfoPtr__ctor_Public_Void_0;
+
+		private static readonly System.IntPtr NativeMethodInfoPtr__ValidateSimpleWorldName_b__0_Internal_Boolean_WorldSaveFile_0;
+
+		public unsafe string name
+		{
+			get
+			{
+				nint num = (nint)IL2CPP.Il2CppObjectBaseToPtrNotNull(this) + (int)IL2CPP.il2cpp_field_get_offset(NativeFieldInfoPtr_name);
+				return IL2CPP.Il2CppStringToManaged(*(System.IntPtr*)num);
+			}
+			set
+			{
+				System.IntPtr num = IL2CPP.Il2CppObjectBaseToPtrNotNull(this);
+				IL2CPP.il2cpp_gc_wbarrier_set_field(num, (nint)num + (int)IL2CPP.il2cpp_field_get_offset(NativeFieldInfoPtr_name), IL2CPP.ManagedStringToIl2Cpp(str));
+			}
+		}
+
+		static __c__DisplayClass111_0()
+		{
+			Il2CppClassPointerStore<__c__DisplayClass111_0>.NativeClassPtr = IL2CPP.GetIl2CppNestedType(Il2CppClassPointerStore<FinalSelection>.NativeClassPtr, "<>c__DisplayClass111_0");
+			IL2CPP.il2cpp_runtime_class_init(Il2CppClassPointerStore<__c__DisplayClass111_0>.NativeClassPtr);
+			NativeFieldInfoPtr_name = IL2CPP.GetIl2CppField(Il2CppClassPointerStore<__c__DisplayClass111_0>.NativeClassPtr, "name");
+			NativeMethodInfoPtr__ctor_Public_Void_0 = IL2CPP.GetIl2CppMethodByToken(Il2CppClassPointerStore<__c__DisplayClass111_0>.NativeClassPtr, 100687115);
+			NativeMethodInfoPtr__ValidateSimpleWorldName_b__0_Internal_Boolean_WorldSaveFile_0 = IL2CPP.GetIl2CppMethodByToken(Il2CppClassPointerStore<__c__DisplayClass111_0>.NativeClassPtr, 100687116);
+		}
+
+		[CallerCount(3573)]
+		[CachedScanResults(RefRangeStart = 24693, RefRangeEnd = 28266, XrefRangeStart = 24693, XrefRangeEnd = 28266, MetadataInitTokenRva = 0L, MetadataInitFlagRva = 0L)]
+		public unsafe __c__DisplayClass111_0()
+			: this(IL2CPP.il2cpp_object_new(Il2CppClassPointerStore<__c__DisplayClass111_0>.NativeClassPtr))
+		{
+			System.IntPtr* param = null;
+			Unsafe.SkipInit(out System.IntPtr exc);
+			System.IntPtr intPtr = IL2CPP.il2cpp_runtime_invoke(NativeMethodInfoPtr__ctor_Public_Void_0, IL2CPP.Il2CppObjectBaseToPtrNotNull(this), (void**)param, ref exc);
+			Il2CppInterop.Runtime.Il2CppException.RaiseExceptionIfNecessary(exc);
+		}
+
+		[CallerCount(0)]
+		[CachedScanResults(RefRangeStart = 0, RefRangeEnd = 0, XrefRangeStart = 379657, XrefRangeEnd = 379662, MetadataInitTokenRva = 0L, MetadataInitFlagRva = 0L)]
+		public unsafe bool _ValidateSimpleWorldName_b__0(WorldSaveFile f)
+		{
+			IL2CPP.Il2CppObjectBaseToPtrNotNull(this);
+			System.IntPtr* ptr = stackalloc System.IntPtr[1];
+			*ptr = IL2CPP.Il2CppObjectBaseToPtr(f);
+			Unsafe.SkipInit(out System.IntPtr exc);
+			System.IntPtr obj = IL2CPP.il2cpp_runtime_invoke(NativeMethodInfoPtr__ValidateSimpleWorldName_b__0_Internal_Boolean_WorldSaveFile_0, IL2CPP.Il2CppObjectBaseToPtrNotNull(this), (void**)ptr, ref exc);
+			Il2CppInterop.Runtime.Il2CppException.RaiseExceptionIfNecessary(exc);
+			return *(bool*)IL2CPP.il2cpp_object_unbox(obj);
+		}
+
+		public __c__DisplayClass111_0(System.IntPtr pointer)
+			: base(pointer)
+		{
+		}
+	}
+
+	[ObfuscatedName("FinalSelection+<FadeOutNotReadyPopup>d__135")]
+	public sealed class _FadeOutNotReadyPopup_d__135 : Il2CppSystem.Object
+	{
+		private static readonly System.IntPtr NativeFieldInfoPtr___1__state;
+
+		private static readonly System.IntPtr NativeFieldInfoPtr___2__current;
+
+		private static readonly System.IntPtr NativeFieldInfoPtr___4__this;
+
+		private static readonly System.IntPtr NativeFieldInfoPtr_delayBeforeFade;
+
+		private static readonly System.IntPtr NativeFieldInfoPtr__elapsed_5__2;
+
+		private static readonly System.IntPtr NativeMethodInfoPtr__ctor_Public_Void_Int32_0;
+
+		private static readonly System.IntPtr NativeMethodInfoPtr_System_IDisposable_Dispose_Private_Virtual_Final_New_Void_0;
+
+		private static readonly System.IntPtr NativeMethodInfoPtr_MoveNext_Private_Virtual_Final_New_Boolean_0;
+
+		private static readonly System.IntPtr NativeMethodInfoPtr_System_Collections_Generic_IEnumerator_System_Object__get_Current_Private_Virtual_Final_New_get_Object_0;
+
+		private static readonly System.IntPtr NativeMethodInfoPtr_System_Collections_IEnumerator_Reset_Private_Virtual_Final_New_Void_0;
+
+		private static readonly System.IntPtr NativeMethodInfoPtr_System_Collections_IEnumerator_get_Current_Private_Virtual_Final_New_get_Object_0;
+
+		public unsafe int __1__state
+		{
+			get
+			{
+				nint num = (nint)IL2CPP.Il2CppObjectBaseToPtrNotNull(this) + (int)IL2CPP.il2cpp_field_get_offset(NativeFieldInfoPtr___1__state);
+				return *(int*)num;
+			}
+			set
+			{
+				*(int*)((nint)IL2CPP.Il2CppObjectBaseToPtrNotNull(this) + (int)IL2CPP.il2cpp_field_get_offset(NativeFieldInfoPtr___1__state)) = num;
+			}
+		}
+
+		public unsafe Il2CppSystem.Object __2__current
+		{
+			get
+			{
+				nint num = (nint)IL2CPP.Il2CppObjectBaseToPtrNotNull(this) + (int)IL2CPP.il2cpp_field_get_offset(NativeFieldInfoPtr___2__current);
+				System.IntPtr intPtr = *(System.IntPtr*)num;
+				return (intPtr != (System.IntPtr)0) ? Il2CppObjectPool.Get<Il2CppSystem.Object>(intPtr) : null;
+			}
+			set
+			{
+				System.IntPtr num = IL2CPP.Il2CppObjectBaseToPtrNotNull(this);
+				IL2CPP.il2cpp_gc_wbarrier_set_field(num, (nint)num + (int)IL2CPP.il2cpp_field_get_offset(NativeFieldInfoPtr___2__current), IL2CPP.Il2CppObjectBaseToPtr(obj));
+			}
+		}
+
+		public unsafe FinalSelection __4__this
+		{
+			get
+			{
+				nint num = (nint)IL2CPP.Il2CppObjectBaseToPtrNotNull(this) + (int)IL2CPP.il2cpp_field_get_offset(NativeFieldInfoPtr___4__this);
+				System.IntPtr intPtr = *(System.IntPtr*)num;
+				return (intPtr != (System.IntPtr)0) ? Il2CppObjectPool.Get<FinalSelection>(intPtr) : null;
+			}
+			set
+			{
+				System.IntPtr num = IL2CPP.Il2CppObjectBaseToPtrNotNull(this);
+				IL2CPP.il2cpp_gc_wbarrier_set_field(num, (nint)num + (int)IL2CPP.il2cpp_field_get_offset(NativeFieldInfoPtr___4__this), IL2CPP.Il2CppObjectBaseToPtr(obj));
+			}
+		}
+
+		public unsafe float delayBeforeFade
+		{
+			get
+			{
+				nint num = (nint)IL2CPP.Il2CppObjectBaseToPtrNotNull(this) + (int)IL2CPP.il2cpp_field_get_offset(NativeFieldInfoPtr_delayBeforeFade);
+				return *(float*)num;
+			}
+			set
+			{
+				*(float*)((nint)IL2CPP.Il2CppObjectBaseToPtrNotNull(this) + (int)IL2CPP.il2cpp_field_get_offset(NativeFieldInfoPtr_delayBeforeFade)) = num;
+			}
+		}
+
+		public unsafe float _elapsed_5__2
+		{
+			get
+			{
+				nint num = (nint)IL2CPP.Il2CppObjectBaseToPtrNotNull(this) + (int)IL2CPP.il2cpp_field_get_offset(NativeFieldInfoPtr__elapsed_5__2);
+				return *(float*)num;
+			}
+			set
+			{
+				*(float*)((nint)IL2CPP.Il2CppObjectBaseToPtrNotNull(this) + (int)IL2CPP.il2cpp_field_get_offset(NativeFieldInfoPtr__elapsed_5__2)) = num;
+			}
+		}
+
+		public unsafe virtual Il2CppSystem.Object System.Collections.Generic.IEnumerator<System.Object>.Current
+		{
+			[CallerCount(16)]
+			[CachedScanResults(RefRangeStart = 129, RefRangeEnd = 145, XrefRangeStart = 129, XrefRangeEnd = 145, MetadataInitTokenRva = 0L, MetadataInitFlagRva = 0L)]
+			get
+			{
+				IL2CPP.Il2CppObjectBaseToPtrNotNull(this);
+				System.IntPtr* param = null;
+				Unsafe.SkipInit(out System.IntPtr exc);
+				System.IntPtr intPtr = IL2CPP.il2cpp_runtime_invoke(NativeMethodInfoPtr_System_Collections_Generic_IEnumerator_System_Object__get_Current_Private_Virtual_Final_New_get_Object_0, IL2CPP.Il2CppObjectBaseToPtrNotNull(this), (void**)param, ref exc);
+				Il2CppInterop.Runtime.Il2CppException.RaiseExceptionIfNecessary(exc);
+				return (intPtr != (System.IntPtr)0) ? Il2CppObjectPool.Get<Il2CppSystem.Object>(intPtr) : null;
+			}
+		}
+
+		public unsafe virtual Il2CppSystem.Object System.Collections.IEnumerator.Current
+		{
+			[CallerCount(16)]
+			[CachedScanResults(RefRangeStart = 129, RefRangeEnd = 145, XrefRangeStart = 129, XrefRangeEnd = 145, MetadataInitTokenRva = 0L, MetadataInitFlagRva = 0L)]
+			get
+			{
+				IL2CPP.Il2CppObjectBaseToPtrNotNull(this);
+				System.IntPtr* param = null;
+				Unsafe.SkipInit(out System.IntPtr exc);
+				System.IntPtr intPtr = IL2CPP.il2cpp_runtime_invoke(NativeMethodInfoPtr_System_Collections_IEnumerator_get_Current_Private_Virtual_Final_New_get_Object_0, IL2CPP.Il2CppObjectBaseToPtrNotNull(this), (void**)param, ref exc);
+				Il2CppInterop.Runtime.Il2CppException.RaiseExceptionIfNecessary(exc);
+				return (intPtr != (System.IntPtr)0) ? Il2CppObjectPool.Get<Il2CppSystem.Object>(intPtr) : null;
+			}
+		}
+
+		static _FadeOutNotReadyPopup_d__135()
+		{
+			Il2CppClassPointerStore<_FadeOutNotReadyPopup_d__135>.NativeClassPtr = IL2CPP.GetIl2CppNestedType(Il2CppClassPointerStore<FinalSelection>.NativeClassPtr, "<FadeOutNotReadyPopup>d__135");
+			IL2CPP.il2cpp_runtime_class_init(Il2CppClassPointerStore<_FadeOutNotReadyPopup_d__135>.NativeClassPtr);
+			NativeFieldInfoPtr___1__state = IL2CPP.GetIl2CppField(Il2CppClassPointerStore<_FadeOutNotReadyPopup_d__135>.NativeClassPtr, "<>1__state");
+			NativeFieldInfoPtr___2__current = IL2CPP.GetIl2CppField(Il2CppClassPointerStore<_FadeOutNotReadyPopup_d__135>.NativeClassPtr, "<>2__current");
+			NativeFieldInfoPtr___4__this = IL2CPP.GetIl2CppField(Il2CppClassPointerStore<_FadeOutNotReadyPopup_d__135>.NativeClassPtr, "<>4__this");
+			NativeFieldInfoPtr_delayBeforeFade = IL2CPP.GetIl2CppField(Il2CppClassPointerStore<_FadeOutNotReadyPopup_d__135>.NativeClassPtr, "delayBeforeFade");
+			NativeFieldInfoPtr__elapsed_5__2 = IL2CPP.GetIl2CppField(Il2CppClassPointerStore<_FadeOutNotReadyPopup_d__135>.NativeClassPtr, "<elapsed>5__2");
+			NativeMethodInfoPtr__ctor_Public_Void_Int32_0 = IL2CPP.GetIl2CppMethodByToken(Il2CppClassPointerStore<_FadeOutNotReadyPopup_d__135>.NativeClassPtr, 100687117);
+			NativeMethodInfoPtr_System_IDisposable_Dispose_Private_Virtual_Final_New_Void_0 = IL2CPP.GetIl2CppMethodByToken(Il2CppClassPointerStore<_FadeOutNotReadyPopup_d__135>.NativeClassPtr, 100687118);
+			NativeMethodInfoPtr_MoveNext_Private_Virtual_Final_New_Boolean_0 = IL2CPP.GetIl2CppMethodByToken(Il2CppClassPointerStore<_FadeOutNotReadyPopup_d__135>.NativeClassPtr, 100687119);
+			NativeMethodInfoPtr_System_Collections_Generic_IEnumerator_System_Object__get_Current_Private_Virtual_Final_New_get_Object_0 = IL2CPP.GetIl2CppMethodByToken(Il2CppClassPointerStore<_FadeOutNotReadyPopup_d__135>.NativeClassPtr, 100687120);
+			NativeMethodInfoPtr_System_Collections_IEnumerator_Reset_Private_Virtual_Final_New_Void_0 = IL2CPP.GetIl2CppMethodByToken(Il2CppClassPointerStore<_FadeOutNotReadyPopup_d__135>.NativeClassPtr, 100687121);
+			NativeMethodInfoPtr_System_Collections_IEnumerator_get_Current_Private_Virtual_Final_New_get_Object_0 = IL2CPP.GetIl2CppMethodByToken(Il2CppClassPointerStore<_FadeOutNotReadyPopup_d__135>.NativeClassPtr, 100687122);
+		}
+
+		[CallerCount(395)]
+		[CachedScanResults(RefRangeStart = 2277, RefRangeEnd = 2672, XrefRangeStart = 2277, XrefRangeEnd = 2672, MetadataInitTokenRva = 0L, MetadataInitFlagRva = 0L)]
+		public unsafe _FadeOutNotReadyPopup_d__135(int <>1__state)
+			: this(IL2CPP.il2cpp_object_new(Il2CppClassPointerStore<_FadeOutNotReadyPopup_d__135>.NativeClassPtr))
+		{
+			System.IntPtr* ptr = stackalloc System.IntPtr[1];
+			*ptr = (nint)(&<>1__state);
+			Unsafe.SkipInit(out System.IntPtr exc);
+			System.IntPtr intPtr = IL2CPP.il2cpp_runtime_invoke(NativeMethodInfoPtr__ctor_Public_Void_Int32_0, IL2CPP.Il2CppObjectBaseToPtrNotNull(this), (void**)ptr, ref exc);
+			Il2CppInterop.Runtime.Il2CppException.RaiseExceptionIfNecessary(exc);
+		}
+
+		[CallerCount(21436)]
+		[CachedScanResults(RefRangeStart = 2672, RefRangeEnd = 24108, XrefRangeStart = 2672, XrefRangeEnd = 24108, MetadataInitTokenRva = 0L, MetadataInitFlagRva = 0L)]
+		public unsafe virtual void System_IDisposable_Dispose()
+		{
+			IL2CPP.Il2CppObjectBaseToPtrNotNull(this);
+			System.IntPtr* param = null;
+			Unsafe.SkipInit(out System.IntPtr exc);
+			System.IntPtr intPtr = IL2CPP.il2cpp_runtime_invoke(NativeMethodInfoPtr_System_IDisposable_Dispose_Private_Virtual_Final_New_Void_0, IL2CPP.Il2CppObjectBaseToPtrNotNull(this), (void**)param, ref exc);
+			Il2CppInterop.Runtime.Il2CppException.RaiseExceptionIfNecessary(exc);
+		}
+
+		[CallerCount(0)]
+		[CachedScanResults(RefRangeStart = 0, RefRangeEnd = 0, XrefRangeStart = 379662, XrefRangeEnd = 379663, MetadataInitTokenRva = 0L, MetadataInitFlagRva = 0L)]
+		public unsafe virtual bool MoveNext()
+		{
+			IL2CPP.Il2CppObjectBaseToPtrNotNull(this);
+			System.IntPtr* param = null;
+			Unsafe.SkipInit(out System.IntPtr exc);
+			System.IntPtr obj = IL2CPP.il2cpp_runtime_invoke(NativeMethodInfoPtr_MoveNext_Private_Virtual_Final_New_Boolean_0, IL2CPP.Il2CppObjectBaseToPtrNotNull(this), (void**)param, ref exc);
+			Il2CppInterop.Runtime.Il2CppException.RaiseExceptionIfNecessary(exc);
+			return *(bool*)IL2CPP.il2cpp_object_unbox(obj);
+		}
+
+		[CallerCount(0)]
+		[CachedScanResults(RefRangeStart = 0, RefRangeEnd = 0, XrefRangeStart = 379663, XrefRangeEnd = 379668, MetadataInitTokenRva = 0L, MetadataInitFlagRva = 0L)]
+		public unsafe virtual void System_Collections_IEnumerator_Reset()
+		{
+			IL2CPP.Il2CppObjectBaseToPtrNotNull(this);
+			System.IntPtr* param = null;
+			Unsafe.SkipInit(out System.IntPtr exc);
+			System.IntPtr intPtr = IL2CPP.il2cpp_runtime_invoke(NativeMethodInfoPtr_System_Collections_IEnumerator_Reset_Private_Virtual_Final_New_Void_0, IL2CPP.Il2CppObjectBaseToPtrNotNull(this), (void**)param, ref exc);
+			Il2CppInterop.Runtime.Il2CppException.RaiseExceptionIfNecessary(exc);
+		}
+
+		public _FadeOutNotReadyPopup_d__135(System.IntPtr pointer)
+			: base(pointer)
+		{
+		}
+	}
+
+	[ObfuscatedName("FinalSelection+<SetInitialControllerSelection>d__103")]
+	public sealed class _SetInitialControllerSelection_d__103 : Il2CppSystem.Object
+	{
+		private static readonly System.IntPtr NativeFieldInfoPtr___1__state;
+
+		private static readonly System.IntPtr NativeFieldInfoPtr___2__current;
+
+		private static readonly System.IntPtr NativeFieldInfoPtr___4__this;
+
+		private static readonly System.IntPtr NativeMethodInfoPtr__ctor_Public_Void_Int32_0;
+
+		private static readonly System.IntPtr NativeMethodInfoPtr_System_IDisposable_Dispose_Private_Virtual_Final_New_Void_0;
+
+		private static readonly System.IntPtr NativeMethodInfoPtr_MoveNext_Private_Virtual_Final_New_Boolean_0;
+
+		private static readonly System.IntPtr NativeMethodInfoPtr_System_Collections_Generic_IEnumerator_System_Object__get_Current_Private_Virtual_Final_New_get_Object_0;
+
+		private static readonly System.IntPtr NativeMethodInfoPtr_System_Collections_IEnumerator_Reset_Private_Virtual_Final_New_Void_0;
+
+		private static readonly System.IntPtr NativeMethodInfoPtr_System_Collections_IEnumerator_get_Current_Private_Virtual_Final_New_get_Object_0;
+
+		public unsafe int __1__state
+		{
+			get
+			{
+				nint num = (nint)IL2CPP.Il2CppObjectBaseToPtrNotNull(this) + (int)IL2CPP.il2cpp_field_get_offset(NativeFieldInfoPtr___1__state);
+				return *(int*)num;
+			}
+			set
+			{
+				*(int*)((nint)IL2CPP.Il2CppObjectBaseToPtrNotNull(this) + (int)IL2CPP.il2cpp_field_get_offset(NativeFieldInfoPtr___1__state)) = num;
+			}
+		}
+
+		public unsafe Il2CppSystem.Object __2__current
+		{
+			get
+			{
+				nint num = (nint)IL2CPP.Il2CppObjectBaseToPtrNotNull(this) + (int)IL2CPP.il2cpp_field_get_offset(NativeFieldInfoPtr___2__current);
+				System.IntPtr intPtr = *(System.IntPtr*)num;
+				return (intPtr != (System.IntPtr)0) ? Il2CppObjectPool.Get<Il2CppSystem.Object>(intPtr) : null;
+			}
+			set
+			{
+				System.IntPtr num = IL2CPP.Il2CppObjectBaseToPtrNotNull(this);
+				IL2CPP.il2cpp_gc_wbarrier_set_field(num, (nint)num + (int)IL2CPP.il2cpp_field_get_offset(NativeFieldInfoPtr___2__current), IL2CPP.Il2CppObjectBaseToPtr(obj));
+			}
+		}
+
+		public unsafe FinalSelection __4__this
+		{
+			get
+			{
+				nint num = (nint)IL2CPP.Il2CppObjectBaseToPtrNotNull(this) + (int)IL2CPP.il2cpp_field_get_offset(NativeFieldInfoPtr___4__this);
+				System.IntPtr intPtr = *(System.IntPtr*)num;
+				return (intPtr != (System.IntPtr)0) ? Il2CppObjectPool.Get<FinalSelection>(intPtr) : null;
+			}
+			set
+			{
+				System.IntPtr num = IL2CPP.Il2CppObjectBaseToPtrNotNull(this);
+				IL2CPP.il2cpp_gc_wbarrier_set_field(num, (nint)num + (int)IL2CPP.il2cpp_field_get_offset(NativeFieldInfoPtr___4__this), IL2CPP.Il2CppObjectBaseToPtr(obj));
+			}
+		}
+
+		public unsafe virtual Il2CppSystem.Object System.Collections.Generic.IEnumerator<System.Object>.Current
+		{
+			[CallerCount(16)]
+			[CachedScanResults(RefRangeStart = 129, RefRangeEnd = 145, XrefRangeStart = 129, XrefRangeEnd = 145, MetadataInitTokenRva = 0L, MetadataInitFlagRva = 0L)]
+			get
+			{
+				IL2CPP.Il2CppObjectBaseToPtrNotNull(this);
+				System.IntPtr* param = null;
+				Unsafe.SkipInit(out System.IntPtr exc);
+				System.IntPtr intPtr = IL2CPP.il2cpp_runtime_invoke(NativeMethodInfoPtr_System_Collections_Generic_IEnumerator_System_Object__get_Current_Private_Virtual_Final_New_get_Object_0, IL2CPP.Il2CppObjectBaseToPtrNotNull(this), (void**)param, ref exc);
+				Il2CppInterop.Runtime.Il2CppException.RaiseExceptionIfNecessary(exc);
+				return (intPtr != (System.IntPtr)0) ? Il2CppObjectPool.Get<Il2CppSystem.Object>(intPtr) : null;
+			}
+		}
+
+		public unsafe virtual Il2CppSystem.Object System.Collections.IEnumerator.Current
+		{
+			[CallerCount(16)]
+			[CachedScanResults(RefRangeStart = 129, RefRangeEnd = 145, XrefRangeStart = 129, XrefRangeEnd = 145, MetadataInitTokenRva = 0L, MetadataInitFlagRva = 0L)]
+			get
+			{
+				IL2CPP.Il2CppObjectBaseToPtrNotNull(this);
+				System.IntPtr* param = null;
+				Unsafe.SkipInit(out System.IntPtr exc);
+				System.IntPtr intPtr = IL2CPP.il2cpp_runtime_invoke(NativeMethodInfoPtr_System_Collections_IEnumerator_get_Current_Private_Virtual_Final_New_get_Object_0, IL2CPP.Il2CppObjectBaseToPtrNotNull(this), (void**)param, ref exc);
+				Il2CppInterop.Runtime.Il2CppException.RaiseExceptionIfNecessary(exc);
+				return (intPtr != (System.IntPtr)0) ? Il2CppObjectPool.Get<Il2CppSystem.Object>(intPtr) : null;
+			}
+		}
+
+		static _SetInitialControllerSelection_d__103()
+		{
+			Il2CppClassPointerStore<_SetInitialControllerSelection_d__103>.NativeClassPtr = IL2CPP.GetIl2CppNestedType(Il2CppClassPointerStore<FinalSelection>.NativeClassPtr, "<SetInitialControllerSelection>d__103");
+			IL2CPP.il2cpp_runtime_class_init(Il2CppClassPointerStore<_SetInitialControllerSelection_d__103>.NativeClassPtr);
+			NativeFieldInfoPtr___1__state = IL2CPP.GetIl2CppField(Il2CppClassPointerStore<_SetInitialControllerSelection_d__103>.NativeClassPtr, "<>1__state");
+			NativeFieldInfoPtr___2__current = IL2CPP.GetIl2CppField(Il2CppClassPointerStore<_SetInitialControllerSelection_d__103>.NativeClassPtr, "<>2__current");
+			NativeFieldInfoPtr___4__this = IL2CPP.GetIl2CppField(Il2CppClassPointerStore<_SetInitialControllerSelection_d__103>.NativeClassPtr, "<>4__this");
+			NativeMethodInfoPtr__ctor_Public_Void_Int32_0 = IL2CPP.GetIl2CppMethodByToken(Il2CppClassPointerStore<_SetInitialControllerSelection_d__103>.NativeClassPtr, 100687123);
+			NativeMethodInfoPtr_System_IDisposable_Dispose_Private_Virtual_Final_New_Void_0 = IL2CPP.GetIl2CppMethodByToken(Il2CppClassPointerStore<_SetInitialControllerSelection_d__103>.NativeClassPtr, 100687124);
+			NativeMethodInfoPtr_MoveNext_Private_Virtual_Final_New_Boolean_0 = IL2CPP.GetIl2CppMethodByToken(Il2CppClassPointerStore<_SetInitialControllerSelection_d__103>.NativeClassPtr, 100687125);
+			NativeMethodInfoPtr_System_Collections_Generic_IEnumerator_System_Object__get_Current_Private_Virtual_Final_New_get_Object_0 = IL2CPP.GetIl2CppMethodByToken(Il2CppClassPointerStore<_SetInitialControllerSelection_d__103>.NativeClassPtr, 100687126);
+			NativeMethodInfoPtr_System_Collections_IEnumerator_Reset_Private_Virtual_Final_New_Void_0 = IL2CPP.GetIl2CppMethodByToken(Il2CppClassPointerStore<_SetInitialControllerSelection_d__103>.NativeClassPtr, 100687127);
+			NativeMethodInfoPtr_System_Collections_IEnumerator_get_Current_Private_Virtual_Final_New_get_Object_0 = IL2CPP.GetIl2CppMethodByToken(Il2CppClassPointerStore<_SetInitialControllerSelection_d__103>.NativeClassPtr, 100687128);
+		}
+
+		[CallerCount(395)]
+		[CachedScanResults(RefRangeStart = 2277, RefRangeEnd = 2672, XrefRangeStart = 2277, XrefRangeEnd = 2672, MetadataInitTokenRva = 0L, MetadataInitFlagRva = 0L)]
+		public unsafe _SetInitialControllerSelection_d__103(int <>1__state)
+			: this(IL2CPP.il2cpp_object_new(Il2CppClassPointerStore<_SetInitialControllerSelection_d__103>.NativeClassPtr))
+		{
+			System.IntPtr* ptr = stackalloc System.IntPtr[1];
+			*ptr = (nint)(&<>1__state);
+			Unsafe.SkipInit(out System.IntPtr exc);
+			System.IntPtr intPtr = IL2CPP.il2cpp_runtime_invoke(NativeMethodInfoPtr__ctor_Public_Void_Int32_0, IL2CPP.Il2CppObjectBaseToPtrNotNull(this), (void**)ptr, ref exc);
+			Il2CppInterop.Runtime.Il2CppException.RaiseExceptionIfNecessary(exc);
+		}
+
+		[CallerCount(21436)]
+		[CachedScanResults(RefRangeStart = 2672, RefRangeEnd = 24108, XrefRangeStart = 2672, XrefRangeEnd = 24108, MetadataInitTokenRva = 0L, MetadataInitFlagRva = 0L)]
+		public unsafe virtual void System_IDisposable_Dispose()
+		{
+			IL2CPP.Il2CppObjectBaseToPtrNotNull(this);
+			System.IntPtr* param = null;
+			Unsafe.SkipInit(out System.IntPtr exc);
+			System.IntPtr intPtr = IL2CPP.il2cpp_runtime_invoke(NativeMethodInfoPtr_System_IDisposable_Dispose_Private_Virtual_Final_New_Void_0, IL2CPP.Il2CppObjectBaseToPtrNotNull(this), (void**)param, ref exc);
+			Il2CppInterop.Runtime.Il2CppException.RaiseExceptionIfNecessary(exc);
+		}
+
+		[CallerCount(0)]
+		[CachedScanResults(RefRangeStart = 0, RefRangeEnd = 0, XrefRangeStart = 379668, XrefRangeEnd = 379669, MetadataInitTokenRva = 0L, MetadataInitFlagRva = 0L)]
+		public unsafe virtual bool MoveNext()
+		{
+			IL2CPP.Il2CppObjectBaseToPtrNotNull(this);
+			System.IntPtr* param = null;
+			Unsafe.SkipInit(out System.IntPtr exc);
+			System.IntPtr obj = IL2CPP.il2cpp_runtime_invoke(NativeMethodInfoPtr_MoveNext_Private_Virtual_Final_New_Boolean_0, IL2CPP.Il2CppObjectBaseToPtrNotNull(this), (void**)param, ref exc);
+			Il2CppInterop.Runtime.Il2CppException.RaiseExceptionIfNecessary(exc);
+			return *(bool*)IL2CPP.il2cpp_object_unbox(obj);
+		}
+
+		[CallerCount(0)]
+		[CachedScanResults(RefRangeStart = 0, RefRangeEnd = 0, XrefRangeStart = 379669, XrefRangeEnd = 379674, MetadataInitTokenRva = 0L, MetadataInitFlagRva = 0L)]
+		public unsafe virtual void System_Collections_IEnumerator_Reset()
+		{
+			IL2CPP.Il2CppObjectBaseToPtrNotNull(this);
+			System.IntPtr* param = null;
+			Unsafe.SkipInit(out System.IntPtr exc);
+			System.IntPtr intPtr = IL2CPP.il2cpp_runtime_invoke(NativeMethodInfoPtr_System_Collections_IEnumerator_Reset_Private_Virtual_Final_New_Void_0, IL2CPP.Il2CppObjectBaseToPtrNotNull(this), (void**)param, ref exc);
+			Il2CppInterop.Runtime.Il2CppException.RaiseExceptionIfNecessary(exc);
+		}
+
+		public _SetInitialControllerSelection_d__103(System.IntPtr pointer)
+			: base(pointer)
+		{
+		}
+	}
+
+	private static readonly System.IntPtr NativeFieldInfoPtr_Singleton;
+
+	private static readonly System.IntPtr NativeFieldInfoPtr__simpleWorld;
+
+	private static readonly System.IntPtr NativeFieldInfoPtr__worldInfo;
+
+	private static readonly System.IntPtr NativeFieldInfoPtr__changeWorldBtn;
+
+	private static readonly System.IntPtr NativeFieldInfoPtr__note;
+
+	private static readonly System.IntPtr NativeFieldInfoPtr__multiplayerHost;
+
+	private static readonly System.IntPtr NativeFieldInfoPtr__multiplayerJoin;
+
+	private static readonly System.IntPtr NativeFieldInfoPtr__simpleWorldNameInput;
+
+	private static readonly System.IntPtr NativeFieldInfoPtr__simpleWorldNameError;
+
+	private static readonly System.IntPtr NativeFieldInfoPtr__startButton;
+
+	private static readonly System.IntPtr NativeFieldInfoPtr__simpleWorldDifficultySlider;
+
+	private static readonly System.IntPtr NativeFieldInfoPtr__adjustDifficultyHint;
+
+	private static readonly System.IntPtr NativeFieldInfoPtr__bannerPreview;
+
+	private static readonly System.IntPtr NativeFieldInfoPtr__characterPreviews;
+
+	private static readonly System.IntPtr NativeFieldInfoPtr__characterNamePreview;
+
+	private static readonly System.IntPtr NativeFieldInfoPtr__characterLevelPreview;
+
+	private static readonly System.IntPtr NativeFieldInfoPtr__characterHoursPreview;
+
+	private static readonly System.IntPtr NativeFieldInfoPtr__characterDifficultyPreview;
+
+	private static readonly System.IntPtr NativeFieldInfoPtr__characterArchetype;
+
+	private static readonly System.IntPtr NativeFieldInfoPtr__characterScene;
+
+	private static readonly System.IntPtr NativeFieldInfoPtr__memory;
+
+	private static readonly System.IntPtr NativeFieldInfoPtr__intelligence;
+
+	private static readonly System.IntPtr NativeFieldInfoPtr__physique;
+
+	private static readonly System.IntPtr NativeFieldInfoPtr__strength;
+
+	private static readonly System.IntPtr NativeFieldInfoPtr__adventure;
+
+	private static readonly System.IntPtr NativeFieldInfoPtr__charisma;
+
+	private static readonly System.IntPtr NativeFieldInfoPtr__agility;
+
+	private static readonly System.IntPtr NativeFieldInfoPtr__energy;
+
+	private static readonly System.IntPtr NativeFieldInfoPtr__worldName;
+
+	private static readonly System.IntPtr NativeFieldInfoPtr__backgroundDifficultyPreview;
+
+	private static readonly System.IntPtr NativeFieldInfoPtr__worldDifficultyPreview;
+
+	private static readonly System.IntPtr NativeFieldInfoPtr__lobbyCount;
+
+	private static readonly System.IntPtr NativeFieldInfoPtr__passwordInput;
+
+	private static readonly System.IntPtr NativeFieldInfoPtr__lobbyNoteInput;
+
+	private static readonly System.IntPtr NativeFieldInfoPtr__worldNamePreview;
+
+	private static readonly System.IntPtr NativeFieldInfoPtr__worldAgeTexts;
+
+	private static readonly System.IntPtr NativeFieldInfoPtr__worldDifficultyTexts;
+
+	private static readonly System.IntPtr NativeFieldInfoPtr__worldTypeTexts;
+
+	private static readonly System.IntPtr NativeFieldInfoPtr__friendlyFire;
+
+	private static readonly System.IntPtr NativeFieldInfoPtr__newCharactersOnly;
+
+	private static readonly System.IntPtr NativeFieldInfoPtr__personalLoot;
+
+	private static readonly System.IntPtr NativeFieldInfoPtr_LobbyOpen;
+
+	private static readonly System.IntPtr NativeFieldInfoPtr_FriendsOnly;
+
+	private static readonly System.IntPtr NativeFieldInfoPtr_InviteOnly;
+
+	private static readonly System.IntPtr NativeFieldInfoPtr__decreaseButton;
+
+	private static readonly System.IntPtr NativeFieldInfoPtr__increaseButton;
+
+	private static readonly System.IntPtr NativeFieldInfoPtr__maxPlayersDisplay;
+
+	private static readonly System.IntPtr NativeFieldInfoPtr__maxPlayersWarning;
+
+	private static readonly System.IntPtr NativeFieldInfoPtr__maxPlayersForServer;
+
+	private static readonly System.IntPtr NativeFieldInfoPtr__maxPlayersSelectable;
+
+	private static readonly System.IntPtr NativeFieldInfoPtr__adjustPlayerLimitHint;
+
+	private static readonly System.IntPtr NativeFieldInfoPtr__notReadyPopUp;
+
+	private static readonly System.IntPtr NativeFieldInfoPtr__errorText;
+
+	private static readonly System.IntPtr NativeFieldInfoPtr__backButton;
+
+	private static readonly System.IntPtr NativeFieldInfoPtr__changeWorldButton;
+
+	private static readonly System.IntPtr NativeFieldInfoPtr__simpleChangeWorldButton;
+
+	private static readonly System.IntPtr NativeFieldInfoPtr__backToWorldSelectButton;
+
+	private static readonly System.IntPtr NativeFieldInfoPtr__backToLobbySelectButton;
+
+	private static readonly System.IntPtr NativeFieldInfoPtr__personalLootMirrorToggles;
+
+	private static readonly System.IntPtr NativeFieldInfoPtr__textInputViews;
+
+	private static readonly System.IntPtr NativeFieldInfoPtr__notReadyCoroutine;
+
+	private static readonly System.IntPtr NativeFieldInfoPtr__playerFile;
+
+	private static readonly System.IntPtr NativeFieldInfoPtr__worldFile;
+
+	private static readonly System.IntPtr NativeFieldInfoPtr__localPlayers;
+
+	private static readonly System.IntPtr NativeFieldInfoPtr__isNewWorldMode;
+
+	private static readonly System.IntPtr NativeFieldInfoPtr__userChangedWorld;
+
+	private static readonly System.IntPtr NativeFieldInfoPtr__worldChoiceOwner;
+
+	private static readonly System.IntPtr NativeFieldInfoPtr__privacyListenersWired;
+
+	private static readonly System.IntPtr NativeFieldInfoPtr__personalLootListenerWired;
+
+	private static readonly System.IntPtr NativeFieldInfoPtr__personalLootDirty;
+
+	private static readonly System.IntPtr NativeFieldInfoPtr__difficultyListenerWired;
+
+	private static readonly System.IntPtr NativeFieldInfoPtr__selectedDifficulty;
+
+	private static readonly System.IntPtr NativeFieldInfoPtr__focusScope;
+
+	private static readonly System.IntPtr NativeFieldInfoPtr__node;
+
+	private static readonly System.IntPtr NativeFieldInfoPtr__tabNavigator;
+
+	private static readonly System.IntPtr NativeFieldInfoPtr__tabNavigatorCoordinator;
+
+	private static readonly System.IntPtr NativeFieldInfoPtr__textInputPresenters;
+
+	private static readonly System.IntPtr NativeFieldInfoPtr__maxPlayersReturnSelectable;
+
+	private static readonly System.IntPtr NativeFieldInfoPtr__lastCoordinatorSelection;
+
+	private static readonly System.IntPtr NativeFieldInfoPtr__selectionTrackedCoordinator;
+
+	private static readonly System.IntPtr NativeFieldInfoPtr_MinSeats;
+
+	private static readonly System.IntPtr NativeFieldInfoPtr_PrefLastMaxPlayers;
+
+	private static readonly System.IntPtr NativeFieldInfoPtr_PrefLastLobbyType;
+
+	private static readonly System.IntPtr NativeFieldInfoPtr_PrefLastSessionMultiplayer;
+
+	private static readonly System.IntPtr NativeMethodInfoPtr_Awake_Private_Void_0;
+
+	private static readonly System.IntPtr NativeMethodInfoPtr_OnDestroy_Private_Void_0;
+
+	private static readonly System.IntPtr NativeMethodInfoPtr_Back_Private_Void_0;
+
+	private static readonly System.IntPtr NativeMethodInfoPtr_ChangeWorld_Private_Void_0;
+
+	private static readonly System.IntPtr NativeMethodInfoPtr_OnPersonalLootMirrorChanged_Private_Void_Boolean_0;
+
+	private static readonly System.IntPtr NativeMethodInfoPtr_WirePersonalLootToggle_Private_Void_0;
+
+	private static readonly System.IntPtr NativeMethodInfoPtr_OnPersonalLootChanged_Private_Void_Boolean_0;
+
+	private static readonly System.IntPtr NativeMethodInfoPtr_WireTextInputPresenters_Private_Void_0;
+
+	private static readonly System.IntPtr NativeMethodInfoPtr_WireSelectionTracking_Private_Void_0;
+
+	private static readonly System.IntPtr NativeMethodInfoPtr_WireTabNavigator_Private_Void_0;
+
+	private static readonly System.IntPtr NativeMethodInfoPtr_PanelEnd_Private_Selectable_Boolean_0;
+
+	private static readonly System.IntPtr NativeMethodInfoPtr_OnCoordinatorSelectionChanged_Private_Void_GameObject_0;
+
+	private static readonly System.IntPtr NativeMethodInfoPtr_IsMaxPlayersFocused_Private_Boolean_0;
+
+	private static readonly System.IntPtr NativeMethodInfoPtr_ResolveChangeWorldButton_Private_Button_0;
+
+	private static readonly System.IntPtr NativeMethodInfoPtr_CanHandle_Public_Boolean_byref_UIActionContext_0;
+
+	private static readonly System.IntPtr NativeMethodInfoPtr_Handle_Public_UIActionResult_byref_UIActionContext_0;
+
+	private static readonly System.IntPtr NativeMethodInfoPtr_NotifyUserChangedWorld_Public_Void_0;
+
+	private static readonly System.IntPtr NativeMethodInfoPtr_RearmWorldChoiceForCharacter_Private_Void_String_0;
+
+	private static readonly System.IntPtr NativeMethodInfoPtr_ResolveNewWorldMode_Private_Boolean_Boolean_Boolean_0;
+
+	private static readonly System.IntPtr NativeMethodInfoPtr_InitializeFinalSelection_Public_Void_0;
+
+	private static readonly System.IntPtr NativeMethodInfoPtr_ApplyWorldTypeLabel_Private_Void_Boolean_0;
+
+	private static readonly System.IntPtr NativeMethodInfoPtr_FirstControllerTarget_Private_Selectable_0;
+
+	private static readonly System.IntPtr NativeMethodInfoPtr_IsTargetable_Private_Static_Boolean_Selectable_0;
+
+	private static readonly System.IntPtr NativeMethodInfoPtr_SetInitialControllerSelection_Private_IEnumerator_0;
+
+	private static readonly System.IntPtr NativeMethodInfoPtr_OnEnable_Private_Void_0;
+
+	private static readonly System.IntPtr NativeMethodInfoPtr_SeedInitialControllerSelection_Private_Void_0;
+
+	private static readonly System.IntPtr NativeMethodInfoPtr_SetupPanels_Private_Void_0;
+
+	private static readonly System.IntPtr NativeMethodInfoPtr_SetupSimpleWorld_Private_Void_0;
+
+	private static readonly System.IntPtr NativeMethodInfoPtr_Update_Private_Void_0;
+
+	private static readonly System.IntPtr NativeMethodInfoPtr_OnSimpleWorldNameUpdate_Public_Void_0;
+
+	private static readonly System.IntPtr NativeMethodInfoPtr_NormalizedWorldName_Private_String_0;
+
+	private static readonly System.IntPtr NativeMethodInfoPtr_ValidateSimpleWorldName_Private_ValueTuple_2_Boolean_String_0;
+
+	private static readonly System.IntPtr NativeMethodInfoPtr_UpdateLobbyCount_Public_Void_Int32_Int32_0;
+
+	private static readonly System.IntPtr NativeMethodInfoPtr_IncreaseMaxPlayers_Public_Void_0;
+
+	private static readonly System.IntPtr NativeMethodInfoPtr_DecreaseMaxPlayers_Public_Void_0;
+
+	private static readonly System.IntPtr NativeMethodInfoPtr_WirePrivacyToggleListeners_Private_Void_0;
+
+	private static readonly System.IntPtr NativeMethodInfoPtr_WireDifficultySlider_Private_Void_0;
+
+	private static readonly System.IntPtr NativeMethodInfoPtr_ReadSliderDifficulty_Private_Difficulty_0;
+
+	private static readonly System.IntPtr NativeMethodInfoPtr_OnDifficultySliderChanged_Private_Void_Single_0;
+
+	private static readonly System.IntPtr NativeMethodInfoPtr_SetAdjustDifficultyHintVisible_Private_Void_Boolean_0;
+
+	private static readonly System.IntPtr NativeMethodInfoPtr_SetAdjustPlayerLimitHintVisible_Private_Void_Boolean_0;
+
+	private static readonly System.IntPtr NativeMethodInfoPtr_SetSelectedDifficulty_Private_Void_Difficulty_0;
+
+	private static readonly System.IntPtr NativeMethodInfoPtr_OnPlayerCountChanged_Private_Void_0;
+
+	private static readonly System.IntPtr NativeMethodInfoPtr_ShowCharacterPreview_Private_Static_Void_GameObject_Race_Gender_AppearanceColors_0;
+
+	private static readonly System.IntPtr NativeMethodInfoPtr_FillInPlayerValues_Private_Void_0;
+
+	private static readonly System.IntPtr NativeMethodInfoPtr_FillInWorldValues_Private_Void_0;
+
+	private static readonly System.IntPtr NativeMethodInfoPtr_RestoreLobbyPrivacyChoice_Private_Void_0;
+
+	private static readonly System.IntPtr NativeMethodInfoPtr_SetSteamLobbyOptions_Private_Void_0;
+
+	private static readonly System.IntPtr NativeMethodInfoPtr_StartGame_Public_Void_0;
+
+	private static readonly System.IntPtr NativeMethodInfoPtr_ShowNewCharactersOnlyPopup_Private_Void_0;
+
+	private static readonly System.IntPtr NativeMethodInfoPtr_GetLocalizedError_Private_String_String_String_0;
+
+	private static readonly System.IntPtr NativeMethodInfoPtr_FadeOutNotReadyPopup_Private_IEnumerator_Single_0;
+
+	private static readonly System.IntPtr NativeMethodInfoPtr_IsCharacterAllowedForWorld_Private_Boolean_0;
+
+	private static readonly System.IntPtr NativeMethodInfoPtr_IsCharacterAllowedForServer_Private_Boolean_0;
+
+	private static readonly System.IntPtr NativeMethodInfoPtr__ctor_Public_Void_0;
+
+	private static readonly System.IntPtr NativeMethodInfoPtr_IUIActionReceiver_CanHandle_Private_Virtual_Final_New_Boolean_byref_UIActionContext_0;
+
+	private static readonly System.IntPtr NativeMethodInfoPtr_IUIActionReceiver_Handle_Private_Virtual_Final_New_UIActionResult_byref_UIActionContext_0;
+
+	private static readonly System.IntPtr NativeMethodInfoPtr__WireTabNavigator_b__89_0_Private_Selectable_0;
+
+	private static readonly System.IntPtr NativeMethodInfoPtr__WireTabNavigator_b__89_1_Private_Selectable_0;
+
+	private static readonly System.IntPtr NativeMethodInfoPtr__WirePrivacyToggleListeners_b__115_0_Private_Void_Boolean_0;
+
+	public unsafe static FinalSelection Singleton
+	{
+		get
+		{
+			Unsafe.SkipInit(out System.IntPtr intPtr);
+			IL2CPP.il2cpp_field_static_get_value(NativeFieldInfoPtr_Singleton, &intPtr);
+			System.IntPtr intPtr2 = intPtr;
+			return (intPtr2 != (System.IntPtr)0) ? Il2CppObjectPool.Get<FinalSelection>(intPtr2) : null;
+		}
+		set
+		{
+			IL2CPP.il2cpp_field_static_set_value(NativeFieldInfoPtr_Singleton, (void*)IL2CPP.Il2CppObjectBaseToPtr(obj));
+		}
+	}
+
+	public unsafe GameObject _simpleWorld
+	{
+		get
+		{
+			nint num = (nint)IL2CPP.Il2CppObjectBaseToPtrNotNull(this) + (int)IL2CPP.il2cpp_field_get_offset(NativeFieldInfoPtr__simpleWorld);
+			System.IntPtr intPtr = *(System.IntPtr*)num;
+			return (intPtr != (System.IntPtr)0) ? Il2CppObjectPool.Get<GameObject>(intPtr) : null;
+		}
+		set
+		{
+			System.IntPtr num = IL2CPP.Il2CppObjectBaseToPtrNotNull(this);
+			IL2CPP.il2cpp_gc_wbarrier_set_field(num, (nint)num + (int)IL2CPP.il2cpp_field_get_offset(NativeFieldInfoPtr__simpleWorld), IL2CPP.Il2CppObjectBaseToPtr(obj));
+		}
+	}
+
+	public unsafe GameObject _worldInfo
+	{
+		get
+		{
+			nint num = (nint)IL2CPP.Il2CppObjectBaseToPtrNotNull(this) + (int)IL2CPP.il2cpp_field_get_offset(NativeFieldInfoPtr__worldInfo);
+			System.IntPtr intPtr = *(System.IntPtr*)num;
+			return (intPtr != (System.IntPtr)0) ? Il2CppObjectPool.Get<GameObject>(intPtr) : null;
+		}
+		set
+		{
+			System.IntPtr num = IL2CPP.Il2CppObjectBaseToPtrNotNull(this);
+			IL2CPP.il2cpp_gc_wbarrier_set_field(num, (nint)num + (int)IL2CPP.il2cpp_field_get_offset(NativeFieldInfoPtr__worldInfo), IL2CPP.Il2CppObjectBaseToPtr(obj));
+		}
+	}
+
+	public unsafe GameObject _changeWorldBtn
+	{
+		get
+		{
+			nint num = (nint)IL2CPP.Il2CppObjectBaseToPtrNotNull(this) + (int)IL2CPP.il2cpp_field_get_offset(NativeFieldInfoPtr__changeWorldBtn);
+			System.IntPtr intPtr = *(System.IntPtr*)num;
+			return (intPtr != (System.IntPtr)0) ? Il2CppObjectPool.Get<GameObject>(intPtr) : null;
+		}
+		set
+		{
+			System.IntPtr num = IL2CPP.Il2CppObjectBaseToPtrNotNull(this);
+			IL2CPP.il2cpp_gc_wbarrier_set_field(num, (nint)num + (int)IL2CPP.il2cpp_field_get_offset(NativeFieldInfoPtr__changeWorldBtn), IL2CPP.Il2CppObjectBaseToPtr(obj));
+		}
+	}
+
+	public unsafe GameObject _note
+	{
+		get
+		{
+			nint num = (nint)IL2CPP.Il2CppObjectBaseToPtrNotNull(this) + (int)IL2CPP.il2cpp_field_get_offset(NativeFieldInfoPtr__note);
+			System.IntPtr intPtr = *(System.IntPtr*)num;
+			return (intPtr != (System.IntPtr)0) ? Il2CppObjectPool.Get<GameObject>(intPtr) : null;
+		}
+		set
+		{
+			System.IntPtr num = IL2CPP.Il2CppObjectBaseToPtrNotNull(this);
+			IL2CPP.il2cpp_gc_wbarrier_set_field(num, (nint)num + (int)IL2CPP.il2cpp_field_get_offset(NativeFieldInfoPtr__note), IL2CPP.Il2CppObjectBaseToPtr(obj));
+		}
+	}
+
+	public unsafe GameObject _multiplayerHost
+	{
+		get
+		{
+			nint num = (nint)IL2CPP.Il2CppObjectBaseToPtrNotNull(this) + (int)IL2CPP.il2cpp_field_get_offset(NativeFieldInfoPtr__multiplayerHost);
+			System.IntPtr intPtr = *(System.IntPtr*)num;
+			return (intPtr != (System.IntPtr)0) ? Il2CppObjectPool.Get<GameObject>(intPtr) : null;
+		}
+		set
+		{
+			System.IntPtr num = IL2CPP.Il2CppObjectBaseToPtrNotNull(this);
+			IL2CPP.il2cpp_gc_wbarrier_set_field(num, (nint)num + (int)IL2CPP.il2cpp_field_get_offset(NativeFieldInfoPtr__multiplayerHost), IL2CPP.Il2CppObjectBaseToPtr(obj));
+		}
+	}
+
+	public unsafe GameObject _multiplayerJoin
+	{
+		get
+		{
+			nint num = (nint)IL2CPP.Il2CppObjectBaseToPtrNotNull(this) + (int)IL2CPP.il2cpp_field_get_offset(NativeFieldInfoPtr__multiplayerJoin);
+			System.IntPtr intPtr = *(System.IntPtr*)num;
+			return (intPtr != (System.IntPtr)0) ? Il2CppObjectPool.Get<GameObject>(intPtr) : null;
+		}
+		set
+		{
+			System.IntPtr num = IL2CPP.Il2CppObjectBaseToPtrNotNull(this);
+			IL2CPP.il2cpp_gc_wbarrier_set_field(num, (nint)num + (int)IL2CPP.il2cpp_field_get_offset(NativeFieldInfoPtr__multiplayerJoin), IL2CPP.Il2CppObjectBaseToPtr(obj));
+		}
+	}
+
+	public unsafe TMP_InputField _simpleWorldNameInput
+	{
+		get
+		{
+			nint num = (nint)IL2CPP.Il2CppObjectBaseToPtrNotNull(this) + (int)IL2CPP.il2cpp_field_get_offset(NativeFieldInfoPtr__simpleWorldNameInput);
+			System.IntPtr intPtr = *(System.IntPtr*)num;
+			return (intPtr != (System.IntPtr)0) ? Il2CppObjectPool.Get<TMP_InputField>(intPtr) : null;
+		}
+		set
+		{
+			System.IntPtr num = IL2CPP.Il2CppObjectBaseToPtrNotNull(this);
+			IL2CPP.il2cpp_gc_wbarrier_set_field(num, (nint)num + (int)IL2CPP.il2cpp_field_get_offset(NativeFieldInfoPtr__simpleWorldNameInput), IL2CPP.Il2CppObjectBaseToPtr(obj));
+		}
+	}
+
+	public unsafe TextMeshProUGUI _simpleWorldNameError
+	{
+		get
+		{
+			nint num = (nint)IL2CPP.Il2CppObjectBaseToPtrNotNull(this) + (int)IL2CPP.il2cpp_field_get_offset(NativeFieldInfoPtr__simpleWorldNameError);
+			System.IntPtr intPtr = *(System.IntPtr*)num;
+			return (intPtr != (System.IntPtr)0) ? Il2CppObjectPool.Get<TextMeshProUGUI>(intPtr) : null;
+		}
+		set
+		{
+			System.IntPtr num = IL2CPP.Il2CppObjectBaseToPtrNotNull(this);
+			IL2CPP.il2cpp_gc_wbarrier_set_field(num, (nint)num + (int)IL2CPP.il2cpp_field_get_offset(NativeFieldInfoPtr__simpleWorldNameError), IL2CPP.Il2CppObjectBaseToPtr(obj));
+		}
+	}
+
+	public unsafe Button _startButton
+	{
+		get
+		{
+			nint num = (nint)IL2CPP.Il2CppObjectBaseToPtrNotNull(this) + (int)IL2CPP.il2cpp_field_get_offset(NativeFieldInfoPtr__startButton);
+			System.IntPtr intPtr = *(System.IntPtr*)num;
+			return (intPtr != (System.IntPtr)0) ? Il2CppObjectPool.Get<Button>(intPtr) : null;
+		}
+		set
+		{
+			System.IntPtr num = IL2CPP.Il2CppObjectBaseToPtrNotNull(this);
+			IL2CPP.il2cpp_gc_wbarrier_set_field(num, (nint)num + (int)IL2CPP.il2cpp_field_get_offset(NativeFieldInfoPtr__startButton), IL2CPP.Il2CppObjectBaseToPtr(obj));
+		}
+	}
+
+	public unsafe Slider _simpleWorldDifficultySlider
+	{
+		get
+		{
+			nint num = (nint)IL2CPP.Il2CppObjectBaseToPtrNotNull(this) + (int)IL2CPP.il2cpp_field_get_offset(NativeFieldInfoPtr__simpleWorldDifficultySlider);
+			System.IntPtr intPtr = *(System.IntPtr*)num;
+			return (intPtr != (System.IntPtr)0) ? Il2CppObjectPool.Get<Slider>(intPtr) : null;
+		}
+		set
+		{
+			System.IntPtr num = IL2CPP.Il2CppObjectBaseToPtrNotNull(this);
+			IL2CPP.il2cpp_gc_wbarrier_set_field(num, (nint)num + (int)IL2CPP.il2cpp_field_get_offset(NativeFieldInfoPtr__simpleWorldDifficultySlider), IL2CPP.Il2CppObjectBaseToPtr(obj));
+		}
+	}
+
+	public unsafe UIActionHint _adjustDifficultyHint
+	{
+		get
+		{
+			nint num = (nint)IL2CPP.Il2CppObjectBaseToPtrNotNull(this) + (int)IL2CPP.il2cpp_field_get_offset(NativeFieldInfoPtr__adjustDifficultyHint);
+			System.IntPtr intPtr = *(System.IntPtr*)num;
+			return (intPtr != (System.IntPtr)0) ? Il2CppObjectPool.Get<UIActionHint>(intPtr) : null;
+		}
+		set
+		{
+			System.IntPtr num = IL2CPP.Il2CppObjectBaseToPtrNotNull(this);
+			IL2CPP.il2cpp_gc_wbarrier_set_field(num, (nint)num + (int)IL2CPP.il2cpp_field_get_offset(NativeFieldInfoPtr__adjustDifficultyHint), IL2CPP.Il2CppObjectBaseToPtr(obj));
+		}
+	}
+
+	public unsafe Image _bannerPreview
+	{
+		get
+		{
+			nint num = (nint)IL2CPP.Il2CppObjectBaseToPtrNotNull(this) + (int)IL2CPP.il2cpp_field_get_offset(NativeFieldInfoPtr__bannerPreview);
+			System.IntPtr intPtr = *(System.IntPtr*)num;
+			return (intPtr != (System.IntPtr)0) ? Il2CppObjectPool.Get<Image>(intPtr) : null;
+		}
+		set
+		{
+			System.IntPtr num = IL2CPP.Il2CppObjectBaseToPtrNotNull(this);
+			IL2CPP.il2cpp_gc_wbarrier_set_field(num, (nint)num + (int)IL2CPP.il2cpp_field_get_offset(NativeFieldInfoPtr__bannerPreview), IL2CPP.Il2CppObjectBaseToPtr(obj));
+		}
+	}
+
+	public unsafe List<RacePreviewEntry> _characterPreviews
+	{
+		get
+		{
+			nint num = (nint)IL2CPP.Il2CppObjectBaseToPtrNotNull(this) + (int)IL2CPP.il2cpp_field_get_offset(NativeFieldInfoPtr__characterPreviews);
+			System.IntPtr intPtr = *(System.IntPtr*)num;
+			return (intPtr != (System.IntPtr)0) ? Il2CppObjectPool.Get<List<RacePreviewEntry>>(intPtr) : null;
+		}
+		set
+		{
+			System.IntPtr num = IL2CPP.Il2CppObjectBaseToPtrNotNull(this);
+			IL2CPP.il2cpp_gc_wbarrier_set_field(num, (nint)num + (int)IL2CPP.il2cpp_field_get_offset(NativeFieldInfoPtr__characterPreviews), IL2CPP.Il2CppObjectBaseToPtr(obj));
+		}
+	}
+
+	public unsafe TextMeshProUGUI _characterNamePreview
+	{
+		get
+		{
+			nint num = (nint)IL2CPP.Il2CppObjectBaseToPtrNotNull(this) + (int)IL2CPP.il2cpp_field_get_offset(NativeFieldInfoPtr__characterNamePreview);
+			System.IntPtr intPtr = *(System.IntPtr*)num;
+			return (intPtr != (System.IntPtr)0) ? Il2CppObjectPool.Get<TextMeshProUGUI>(intPtr) : null;
+		}
+		set
+		{
+			System.IntPtr num = IL2CPP.Il2CppObjectBaseToPtrNotNull(this);
+			IL2CPP.il2cpp_gc_wbarrier_set_field(num, (nint)num + (int)IL2CPP.il2cpp_field_get_offset(NativeFieldInfoPtr__characterNamePreview), IL2CPP.Il2CppObjectBaseToPtr(obj));
+		}
+	}
+
+	public unsafe TextMeshProUGUI _characterLevelPreview
+	{
+		get
+		{
+			nint num = (nint)IL2CPP.Il2CppObjectBaseToPtrNotNull(this) + (int)IL2CPP.il2cpp_field_get_offset(NativeFieldInfoPtr__characterLevelPreview);
+			System.IntPtr intPtr = *(System.IntPtr*)num;
+			return (intPtr != (System.IntPtr)0) ? Il2CppObjectPool.Get<TextMeshProUGUI>(intPtr) : null;
+		}
+		set
+		{
+			System.IntPtr num = IL2CPP.Il2CppObjectBaseToPtrNotNull(this);
+			IL2CPP.il2cpp_gc_wbarrier_set_field(num, (nint)num + (int)IL2CPP.il2cpp_field_get_offset(NativeFieldInfoPtr__characterLevelPreview), IL2CPP.Il2CppObjectBaseToPtr(obj));
+		}
+	}
+
+	public unsafe TextMeshProUGUI _characterHoursPreview
+	{
+		get
+		{
+			nint num = (nint)IL2CPP.Il2CppObjectBaseToPtrNotNull(this) + (int)IL2CPP.il2cpp_field_get_offset(NativeFieldInfoPtr__characterHoursPreview);
+			System.IntPtr intPtr = *(System.IntPtr*)num;
+			return (intPtr != (System.IntPtr)0) ? Il2CppObjectPool.Get<TextMeshProUGUI>(intPtr) : null;
+		}
+		set
+		{
+			System.IntPtr num = IL2CPP.Il2CppObjectBaseToPtrNotNull(this);
+			IL2CPP.il2cpp_gc_wbarrier_set_field(num, (nint)num + (int)IL2CPP.il2cpp_field_get_offset(NativeFieldInfoPtr__characterHoursPreview), IL2CPP.Il2CppObjectBaseToPtr(obj));
+		}
+	}
+
+	public unsafe TextMeshProUGUI _characterDifficultyPreview
+	{
+		get
+		{
+			nint num = (nint)IL2CPP.Il2CppObjectBaseToPtrNotNull(this) + (int)IL2CPP.il2cpp_field_get_offset(NativeFieldInfoPtr__characterDifficultyPreview);
+			System.IntPtr intPtr = *(System.IntPtr*)num;
+			return (intPtr != (System.IntPtr)0) ? Il2CppObjectPool.Get<TextMeshProUGUI>(intPtr) : null;
+		}
+		set
+		{
+			System.IntPtr num = IL2CPP.Il2CppObjectBaseToPtrNotNull(this);
+			IL2CPP.il2cpp_gc_wbarrier_set_field(num, (nint)num + (int)IL2CPP.il2cpp_field_get_offset(NativeFieldInfoPtr__characterDifficultyPreview), IL2CPP.Il2CppObjectBaseToPtr(obj));
+		}
+	}
+
+	public unsafe TextMeshProUGUI _characterArchetype
+	{
+		get
+		{
+			nint num = (nint)IL2CPP.Il2CppObjectBaseToPtrNotNull(this) + (int)IL2CPP.il2cpp_field_get_offset(NativeFieldInfoPtr__characterArchetype);
+			System.IntPtr intPtr = *(System.IntPtr*)num;
+			return (intPtr != (System.IntPtr)0) ? Il2CppObjectPool.Get<TextMeshProUGUI>(intPtr) : null;
+		}
+		set
+		{
+			System.IntPtr num = IL2CPP.Il2CppObjectBaseToPtrNotNull(this);
+			IL2CPP.il2cpp_gc_wbarrier_set_field(num, (nint)num + (int)IL2CPP.il2cpp_field_get_offset(NativeFieldInfoPtr__characterArchetype), IL2CPP.Il2CppObjectBaseToPtr(obj));
+		}
+	}
+
+	public unsafe TextMeshProUGUI _characterScene
+	{
+		get
+		{
+			nint num = (nint)IL2CPP.Il2CppObjectBaseToPtrNotNull(this) + (int)IL2CPP.il2cpp_field_get_offset(NativeFieldInfoPtr__characterScene);
+			System.IntPtr intPtr = *(System.IntPtr*)num;
+			return (intPtr != (System.IntPtr)0) ? Il2CppObjectPool.Get<TextMeshProUGUI>(intPtr) : null;
+		}
+		set
+		{
+			System.IntPtr num = IL2CPP.Il2CppObjectBaseToPtrNotNull(this);
+			IL2CPP.il2cpp_gc_wbarrier_set_field(num, (nint)num + (int)IL2CPP.il2cpp_field_get_offset(NativeFieldInfoPtr__characterScene), IL2CPP.Il2CppObjectBaseToPtr(obj));
+		}
+	}
+
+	public unsafe TextMeshProUGUI _memory
+	{
+		get
+		{
+			nint num = (nint)IL2CPP.Il2CppObjectBaseToPtrNotNull(this) + (int)IL2CPP.il2cpp_field_get_offset(NativeFieldInfoPtr__memory);
+			System.IntPtr intPtr = *(System.IntPtr*)num;
+			return (intPtr != (System.IntPtr)0) ? Il2CppObjectPool.Get<TextMeshProUGUI>(intPtr) : null;
+		}
+		set
+		{
+			System.IntPtr num = IL2CPP.Il2CppObjectBaseToPtrNotNull(this);
+			IL2CPP.il2cpp_gc_wbarrier_set_field(num, (nint)num + (int)IL2CPP.il2cpp_field_get_offset(NativeFieldInfoPtr__memory), IL2CPP.Il2CppObjectBaseToPtr(obj));
+		}
+	}
+
+	public unsafe TextMeshProUGUI _intelligence
+	{
+		get
+		{
+			nint num = (nint)IL2CPP.Il2CppObjectBaseToPtrNotNull(this) + (int)IL2CPP.il2cpp_field_get_offset(NativeFieldInfoPtr__intelligence);
+			System.IntPtr intPtr = *(System.IntPtr*)num;
+			return (intPtr != (System.IntPtr)0) ? Il2CppObjectPool.Get<TextMeshProUGUI>(intPtr) : null;
+		}
+		set
+		{
+			System.IntPtr num = IL2CPP.Il2CppObjectBaseToPtrNotNull(this);
+			IL2CPP.il2cpp_gc_wbarrier_set_field(num, (nint)num + (int)IL2CPP.il2cpp_field_get_offset(NativeFieldInfoPtr__intelligence), IL2CPP.Il2CppObjectBaseToPtr(obj));
+		}
+	}
+
+	public unsafe TextMeshProUGUI _physique
+	{
+		get
+		{
+			nint num = (nint)IL2CPP.Il2CppObjectBaseToPtrNotNull(this) + (int)IL2CPP.il2cpp_field_get_offset(NativeFieldInfoPtr__physique);
+			System.IntPtr intPtr = *(System.IntPtr*)num;
+			return (intPtr != (System.IntPtr)0) ? Il2CppObjectPool.Get<TextMeshProUGUI>(intPtr) : null;
+		}
+		set
+		{
+			System.IntPtr num = IL2CPP.Il2CppObjectBaseToPtrNotNull(this);
+			IL2CPP.il2cpp_gc_wbarrier_set_field(num, (nint)num + (int)IL2CPP.il2cpp_field_get_offset(NativeFieldInfoPtr__physique), IL2CPP.Il2CppObjectBaseToPtr(obj));
+		}
+	}
+
+	public unsafe TextMeshProUGUI _strength
+	{
+		get
+		{
+			nint num = (nint)IL2CPP.Il2CppObjectBaseToPtrNotNull(this) + (int)IL2CPP.il2cpp_field_get_offset(NativeFieldInfoPtr__strength);
+			System.IntPtr intPtr = *(System.IntPtr*)num;
+			return (intPtr != (System.IntPtr)0) ? Il2CppObjectPool.Get<TextMeshProUGUI>(intPtr) : null;
+		}
+		set
+		{
+			System.IntPtr num = IL2CPP.Il2CppObjectBaseToPtrNotNull(this);
+			IL2CPP.il2cpp_gc_wbarrier_set_field(num, (nint)num + (int)IL2CPP.il2cpp_field_get_offset(NativeFieldInfoPtr__strength), IL2CPP.Il2CppObjectBaseToPtr(obj));
+		}
+	}
+
+	public unsafe TextMeshProUGUI _adventure
+	{
+		get
+		{
+			nint num = (nint)IL2CPP.Il2CppObjectBaseToPtrNotNull(this) + (int)IL2CPP.il2cpp_field_get_offset(NativeFieldInfoPtr__adventure);
+			System.IntPtr intPtr = *(System.IntPtr*)num;
+			return (intPtr != (System.IntPtr)0) ? Il2CppObjectPool.Get<TextMeshProUGUI>(intPtr) : null;
+		}
+		set
+		{
+			System.IntPtr num = IL2CPP.Il2CppObjectBaseToPtrNotNull(this);
+			IL2CPP.il2cpp_gc_wbarrier_set_field(num, (nint)num + (int)IL2CPP.il2cpp_field_get_offset(NativeFieldInfoPtr__adventure), IL2CPP.Il2CppObjectBaseToPtr(obj));
+		}
+	}
+
+	public unsafe TextMeshProUGUI _charisma
+	{
+		get
+		{
+			nint num = (nint)IL2CPP.Il2CppObjectBaseToPtrNotNull(this) + (int)IL2CPP.il2cpp_field_get_offset(NativeFieldInfoPtr__charisma);
+			System.IntPtr intPtr = *(System.IntPtr*)num;
+			return (intPtr != (System.IntPtr)0) ? Il2CppObjectPool.Get<TextMeshProUGUI>(intPtr) : null;
+		}
+		set
+		{
+			System.IntPtr num = IL2CPP.Il2CppObjectBaseToPtrNotNull(this);
+			IL2CPP.il2cpp_gc_wbarrier_set_field(num, (nint)num + (int)IL2CPP.il2cpp_field_get_offset(NativeFieldInfoPtr__charisma), IL2CPP.Il2CppObjectBaseToPtr(obj));
+		}
+	}
+
+	public unsafe TextMeshProUGUI _agility
+	{
+		get
+		{
+			nint num = (nint)IL2CPP.Il2CppObjectBaseToPtrNotNull(this) + (int)IL2CPP.il2cpp_field_get_offset(NativeFieldInfoPtr__agility);
+			System.IntPtr intPtr = *(System.IntPtr*)num;
+			return (intPtr != (System.IntPtr)0) ? Il2CppObjectPool.Get<TextMeshProUGUI>(intPtr) : null;
+		}
+		set
+		{
+			System.IntPtr num = IL2CPP.Il2CppObjectBaseToPtrNotNull(this);
+			IL2CPP.il2cpp_gc_wbarrier_set_field(num, (nint)num + (int)IL2CPP.il2cpp_field_get_offset(NativeFieldInfoPtr__agility), IL2CPP.Il2CppObjectBaseToPtr(obj));
+		}
+	}
+
+	public unsafe TextMeshProUGUI _energy
+	{
+		get
+		{
+			nint num = (nint)IL2CPP.Il2CppObjectBaseToPtrNotNull(this) + (int)IL2CPP.il2cpp_field_get_offset(NativeFieldInfoPtr__energy);
+			System.IntPtr intPtr = *(System.IntPtr*)num;
+			return (intPtr != (System.IntPtr)0) ? Il2CppObjectPool.Get<TextMeshProUGUI>(intPtr) : null;
+		}
+		set
+		{
+			System.IntPtr num = IL2CPP.Il2CppObjectBaseToPtrNotNull(this);
+			IL2CPP.il2cpp_gc_wbarrier_set_field(num, (nint)num + (int)IL2CPP.il2cpp_field_get_offset(NativeFieldInfoPtr__energy), IL2CPP.Il2CppObjectBaseToPtr(obj));
+		}
+	}
+
+	public unsafe GameObject _worldName
+	{
+		get
+		{
+			nint num = (nint)IL2CPP.Il2CppObjectBaseToPtrNotNull(this) + (int)IL2CPP.il2cpp_field_get_offset(NativeFieldInfoPtr__worldName);
+			System.IntPtr intPtr = *(System.IntPtr*)num;
+			return (intPtr != (System.IntPtr)0) ? Il2CppObjectPool.Get<GameObject>(intPtr) : null;
+		}
+		set
+		{
+			System.IntPtr num = IL2CPP.Il2CppObjectBaseToPtrNotNull(this);
+			IL2CPP.il2cpp_gc_wbarrier_set_field(num, (nint)num + (int)IL2CPP.il2cpp_field_get_offset(NativeFieldInfoPtr__worldName), IL2CPP.Il2CppObjectBaseToPtr(obj));
+		}
+	}
+
+	public unsafe Image _backgroundDifficultyPreview
+	{
+		get
+		{
+			nint num = (nint)IL2CPP.Il2CppObjectBaseToPtrNotNull(this) + (int)IL2CPP.il2cpp_field_get_offset(NativeFieldInfoPtr__backgroundDifficultyPreview);
+			System.IntPtr intPtr = *(System.IntPtr*)num;
+			return (intPtr != (System.IntPtr)0) ? Il2CppObjectPool.Get<Image>(intPtr) : null;
+		}
+		set
+		{
+			System.IntPtr num = IL2CPP.Il2CppObjectBaseToPtrNotNull(this);
+			IL2CPP.il2cpp_gc_wbarrier_set_field(num, (nint)num + (int)IL2CPP.il2cpp_field_get_offset(NativeFieldInfoPtr__backgroundDifficultyPreview), IL2CPP.Il2CppObjectBaseToPtr(obj));
+		}
+	}
+
+	public unsafe Image _worldDifficultyPreview
+	{
+		get
+		{
+			nint num = (nint)IL2CPP.Il2CppObjectBaseToPtrNotNull(this) + (int)IL2CPP.il2cpp_field_get_offset(NativeFieldInfoPtr__worldDifficultyPreview);
+			System.IntPtr intPtr = *(System.IntPtr*)num;
+			return (intPtr != (System.IntPtr)0) ? Il2CppObjectPool.Get<Image>(intPtr) : null;
+		}
+		set
+		{
+			System.IntPtr num = IL2CPP.Il2CppObjectBaseToPtrNotNull(this);
+			IL2CPP.il2cpp_gc_wbarrier_set_field(num, (nint)num + (int)IL2CPP.il2cpp_field_get_offset(NativeFieldInfoPtr__worldDifficultyPreview), IL2CPP.Il2CppObjectBaseToPtr(obj));
+		}
+	}
+
+	public unsafe TextMeshProUGUI _lobbyCount
+	{
+		get
+		{
+			nint num = (nint)IL2CPP.Il2CppObjectBaseToPtrNotNull(this) + (int)IL2CPP.il2cpp_field_get_offset(NativeFieldInfoPtr__lobbyCount);
+			System.IntPtr intPtr = *(System.IntPtr*)num;
+			return (intPtr != (System.IntPtr)0) ? Il2CppObjectPool.Get<TextMeshProUGUI>(intPtr) : null;
+		}
+		set
+		{
+			System.IntPtr num = IL2CPP.Il2CppObjectBaseToPtrNotNull(this);
+			IL2CPP.il2cpp_gc_wbarrier_set_field(num, (nint)num + (int)IL2CPP.il2cpp_field_get_offset(NativeFieldInfoPtr__lobbyCount), IL2CPP.Il2CppObjectBaseToPtr(obj));
+		}
+	}
+
+	public unsafe TMP_InputField _passwordInput
+	{
+		get
+		{
+			nint num = (nint)IL2CPP.Il2CppObjectBaseToPtrNotNull(this) + (int)IL2CPP.il2cpp_field_get_offset(NativeFieldInfoPtr__passwordInput);
+			System.IntPtr intPtr = *(System.IntPtr*)num;
+			return (intPtr != (System.IntPtr)0) ? Il2CppObjectPool.Get<TMP_InputField>(intPtr) : null;
+		}
+		set
+		{
+			System.IntPtr num = IL2CPP.Il2CppObjectBaseToPtrNotNull(this);
+			IL2CPP.il2cpp_gc_wbarrier_set_field(num, (nint)num + (int)IL2CPP.il2cpp_field_get_offset(NativeFieldInfoPtr__passwordInput), IL2CPP.Il2CppObjectBaseToPtr(obj));
+		}
+	}
+
+	public unsafe TMP_InputField _lobbyNoteInput
+	{
+		get
+		{
+			nint num = (nint)IL2CPP.Il2CppObjectBaseToPtrNotNull(this) + (int)IL2CPP.il2cpp_field_get_offset(NativeFieldInfoPtr__lobbyNoteInput);
+			System.IntPtr intPtr = *(System.IntPtr*)num;
+			return (intPtr != (System.IntPtr)0) ? Il2CppObjectPool.Get<TMP_InputField>(intPtr) : null;
+		}
+		set
+		{
+			System.IntPtr num = IL2CPP.Il2CppObjectBaseToPtrNotNull(this);
+			IL2CPP.il2cpp_gc_wbarrier_set_field(num, (nint)num + (int)IL2CPP.il2cpp_field_get_offset(NativeFieldInfoPtr__lobbyNoteInput), IL2CPP.Il2CppObjectBaseToPtr(obj));
+		}
+	}
+
+	public unsafe TextMeshProUGUI _worldNamePreview
+	{
+		get
+		{
+			nint num = (nint)IL2CPP.Il2CppObjectBaseToPtrNotNull(this) + (int)IL2CPP.il2cpp_field_get_offset(NativeFieldInfoPtr__worldNamePreview);
+			System.IntPtr intPtr = *(System.IntPtr*)num;
+			return (intPtr != (System.IntPtr)0) ? Il2CppObjectPool.Get<TextMeshProUGUI>(intPtr) : null;
+		}
+		set
+		{
+			System.IntPtr num = IL2CPP.Il2CppObjectBaseToPtrNotNull(this);
+			IL2CPP.il2cpp_gc_wbarrier_set_field(num, (nint)num + (int)IL2CPP.il2cpp_field_get_offset(NativeFieldInfoPtr__worldNamePreview), IL2CPP.Il2CppObjectBaseToPtr(obj));
+		}
+	}
+
+	public unsafe List<TextMeshProUGUI> _worldAgeTexts
+	{
+		get
+		{
+			nint num = (nint)IL2CPP.Il2CppObjectBaseToPtrNotNull(this) + (int)IL2CPP.il2cpp_field_get_offset(NativeFieldInfoPtr__worldAgeTexts);
+			System.IntPtr intPtr = *(System.IntPtr*)num;
+			return (intPtr != (System.IntPtr)0) ? Il2CppObjectPool.Get<List<TextMeshProUGUI>>(intPtr) : null;
+		}
+		set
+		{
+			System.IntPtr num = IL2CPP.Il2CppObjectBaseToPtrNotNull(this);
+			IL2CPP.il2cpp_gc_wbarrier_set_field(num, (nint)num + (int)IL2CPP.il2cpp_field_get_offset(NativeFieldInfoPtr__worldAgeTexts), IL2CPP.Il2CppObjectBaseToPtr(obj));
+		}
+	}
+
+	public unsafe List<TextMeshProUGUI> _worldDifficultyTexts
+	{
+		get
+		{
+			nint num = (nint)IL2CPP.Il2CppObjectBaseToPtrNotNull(this) + (int)IL2CPP.il2cpp_field_get_offset(NativeFieldInfoPtr__worldDifficultyTexts);
+			System.IntPtr intPtr = *(System.IntPtr*)num;
+			return (intPtr != (System.IntPtr)0) ? Il2CppObjectPool.Get<List<TextMeshProUGUI>>(intPtr) : null;
+		}
+		set
+		{
+			System.IntPtr num = IL2CPP.Il2CppObjectBaseToPtrNotNull(this);
+			IL2CPP.il2cpp_gc_wbarrier_set_field(num, (nint)num + (int)IL2CPP.il2cpp_field_get_offset(NativeFieldInfoPtr__worldDifficultyTexts), IL2CPP.Il2CppObjectBaseToPtr(obj));
+		}
+	}
+
+	public unsafe List<TextMeshProUGUI> _worldTypeTexts
+	{
+		get
+		{
+			nint num = (nint)IL2CPP.Il2CppObjectBaseToPtrNotNull(this) + (int)IL2CPP.il2cpp_field_get_offset(NativeFieldInfoPtr__worldTypeTexts);
+			System.IntPtr intPtr = *(System.IntPtr*)num;
+			return (intPtr != (System.IntPtr)0) ? Il2CppObjectPool.Get<List<TextMeshProUGUI>>(intPtr) : null;
+		}
+		set
+		{
+			System.IntPtr num = IL2CPP.Il2CppObjectBaseToPtrNotNull(this);
+			IL2CPP.il2cpp_gc_wbarrier_set_field(num, (nint)num + (int)IL2CPP.il2cpp_field_get_offset(NativeFieldInfoPtr__worldTypeTexts), IL2CPP.Il2CppObjectBaseToPtr(obj));
+		}
+	}
+
+	public unsafe Toggle _friendlyFire
+	{
+		get
+		{
+			nint num = (nint)IL2CPP.Il2CppObjectBaseToPtrNotNull(this) + (int)IL2CPP.il2cpp_field_get_offset(NativeFieldInfoPtr__friendlyFire);
+			System.IntPtr intPtr = *(System.IntPtr*)num;
+			return (intPtr != (System.IntPtr)0) ? Il2CppObjectPool.Get<Toggle>(intPtr) : null;
+		}
+		set
+		{
+			System.IntPtr num = IL2CPP.Il2CppObjectBaseToPtrNotNull(this);
+			IL2CPP.il2cpp_gc_wbarrier_set_field(num, (nint)num + (int)IL2CPP.il2cpp_field_get_offset(NativeFieldInfoPtr__friendlyFire), IL2CPP.Il2CppObjectBaseToPtr(obj));
+		}
+	}
+
+	public unsafe Toggle _newCharactersOnly
+	{
+		get
+		{
+			nint num = (nint)IL2CPP.Il2CppObjectBaseToPtrNotNull(this) + (int)IL2CPP.il2cpp_field_get_offset(NativeFieldInfoPtr__newCharactersOnly);
+			System.IntPtr intPtr = *(System.IntPtr*)num;
+			return (intPtr != (System.IntPtr)0) ? Il2CppObjectPool.Get<Toggle>(intPtr) : null;
+		}
+		set
+		{
+			System.IntPtr num = IL2CPP.Il2CppObjectBaseToPtrNotNull(this);
+			IL2CPP.il2cpp_gc_wbarrier_set_field(num, (nint)num + (int)IL2CPP.il2cpp_field_get_offset(NativeFieldInfoPtr__newCharactersOnly), IL2CPP.Il2CppObjectBaseToPtr(obj));
+		}
+	}
+
+	public unsafe Toggle _personalLoot
+	{
+		get
+		{
+			nint num = (nint)IL2CPP.Il2CppObjectBaseToPtrNotNull(this) + (int)IL2CPP.il2cpp_field_get_offset(NativeFieldInfoPtr__personalLoot);
+			System.IntPtr intPtr = *(System.IntPtr*)num;
+			return (intPtr != (System.IntPtr)0) ? Il2CppObjectPool.Get<Toggle>(intPtr) : null;
+		}
+		set
+		{
+			System.IntPtr num = IL2CPP.Il2CppObjectBaseToPtrNotNull(this);
+			IL2CPP.il2cpp_gc_wbarrier_set_field(num, (nint)num + (int)IL2CPP.il2cpp_field_get_offset(NativeFieldInfoPtr__personalLoot), IL2CPP.Il2CppObjectBaseToPtr(obj));
+		}
+	}
+
+	public unsafe Toggle LobbyOpen
+	{
+		get
+		{
+			nint num = (nint)IL2CPP.Il2CppObjectBaseToPtrNotNull(this) + (int)IL2CPP.il2cpp_field_get_offset(NativeFieldInfoPtr_LobbyOpen);
+			System.IntPtr intPtr = *(System.IntPtr*)num;
+			return (intPtr != (System.IntPtr)0) ? Il2CppObjectPool.Get<Toggle>(intPtr) : null;
+		}
+		set
+		{
+			System.IntPtr num = IL2CPP.Il2CppObjectBaseToPtrNotNull(this);
+			IL2CPP.il2cpp_gc_wbarrier_set_field(num, (nint)num + (int)IL2CPP.il2cpp_field_get_offset(NativeFieldInfoPtr_LobbyOpen), IL2CPP.Il2CppObjectBaseToPtr(obj));
+		}
+	}
+
+	public unsafe Toggle FriendsOnly
+	{
+		get
+		{
+			nint num = (nint)IL2CPP.Il2CppObjectBaseToPtrNotNull(this) + (int)IL2CPP.il2cpp_field_get_offset(NativeFieldInfoPtr_FriendsOnly);
+			System.IntPtr intPtr = *(System.IntPtr*)num;
+			return (intPtr != (System.IntPtr)0) ? Il2CppObjectPool.Get<Toggle>(intPtr) : null;
+		}
+		set
+		{
+			System.IntPtr num = IL2CPP.Il2CppObjectBaseToPtrNotNull(this);
+			IL2CPP.il2cpp_gc_wbarrier_set_field(num, (nint)num + (int)IL2CPP.il2cpp_field_get_offset(NativeFieldInfoPtr_FriendsOnly), IL2CPP.Il2CppObjectBaseToPtr(obj));
+		}
+	}
+
+	public unsafe Toggle InviteOnly
+	{
+		get
+		{
+			nint num = (nint)IL2CPP.Il2CppObjectBaseToPtrNotNull(this) + (int)IL2CPP.il2cpp_field_get_offset(NativeFieldInfoPtr_InviteOnly);
+			System.IntPtr intPtr = *(System.IntPtr*)num;
+			return (intPtr != (System.IntPtr)0) ? Il2CppObjectPool.Get<Toggle>(intPtr) : null;
+		}
+		set
+		{
+			System.IntPtr num = IL2CPP.Il2CppObjectBaseToPtrNotNull(this);
+			IL2CPP.il2cpp_gc_wbarrier_set_field(num, (nint)num + (int)IL2CPP.il2cpp_field_get_offset(NativeFieldInfoPtr_InviteOnly), IL2CPP.Il2CppObjectBaseToPtr(obj));
+		}
+	}
+
+	public unsafe Button _decreaseButton
+	{
+		get
+		{
+			nint num = (nint)IL2CPP.Il2CppObjectBaseToPtrNotNull(this) + (int)IL2CPP.il2cpp_field_get_offset(NativeFieldInfoPtr__decreaseButton);
+			System.IntPtr intPtr = *(System.IntPtr*)num;
+			return (intPtr != (System.IntPtr)0) ? Il2CppObjectPool.Get<Button>(intPtr) : null;
+		}
+		set
+		{
+			System.IntPtr num = IL2CPP.Il2CppObjectBaseToPtrNotNull(this);
+			IL2CPP.il2cpp_gc_wbarrier_set_field(num, (nint)num + (int)IL2CPP.il2cpp_field_get_offset(NativeFieldInfoPtr__decreaseButton), IL2CPP.Il2CppObjectBaseToPtr(obj));
+		}
+	}
+
+	public unsafe Button _increaseButton
+	{
+		get
+		{
+			nint num = (nint)IL2CPP.Il2CppObjectBaseToPtrNotNull(this) + (int)IL2CPP.il2cpp_field_get_offset(NativeFieldInfoPtr__increaseButton);
+			System.IntPtr intPtr = *(System.IntPtr*)num;
+			return (intPtr != (System.IntPtr)0) ? Il2CppObjectPool.Get<Button>(intPtr) : null;
+		}
+		set
+		{
+			System.IntPtr num = IL2CPP.Il2CppObjectBaseToPtrNotNull(this);
+			IL2CPP.il2cpp_gc_wbarrier_set_field(num, (nint)num + (int)IL2CPP.il2cpp_field_get_offset(NativeFieldInfoPtr__increaseButton), IL2CPP.Il2CppObjectBaseToPtr(obj));
+		}
+	}
+
+	public unsafe TextMeshProUGUI _maxPlayersDisplay
+	{
+		get
+		{
+			nint num = (nint)IL2CPP.Il2CppObjectBaseToPtrNotNull(this) + (int)IL2CPP.il2cpp_field_get_offset(NativeFieldInfoPtr__maxPlayersDisplay);
+			System.IntPtr intPtr = *(System.IntPtr*)num;
+			return (intPtr != (System.IntPtr)0) ? Il2CppObjectPool.Get<TextMeshProUGUI>(intPtr) : null;
+		}
+		set
+		{
+			System.IntPtr num = IL2CPP.Il2CppObjectBaseToPtrNotNull(this);
+			IL2CPP.il2cpp_gc_wbarrier_set_field(num, (nint)num + (int)IL2CPP.il2cpp_field_get_offset(NativeFieldInfoPtr__maxPlayersDisplay), IL2CPP.Il2CppObjectBaseToPtr(obj));
+		}
+	}
+
+	public unsafe GameObject _maxPlayersWarning
+	{
+		get
+		{
+			nint num = (nint)IL2CPP.Il2CppObjectBaseToPtrNotNull(this) + (int)IL2CPP.il2cpp_field_get_offset(NativeFieldInfoPtr__maxPlayersWarning);
+			System.IntPtr intPtr = *(System.IntPtr*)num;
+			return (intPtr != (System.IntPtr)0) ? Il2CppObjectPool.Get<GameObject>(intPtr) : null;
+		}
+		set
+		{
+			System.IntPtr num = IL2CPP.Il2CppObjectBaseToPtrNotNull(this);
+			IL2CPP.il2cpp_gc_wbarrier_set_field(num, (nint)num + (int)IL2CPP.il2cpp_field_get_offset(NativeFieldInfoPtr__maxPlayersWarning), IL2CPP.Il2CppObjectBaseToPtr(obj));
+		}
+	}
+
+	public unsafe TextMeshProUGUI _maxPlayersForServer
+	{
+		get
+		{
+			nint num = (nint)IL2CPP.Il2CppObjectBaseToPtrNotNull(this) + (int)IL2CPP.il2cpp_field_get_offset(NativeFieldInfoPtr__maxPlayersForServer);
+			System.IntPtr intPtr = *(System.IntPtr*)num;
+			return (intPtr != (System.IntPtr)0) ? Il2CppObjectPool.Get<TextMeshProUGUI>(intPtr) : null;
+		}
+		set
+		{
+			System.IntPtr num = IL2CPP.Il2CppObjectBaseToPtrNotNull(this);
+			IL2CPP.il2cpp_gc_wbarrier_set_field(num, (nint)num + (int)IL2CPP.il2cpp_field_get_offset(NativeFieldInfoPtr__maxPlayersForServer), IL2CPP.Il2CppObjectBaseToPtr(obj));
+		}
+	}
+
+	public unsafe Selectable _maxPlayersSelectable
+	{
+		get
+		{
+			nint num = (nint)IL2CPP.Il2CppObjectBaseToPtrNotNull(this) + (int)IL2CPP.il2cpp_field_get_offset(NativeFieldInfoPtr__maxPlayersSelectable);
+			System.IntPtr intPtr = *(System.IntPtr*)num;
+			return (intPtr != (System.IntPtr)0) ? Il2CppObjectPool.Get<Selectable>(intPtr) : null;
+		}
+		set
+		{
+			System.IntPtr num = IL2CPP.Il2CppObjectBaseToPtrNotNull(this);
+			IL2CPP.il2cpp_gc_wbarrier_set_field(num, (nint)num + (int)IL2CPP.il2cpp_field_get_offset(NativeFieldInfoPtr__maxPlayersSelectable), IL2CPP.Il2CppObjectBaseToPtr(obj));
+		}
+	}
+
+	public unsafe UIActionHint _adjustPlayerLimitHint
+	{
+		get
+		{
+			nint num = (nint)IL2CPP.Il2CppObjectBaseToPtrNotNull(this) + (int)IL2CPP.il2cpp_field_get_offset(NativeFieldInfoPtr__adjustPlayerLimitHint);
+			System.IntPtr intPtr = *(System.IntPtr*)num;
+			return (intPtr != (System.IntPtr)0) ? Il2CppObjectPool.Get<UIActionHint>(intPtr) : null;
+		}
+		set
+		{
+			System.IntPtr num = IL2CPP.Il2CppObjectBaseToPtrNotNull(this);
+			IL2CPP.il2cpp_gc_wbarrier_set_field(num, (nint)num + (int)IL2CPP.il2cpp_field_get_offset(NativeFieldInfoPtr__adjustPlayerLimitHint), IL2CPP.Il2CppObjectBaseToPtr(obj));
+		}
+	}
+
+	public unsafe CanvasGroup _notReadyPopUp
+	{
+		get
+		{
+			nint num = (nint)IL2CPP.Il2CppObjectBaseToPtrNotNull(this) + (int)IL2CPP.il2cpp_field_get_offset(NativeFieldInfoPtr__notReadyPopUp);
+			System.IntPtr intPtr = *(System.IntPtr*)num;
+			return (intPtr != (System.IntPtr)0) ? Il2CppObjectPool.Get<CanvasGroup>(intPtr) : null;
+		}
+		set
+		{
+			System.IntPtr num = IL2CPP.Il2CppObjectBaseToPtrNotNull(this);
+			IL2CPP.il2cpp_gc_wbarrier_set_field(num, (nint)num + (int)IL2CPP.il2cpp_field_get_offset(NativeFieldInfoPtr__notReadyPopUp), IL2CPP.Il2CppObjectBaseToPtr(obj));
+		}
+	}
+
+	public unsafe TextMeshProUGUI _errorText
+	{
+		get
+		{
+			nint num = (nint)IL2CPP.Il2CppObjectBaseToPtrNotNull(this) + (int)IL2CPP.il2cpp_field_get_offset(NativeFieldInfoPtr__errorText);
+			System.IntPtr intPtr = *(System.IntPtr*)num;
+			return (intPtr != (System.IntPtr)0) ? Il2CppObjectPool.Get<TextMeshProUGUI>(intPtr) : null;
+		}
+		set
+		{
+			System.IntPtr num = IL2CPP.Il2CppObjectBaseToPtrNotNull(this);
+			IL2CPP.il2cpp_gc_wbarrier_set_field(num, (nint)num + (int)IL2CPP.il2cpp_field_get_offset(NativeFieldInfoPtr__errorText), IL2CPP.Il2CppObjectBaseToPtr(obj));
+		}
+	}
+
+	public unsafe Button _backButton
+	{
+		get
+		{
+			nint num = (nint)IL2CPP.Il2CppObjectBaseToPtrNotNull(this) + (int)IL2CPP.il2cpp_field_get_offset(NativeFieldInfoPtr__backButton);
+			System.IntPtr intPtr = *(System.IntPtr*)num;
+			return (intPtr != (System.IntPtr)0) ? Il2CppObjectPool.Get<Button>(intPtr) : null;
+		}
+		set
+		{
+			System.IntPtr num = IL2CPP.Il2CppObjectBaseToPtrNotNull(this);
+			IL2CPP.il2cpp_gc_wbarrier_set_field(num, (nint)num + (int)IL2CPP.il2cpp_field_get_offset(NativeFieldInfoPtr__backButton), IL2CPP.Il2CppObjectBaseToPtr(obj));
+		}
+	}
+
+	public unsafe Button _changeWorldButton
+	{
+		get
+		{
+			nint num = (nint)IL2CPP.Il2CppObjectBaseToPtrNotNull(this) + (int)IL2CPP.il2cpp_field_get_offset(NativeFieldInfoPtr__changeWorldButton);
+			System.IntPtr intPtr = *(System.IntPtr*)num;
+			return (intPtr != (System.IntPtr)0) ? Il2CppObjectPool.Get<Button>(intPtr) : null;
+		}
+		set
+		{
+			System.IntPtr num = IL2CPP.Il2CppObjectBaseToPtrNotNull(this);
+			IL2CPP.il2cpp_gc_wbarrier_set_field(num, (nint)num + (int)IL2CPP.il2cpp_field_get_offset(NativeFieldInfoPtr__changeWorldButton), IL2CPP.Il2CppObjectBaseToPtr(obj));
+		}
+	}
+
+	public unsafe Button _simpleChangeWorldButton
+	{
+		get
+		{
+			nint num = (nint)IL2CPP.Il2CppObjectBaseToPtrNotNull(this) + (int)IL2CPP.il2cpp_field_get_offset(NativeFieldInfoPtr__simpleChangeWorldButton);
+			System.IntPtr intPtr = *(System.IntPtr*)num;
+			return (intPtr != (System.IntPtr)0) ? Il2CppObjectPool.Get<Button>(intPtr) : null;
+		}
+		set
+		{
+			System.IntPtr num = IL2CPP.Il2CppObjectBaseToPtrNotNull(this);
+			IL2CPP.il2cpp_gc_wbarrier_set_field(num, (nint)num + (int)IL2CPP.il2cpp_field_get_offset(NativeFieldInfoPtr__simpleChangeWorldButton), IL2CPP.Il2CppObjectBaseToPtr(obj));
+		}
+	}
+
+	public unsafe Button _backToWorldSelectButton
+	{
+		get
+		{
+			nint num = (nint)IL2CPP.Il2CppObjectBaseToPtrNotNull(this) + (int)IL2CPP.il2cpp_field_get_offset(NativeFieldInfoPtr__backToWorldSelectButton);
+			System.IntPtr intPtr = *(System.IntPtr*)num;
+			return (intPtr != (System.IntPtr)0) ? Il2CppObjectPool.Get<Button>(intPtr) : null;
+		}
+		set
+		{
+			System.IntPtr num = IL2CPP.Il2CppObjectBaseToPtrNotNull(this);
+			IL2CPP.il2cpp_gc_wbarrier_set_field(num, (nint)num + (int)IL2CPP.il2cpp_field_get_offset(NativeFieldInfoPtr__backToWorldSelectButton), IL2CPP.Il2CppObjectBaseToPtr(obj));
+		}
+	}
+
+	public unsafe Button _backToLobbySelectButton
+	{
+		get
+		{
+			nint num = (nint)IL2CPP.Il2CppObjectBaseToPtrNotNull(this) + (int)IL2CPP.il2cpp_field_get_offset(NativeFieldInfoPtr__backToLobbySelectButton);
+			System.IntPtr intPtr = *(System.IntPtr*)num;
+			return (intPtr != (System.IntPtr)0) ? Il2CppObjectPool.Get<Button>(intPtr) : null;
+		}
+		set
+		{
+			System.IntPtr num = IL2CPP.Il2CppObjectBaseToPtrNotNull(this);
+			IL2CPP.il2cpp_gc_wbarrier_set_field(num, (nint)num + (int)IL2CPP.il2cpp_field_get_offset(NativeFieldInfoPtr__backToLobbySelectButton), IL2CPP.Il2CppObjectBaseToPtr(obj));
+		}
+	}
+
+	public unsafe List<Toggle> _personalLootMirrorToggles
+	{
+		get
+		{
+			nint num = (nint)IL2CPP.Il2CppObjectBaseToPtrNotNull(this) + (int)IL2CPP.il2cpp_field_get_offset(NativeFieldInfoPtr__personalLootMirrorToggles);
+			System.IntPtr intPtr = *(System.IntPtr*)num;
+			return (intPtr != (System.IntPtr)0) ? Il2CppObjectPool.Get<List<Toggle>>(intPtr) : null;
+		}
+		set
+		{
+			System.IntPtr num = IL2CPP.Il2CppObjectBaseToPtrNotNull(this);
+			IL2CPP.il2cpp_gc_wbarrier_set_field(num, (nint)num + (int)IL2CPP.il2cpp_field_get_offset(NativeFieldInfoPtr__personalLootMirrorToggles), IL2CPP.Il2CppObjectBaseToPtr(obj));
+		}
+	}
+
+	public unsafe List<UITextInputView> _textInputViews
+	{
+		get
+		{
+			nint num = (nint)IL2CPP.Il2CppObjectBaseToPtrNotNull(this) + (int)IL2CPP.il2cpp_field_get_offset(NativeFieldInfoPtr__textInputViews);
+			System.IntPtr intPtr = *(System.IntPtr*)num;
+			return (intPtr != (System.IntPtr)0) ? Il2CppObjectPool.Get<List<UITextInputView>>(intPtr) : null;
+		}
+		set
+		{
+			System.IntPtr num = IL2CPP.Il2CppObjectBaseToPtrNotNull(this);
+			IL2CPP.il2cpp_gc_wbarrier_set_field(num, (nint)num + (int)IL2CPP.il2cpp_field_get_offset(NativeFieldInfoPtr__textInputViews), IL2CPP.Il2CppObjectBaseToPtr(obj));
+		}
+	}
+
+	public unsafe Coroutine _notReadyCoroutine
+	{
+		get
+		{
+			nint num = (nint)IL2CPP.Il2CppObjectBaseToPtrNotNull(this) + (int)IL2CPP.il2cpp_field_get_offset(NativeFieldInfoPtr__notReadyCoroutine);
+			System.IntPtr intPtr = *(System.IntPtr*)num;
+			return (intPtr != (System.IntPtr)0) ? Il2CppObjectPool.Get<Coroutine>(intPtr) : null;
+		}
+		set
+		{
+			System.IntPtr num = IL2CPP.Il2CppObjectBaseToPtrNotNull(this);
+			IL2CPP.il2cpp_gc_wbarrier_set_field(num, (nint)num + (int)IL2CPP.il2cpp_field_get_offset(NativeFieldInfoPtr__notReadyCoroutine), IL2CPP.Il2CppObjectBaseToPtr(obj));
+		}
+	}
+
+	public unsafe PlayerSaveFile _playerFile
+	{
+		get
+		{
+			nint num = (nint)IL2CPP.Il2CppObjectBaseToPtrNotNull(this) + (int)IL2CPP.il2cpp_field_get_offset(NativeFieldInfoPtr__playerFile);
+			System.IntPtr intPtr = *(System.IntPtr*)num;
+			return (intPtr != (System.IntPtr)0) ? Il2CppObjectPool.Get<PlayerSaveFile>(intPtr) : null;
+		}
+		set
+		{
+			System.IntPtr num = IL2CPP.Il2CppObjectBaseToPtrNotNull(this);
+			IL2CPP.il2cpp_gc_wbarrier_set_field(num, (nint)num + (int)IL2CPP.il2cpp_field_get_offset(NativeFieldInfoPtr__playerFile), IL2CPP.Il2CppObjectBaseToPtr(obj));
+		}
+	}
+
+	public unsafe WorldSaveFile _worldFile
+	{
+		get
+		{
+			nint num = (nint)IL2CPP.Il2CppObjectBaseToPtrNotNull(this) + (int)IL2CPP.il2cpp_field_get_offset(NativeFieldInfoPtr__worldFile);
+			System.IntPtr intPtr = *(System.IntPtr*)num;
+			return (intPtr != (System.IntPtr)0) ? Il2CppObjectPool.Get<WorldSaveFile>(intPtr) : null;
+		}
+		set
+		{
+			System.IntPtr num = IL2CPP.Il2CppObjectBaseToPtrNotNull(this);
+			IL2CPP.il2cpp_gc_wbarrier_set_field(num, (nint)num + (int)IL2CPP.il2cpp_field_get_offset(NativeFieldInfoPtr__worldFile), IL2CPP.Il2CppObjectBaseToPtr(obj));
+		}
+	}
+
+	public unsafe int _localPlayers
+	{
+		get
+		{
+			nint num = (nint)IL2CPP.Il2CppObjectBaseToPtrNotNull(this) + (int)IL2CPP.il2cpp_field_get_offset(NativeFieldInfoPtr__localPlayers);
+			return *(int*)num;
+		}
+		set
+		{
+			*(int*)((nint)IL2CPP.Il2CppObjectBaseToPtrNotNull(this) + (int)IL2CPP.il2cpp_field_get_offset(NativeFieldInfoPtr__localPlayers)) = num;
+		}
+	}
+
+	public unsafe bool _isNewWorldMode
+	{
+		get
+		{
+			nint num = (nint)IL2CPP.Il2CppObjectBaseToPtrNotNull(this) + (int)IL2CPP.il2cpp_field_get_offset(NativeFieldInfoPtr__isNewWorldMode);
+			return *(bool*)num;
+		}
+		set
+		{
+			*(bool*)((nint)IL2CPP.Il2CppObjectBaseToPtrNotNull(this) + (int)IL2CPP.il2cpp_field_get_offset(NativeFieldInfoPtr__isNewWorldMode)) = flag;
+		}
+	}
+
+	public unsafe bool _userChangedWorld
+	{
+		get
+		{
+			nint num = (nint)IL2CPP.Il2CppObjectBaseToPtrNotNull(this) + (int)IL2CPP.il2cpp_field_get_offset(NativeFieldInfoPtr__userChangedWorld);
+			return *(bool*)num;
+		}
+		set
+		{
+			*(bool*)((nint)IL2CPP.Il2CppObjectBaseToPtrNotNull(this) + (int)IL2CPP.il2cpp_field_get_offset(NativeFieldInfoPtr__userChangedWorld)) = flag;
+		}
+	}
+
+	public unsafe string _worldChoiceOwner
+	{
+		get
+		{
+			nint num = (nint)IL2CPP.Il2CppObjectBaseToPtrNotNull(this) + (int)IL2CPP.il2cpp_field_get_offset(NativeFieldInfoPtr__worldChoiceOwner);
+			return IL2CPP.Il2CppStringToManaged(*(System.IntPtr*)num);
+		}
+		set
+		{
+			System.IntPtr num = IL2CPP.Il2CppObjectBaseToPtrNotNull(this);
+			IL2CPP.il2cpp_gc_wbarrier_set_field(num, (nint)num + (int)IL2CPP.il2cpp_field_get_offset(NativeFieldInfoPtr__worldChoiceOwner), IL2CPP.ManagedStringToIl2Cpp(str));
+		}
+	}
+
+	public unsafe bool _privacyListenersWired
+	{
+		get
+		{
+			nint num = (nint)IL2CPP.Il2CppObjectBaseToPtrNotNull(this) + (int)IL2CPP.il2cpp_field_get_offset(NativeFieldInfoPtr__privacyListenersWired);
+			return *(bool*)num;
+		}
+		set
+		{
+			*(bool*)((nint)IL2CPP.Il2CppObjectBaseToPtrNotNull(this) + (int)IL2CPP.il2cpp_field_get_offset(NativeFieldInfoPtr__privacyListenersWired)) = flag;
+		}
+	}
+
+	public unsafe bool _personalLootListenerWired
+	{
+		get
+		{
+			nint num = (nint)IL2CPP.Il2CppObjectBaseToPtrNotNull(this) + (int)IL2CPP.il2cpp_field_get_offset(NativeFieldInfoPtr__personalLootListenerWired);
+			return *(bool*)num;
+		}
+		set
+		{
+			*(bool*)((nint)IL2CPP.Il2CppObjectBaseToPtrNotNull(this) + (int)IL2CPP.il2cpp_field_get_offset(NativeFieldInfoPtr__personalLootListenerWired)) = flag;
+		}
+	}
+
+	public unsafe bool _personalLootDirty
+	{
+		get
+		{
+			nint num = (nint)IL2CPP.Il2CppObjectBaseToPtrNotNull(this) + (int)IL2CPP.il2cpp_field_get_offset(NativeFieldInfoPtr__personalLootDirty);
+			return *(bool*)num;
+		}
+		set
+		{
+			*(bool*)((nint)IL2CPP.Il2CppObjectBaseToPtrNotNull(this) + (int)IL2CPP.il2cpp_field_get_offset(NativeFieldInfoPtr__personalLootDirty)) = flag;
+		}
+	}
+
+	public unsafe bool _difficultyListenerWired
+	{
+		get
+		{
+			nint num = (nint)IL2CPP.Il2CppObjectBaseToPtrNotNull(this) + (int)IL2CPP.il2cpp_field_get_offset(NativeFieldInfoPtr__difficultyListenerWired);
+			return *(bool*)num;
+		}
+		set
+		{
+			*(bool*)((nint)IL2CPP.Il2CppObjectBaseToPtrNotNull(this) + (int)IL2CPP.il2cpp_field_get_offset(NativeFieldInfoPtr__difficultyListenerWired)) = flag;
+		}
+	}
+
+	public unsafe Difficulty _selectedDifficulty
+	{
+		get
+		{
+			nint num = (nint)IL2CPP.Il2CppObjectBaseToPtrNotNull(this) + (int)IL2CPP.il2cpp_field_get_offset(NativeFieldInfoPtr__selectedDifficulty);
+			return *(Difficulty*)num;
+		}
+		set
+		{
+			*(Difficulty*)((nint)IL2CPP.Il2CppObjectBaseToPtrNotNull(this) + (int)IL2CPP.il2cpp_field_get_offset(NativeFieldInfoPtr__selectedDifficulty)) = difficulty;
+		}
+	}
+
+	public unsafe UIFocusScope _focusScope
+	{
+		get
+		{
+			nint num = (nint)IL2CPP.Il2CppObjectBaseToPtrNotNull(this) + (int)IL2CPP.il2cpp_field_get_offset(NativeFieldInfoPtr__focusScope);
+			System.IntPtr intPtr = *(System.IntPtr*)num;
+			return (intPtr != (System.IntPtr)0) ? Il2CppObjectPool.Get<UIFocusScope>(intPtr) : null;
+		}
+		set
+		{
+			System.IntPtr num = IL2CPP.Il2CppObjectBaseToPtrNotNull(this);
+			IL2CPP.il2cpp_gc_wbarrier_set_field(num, (nint)num + (int)IL2CPP.il2cpp_field_get_offset(NativeFieldInfoPtr__focusScope), IL2CPP.Il2CppObjectBaseToPtr(obj));
+		}
+	}
+
+	public unsafe UINode _node
+	{
+		get
+		{
+			nint num = (nint)IL2CPP.Il2CppObjectBaseToPtrNotNull(this) + (int)IL2CPP.il2cpp_field_get_offset(NativeFieldInfoPtr__node);
+			System.IntPtr intPtr = *(System.IntPtr*)num;
+			return (intPtr != (System.IntPtr)0) ? Il2CppObjectPool.Get<UINode>(intPtr) : null;
+		}
+		set
+		{
+			System.IntPtr num = IL2CPP.Il2CppObjectBaseToPtrNotNull(this);
+			IL2CPP.il2cpp_gc_wbarrier_set_field(num, (nint)num + (int)IL2CPP.il2cpp_field_get_offset(NativeFieldInfoPtr__node), IL2CPP.Il2CppObjectBaseToPtr(obj));
+		}
+	}
+
+	public unsafe MainMenuTabNavigator _tabNavigator
+	{
+		get
+		{
+			nint num = (nint)IL2CPP.Il2CppObjectBaseToPtrNotNull(this) + (int)IL2CPP.il2cpp_field_get_offset(NativeFieldInfoPtr__tabNavigator);
+			System.IntPtr intPtr = *(System.IntPtr*)num;
+			return (intPtr != (System.IntPtr)0) ? Il2CppObjectPool.Get<MainMenuTabNavigator>(intPtr) : null;
+		}
+		set
+		{
+			System.IntPtr num = IL2CPP.Il2CppObjectBaseToPtrNotNull(this);
+			IL2CPP.il2cpp_gc_wbarrier_set_field(num, (nint)num + (int)IL2CPP.il2cpp_field_get_offset(NativeFieldInfoPtr__tabNavigator), IL2CPP.Il2CppObjectBaseToPtr(obj));
+		}
+	}
+
+	public unsafe UIFocusCoordinator _tabNavigatorCoordinator
+	{
+		get
+		{
+			nint num = (nint)IL2CPP.Il2CppObjectBaseToPtrNotNull(this) + (int)IL2CPP.il2cpp_field_get_offset(NativeFieldInfoPtr__tabNavigatorCoordinator);
+			System.IntPtr intPtr = *(System.IntPtr*)num;
+			return (intPtr != (System.IntPtr)0) ? Il2CppObjectPool.Get<UIFocusCoordinator>(intPtr) : null;
+		}
+		set
+		{
+			System.IntPtr num = IL2CPP.Il2CppObjectBaseToPtrNotNull(this);
+			IL2CPP.il2cpp_gc_wbarrier_set_field(num, (nint)num + (int)IL2CPP.il2cpp_field_get_offset(NativeFieldInfoPtr__tabNavigatorCoordinator), IL2CPP.Il2CppObjectBaseToPtr(obj));
+		}
+	}
+
+	public unsafe List<UITextInputPresenter> _textInputPresenters
+	{
+		get
+		{
+			nint num = (nint)IL2CPP.Il2CppObjectBaseToPtrNotNull(this) + (int)IL2CPP.il2cpp_field_get_offset(NativeFieldInfoPtr__textInputPresenters);
+			System.IntPtr intPtr = *(System.IntPtr*)num;
+			return (intPtr != (System.IntPtr)0) ? Il2CppObjectPool.Get<List<UITextInputPresenter>>(intPtr) : null;
+		}
+		set
+		{
+			System.IntPtr num = IL2CPP.Il2CppObjectBaseToPtrNotNull(this);
+			IL2CPP.il2cpp_gc_wbarrier_set_field(num, (nint)num + (int)IL2CPP.il2cpp_field_get_offset(NativeFieldInfoPtr__textInputPresenters), IL2CPP.Il2CppObjectBaseToPtr(obj));
+		}
+	}
+
+	public unsafe Selectable _maxPlayersReturnSelectable
+	{
+		get
+		{
+			nint num = (nint)IL2CPP.Il2CppObjectBaseToPtrNotNull(this) + (int)IL2CPP.il2cpp_field_get_offset(NativeFieldInfoPtr__maxPlayersReturnSelectable);
+			System.IntPtr intPtr = *(System.IntPtr*)num;
+			return (intPtr != (System.IntPtr)0) ? Il2CppObjectPool.Get<Selectable>(intPtr) : null;
+		}
+		set
+		{
+			System.IntPtr num = IL2CPP.Il2CppObjectBaseToPtrNotNull(this);
+			IL2CPP.il2cpp_gc_wbarrier_set_field(num, (nint)num + (int)IL2CPP.il2cpp_field_get_offset(NativeFieldInfoPtr__maxPlayersReturnSelectable), IL2CPP.Il2CppObjectBaseToPtr(obj));
+		}
+	}
+
+	public unsafe GameObject _lastCoordinatorSelection
+	{
+		get
+		{
+			nint num = (nint)IL2CPP.Il2CppObjectBaseToPtrNotNull(this) + (int)IL2CPP.il2cpp_field_get_offset(NativeFieldInfoPtr__lastCoordinatorSelection);
+			System.IntPtr intPtr = *(System.IntPtr*)num;
+			return (intPtr != (System.IntPtr)0) ? Il2CppObjectPool.Get<GameObject>(intPtr) : null;
+		}
+		set
+		{
+			System.IntPtr num = IL2CPP.Il2CppObjectBaseToPtrNotNull(this);
+			IL2CPP.il2cpp_gc_wbarrier_set_field(num, (nint)num + (int)IL2CPP.il2cpp_field_get_offset(NativeFieldInfoPtr__lastCoordinatorSelection), IL2CPP.Il2CppObjectBaseToPtr(obj));
+		}
+	}
+
+	public unsafe UIFocusCoordinator _selectionTrackedCoordinator
+	{
+		get
+		{
+			nint num = (nint)IL2CPP.Il2CppObjectBaseToPtrNotNull(this) + (int)IL2CPP.il2cpp_field_get_offset(NativeFieldInfoPtr__selectionTrackedCoordinator);
+			System.IntPtr intPtr = *(System.IntPtr*)num;
+			return (intPtr != (System.IntPtr)0) ? Il2CppObjectPool.Get<UIFocusCoordinator>(intPtr) : null;
+		}
+		set
+		{
+			System.IntPtr num = IL2CPP.Il2CppObjectBaseToPtrNotNull(this);
+			IL2CPP.il2cpp_gc_wbarrier_set_field(num, (nint)num + (int)IL2CPP.il2cpp_field_get_offset(NativeFieldInfoPtr__selectionTrackedCoordinator), IL2CPP.Il2CppObjectBaseToPtr(obj));
+		}
+	}
+
+	public unsafe static int MinSeats
+	{
+		get
+		{
+			Unsafe.SkipInit(out int result);
+			IL2CPP.il2cpp_field_static_get_value(NativeFieldInfoPtr_MinSeats, &result);
+			return result;
+		}
+		set
+		{
+			IL2CPP.il2cpp_field_static_set_value(NativeFieldInfoPtr_MinSeats, &num);
+		}
+	}
+
+	public unsafe static string PrefLastMaxPlayers
+	{
+		get
+		{
+			Unsafe.SkipInit(out System.IntPtr il2CppString);
+			IL2CPP.il2cpp_field_static_get_value(NativeFieldInfoPtr_PrefLastMaxPlayers, &il2CppString);
+			return IL2CPP.Il2CppStringToManaged(il2CppString);
+		}
+		set
+		{
+			IL2CPP.il2cpp_field_static_set_value(NativeFieldInfoPtr_PrefLastMaxPlayers, (void*)IL2CPP.ManagedStringToIl2Cpp(str));
+		}
+	}
+
+	public unsafe static string PrefLastLobbyType
+	{
+		get
+		{
+			Unsafe.SkipInit(out System.IntPtr il2CppString);
+			IL2CPP.il2cpp_field_static_get_value(NativeFieldInfoPtr_PrefLastLobbyType, &il2CppString);
+			return IL2CPP.Il2CppStringToManaged(il2CppString);
+		}
+		set
+		{
+			IL2CPP.il2cpp_field_static_set_value(NativeFieldInfoPtr_PrefLastLobbyType, (void*)IL2CPP.ManagedStringToIl2Cpp(str));
+		}
+	}
+
+	public unsafe static string PrefLastSessionMultiplayer
+	{
+		get
+		{
+			Unsafe.SkipInit(out System.IntPtr il2CppString);
+			IL2CPP.il2cpp_field_static_get_value(NativeFieldInfoPtr_PrefLastSessionMultiplayer, &il2CppString);
+			return IL2CPP.Il2CppStringToManaged(il2CppString);
+		}
+		set
+		{
+			IL2CPP.il2cpp_field_static_set_value(NativeFieldInfoPtr_PrefLastSessionMultiplayer, (void*)IL2CPP.ManagedStringToIl2Cpp(str));
+		}
+	}
+
+	static FinalSelection()
+	{
+		Il2CppClassPointerStore<FinalSelection>.NativeClassPtr = IL2CPP.GetIl2CppClass("Assembly-CSharp.dll", "", "FinalSelection");
+		IL2CPP.il2cpp_runtime_class_init(Il2CppClassPointerStore<FinalSelection>.NativeClassPtr);
+		NativeFieldInfoPtr_Singleton = IL2CPP.GetIl2CppField(Il2CppClassPointerStore<FinalSelection>.NativeClassPtr, "Singleton");
+		NativeFieldInfoPtr__simpleWorld = IL2CPP.GetIl2CppField(Il2CppClassPointerStore<FinalSelection>.NativeClassPtr, "_simpleWorld");
+		NativeFieldInfoPtr__worldInfo = IL2CPP.GetIl2CppField(Il2CppClassPointerStore<FinalSelection>.NativeClassPtr, "_worldInfo");
+		NativeFieldInfoPtr__changeWorldBtn = IL2CPP.GetIl2CppField(Il2CppClassPointerStore<FinalSelection>.NativeClassPtr, "_changeWorldBtn");
+		NativeFieldInfoPtr__note = IL2CPP.GetIl2CppField(Il2CppClassPointerStore<FinalSelection>.NativeClassPtr, "_note");
+		NativeFieldInfoPtr__multiplayerHost = IL2CPP.GetIl2CppField(Il2CppClassPointerStore<FinalSelection>.NativeClassPtr, "_multiplayerHost");
+		NativeFieldInfoPtr__multiplayerJoin = IL2CPP.GetIl2CppField(Il2CppClassPointerStore<FinalSelection>.NativeClassPtr, "_multiplayerJoin");
+		NativeFieldInfoPtr__simpleWorldNameInput = IL2CPP.GetIl2CppField(Il2CppClassPointerStore<FinalSelection>.NativeClassPtr, "_simpleWorldNameInput");
+		NativeFieldInfoPtr__simpleWorldNameError = IL2CPP.GetIl2CppField(Il2CppClassPointerStore<FinalSelection>.NativeClassPtr, "_simpleWorldNameError");
+		NativeFieldInfoPtr__startButton = IL2CPP.GetIl2CppField(Il2CppClassPointerStore<FinalSelection>.NativeClassPtr, "_startButton");
+		NativeFieldInfoPtr__simpleWorldDifficultySlider = IL2CPP.GetIl2CppField(Il2CppClassPointerStore<FinalSelection>.NativeClassPtr, "_simpleWorldDifficultySlider");
+		NativeFieldInfoPtr__adjustDifficultyHint = IL2CPP.GetIl2CppField(Il2CppClassPointerStore<FinalSelection>.NativeClassPtr, "_adjustDifficultyHint");
+		NativeFieldInfoPtr__bannerPreview = IL2CPP.GetIl2CppField(Il2CppClassPointerStore<FinalSelection>.NativeClassPtr, "_bannerPreview");
+		NativeFieldInfoPtr__characterPreviews = IL2CPP.GetIl2CppField(Il2CppClassPointerStore<FinalSelection>.NativeClassPtr, "_characterPreviews");
+		NativeFieldInfoPtr__characterNamePreview = IL2CPP.GetIl2CppField(Il2CppClassPointerStore<FinalSelection>.NativeClassPtr, "_characterNamePreview");
+		NativeFieldInfoPtr__characterLevelPreview = IL2CPP.GetIl2CppField(Il2CppClassPointerStore<FinalSelection>.NativeClassPtr, "_characterLevelPreview");
+		NativeFieldInfoPtr__characterHoursPreview = IL2CPP.GetIl2CppField(Il2CppClassPointerStore<FinalSelection>.NativeClassPtr, "_characterHoursPreview");
+		NativeFieldInfoPtr__characterDifficultyPreview = IL2CPP.GetIl2CppField(Il2CppClassPointerStore<FinalSelection>.NativeClassPtr, "_characterDifficultyPreview");
+		NativeFieldInfoPtr__characterArchetype = IL2CPP.GetIl2CppField(Il2CppClassPointerStore<FinalSelection>.NativeClassPtr, "_characterArchetype");
+		NativeFieldInfoPtr__characterScene = IL2CPP.GetIl2CppField(Il2CppClassPointerStore<FinalSelection>.NativeClassPtr, "_characterScene");
+		NativeFieldInfoPtr__memory = IL2CPP.GetIl2CppField(Il2CppClassPointerStore<FinalSelection>.NativeClassPtr, "_memory");
+		NativeFieldInfoPtr__intelligence = IL2CPP.GetIl2CppField(Il2CppClassPointerStore<FinalSelection>.NativeClassPtr, "_intelligence");
+		NativeFieldInfoPtr__physique = IL2CPP.GetIl2CppField(Il2CppClassPointerStore<FinalSelection>.NativeClassPtr, "_physique");
+		NativeFieldInfoPtr__strength = IL2CPP.GetIl2CppField(Il2CppClassPointerStore<FinalSelection>.NativeClassPtr, "_strength");
+		NativeFieldInfoPtr__adventure = IL2CPP.GetIl2CppField(Il2CppClassPointerStore<FinalSelection>.NativeClassPtr, "_adventure");
+		NativeFieldInfoPtr__charisma = IL2CPP.GetIl2CppField(Il2CppClassPointerStore<FinalSelection>.NativeClassPtr, "_charisma");
+		NativeFieldInfoPtr__agility = IL2CPP.GetIl2CppField(Il2CppClassPointerStore<FinalSelection>.NativeClassPtr, "_agility");
+		NativeFieldInfoPtr__energy = IL2CPP.GetIl2CppField(Il2CppClassPointerStore<FinalSelection>.NativeClassPtr, "_energy");
+		NativeFieldInfoPtr__worldName = IL2CPP.GetIl2CppField(Il2CppClassPointerStore<FinalSelection>.NativeClassPtr, "_worldName");
+		NativeFieldInfoPtr__backgroundDifficultyPreview = IL2CPP.GetIl2CppField(Il2CppClassPointerStore<FinalSelection>.NativeClassPtr, "_backgroundDifficultyPreview");
+		NativeFieldInfoPtr__worldDifficultyPreview = IL2CPP.GetIl2CppField(Il2CppClassPointerStore<FinalSelection>.NativeClassPtr, "_worldDifficultyPreview");
+		NativeFieldInfoPtr__lobbyCount = IL2CPP.GetIl2CppField(Il2CppClassPointerStore<FinalSelection>.NativeClassPtr, "_lobbyCount");
+		NativeFieldInfoPtr__passwordInput = IL2CPP.GetIl2CppField(Il2CppClassPointerStore<FinalSelection>.NativeClassPtr, "_passwordInput");
+		NativeFieldInfoPtr__lobbyNoteInput = IL2CPP.GetIl2CppField(Il2CppClassPointerStore<FinalSelection>.NativeClassPtr, "_lobbyNoteInput");
+		NativeFieldInfoPtr__worldNamePreview = IL2CPP.GetIl2CppField(Il2CppClassPointerStore<FinalSelection>.NativeClassPtr, "_worldNamePreview");
+		NativeFieldInfoPtr__worldAgeTexts = IL2CPP.GetIl2CppField(Il2CppClassPointerStore<FinalSelection>.NativeClassPtr, "_worldAgeTexts");
+		NativeFieldInfoPtr__worldDifficultyTexts = IL2CPP.GetIl2CppField(Il2CppClassPointerStore<FinalSelection>.NativeClassPtr, "_worldDifficultyTexts");
+		NativeFieldInfoPtr__worldTypeTexts = IL2CPP.GetIl2CppField(Il2CppClassPointerStore<FinalSelection>.NativeClassPtr, "_worldTypeTexts");
+		NativeFieldInfoPtr__friendlyFire = IL2CPP.GetIl2CppField(Il2CppClassPointerStore<FinalSelection>.NativeClassPtr, "_friendlyFire");
+		NativeFieldInfoPtr__newCharactersOnly = IL2CPP.GetIl2CppField(Il2CppClassPointerStore<FinalSelection>.NativeClassPtr, "_newCharactersOnly");
+		NativeFieldInfoPtr__personalLoot = IL2CPP.GetIl2CppField(Il2CppClassPointerStore<FinalSelection>.NativeClassPtr, "_personalLoot");
+		NativeFieldInfoPtr_LobbyOpen = IL2CPP.GetIl2CppField(Il2CppClassPointerStore<FinalSelection>.NativeClassPtr, "LobbyOpen");
+		NativeFieldInfoPtr_FriendsOnly = IL2CPP.GetIl2CppField(Il2CppClassPointerStore<FinalSelection>.NativeClassPtr, "FriendsOnly");
+		NativeFieldInfoPtr_InviteOnly = IL2CPP.GetIl2CppField(Il2CppClassPointerStore<FinalSelection>.NativeClassPtr, "InviteOnly");
+		NativeFieldInfoPtr__decreaseButton = IL2CPP.GetIl2CppField(Il2CppClassPointerStore<FinalSelection>.NativeClassPtr, "_decreaseButton");
+		NativeFieldInfoPtr__increaseButton = IL2CPP.GetIl2CppField(Il2CppClassPointerStore<FinalSelection>.NativeClassPtr, "_increaseButton");
+		NativeFieldInfoPtr__maxPlayersDisplay = IL2CPP.GetIl2CppField(Il2CppClassPointerStore<FinalSelection>.NativeClassPtr, "_maxPlayersDisplay");
+		NativeFieldInfoPtr__maxPlayersWarning = IL2CPP.GetIl2CppField(Il2CppClassPointerStore<FinalSelection>.NativeClassPtr, "_maxPlayersWarning");
+		NativeFieldInfoPtr__maxPlayersForServer = IL2CPP.GetIl2CppField(Il2CppClassPointerStore<FinalSelection>.NativeClassPtr, "_maxPlayersForServer");
+		NativeFieldInfoPtr__maxPlayersSelectable = IL2CPP.GetIl2CppField(Il2CppClassPointerStore<FinalSelection>.NativeClassPtr, "_maxPlayersSelectable");
+		NativeFieldInfoPtr__adjustPlayerLimitHint = IL2CPP.GetIl2CppField(Il2CppClassPointerStore<FinalSelection>.NativeClassPtr, "_adjustPlayerLimitHint");
+		NativeFieldInfoPtr__notReadyPopUp = IL2CPP.GetIl2CppField(Il2CppClassPointerStore<FinalSelection>.NativeClassPtr, "_notReadyPopUp");
+		NativeFieldInfoPtr__errorText = IL2CPP.GetIl2CppField(Il2CppClassPointerStore<FinalSelection>.NativeClassPtr, "_errorText");
+		NativeFieldInfoPtr__backButton = IL2CPP.GetIl2CppField(Il2CppClassPointerStore<FinalSelection>.NativeClassPtr, "_backButton");
+		NativeFieldInfoPtr__changeWorldButton = IL2CPP.GetIl2CppField(Il2CppClassPointerStore<FinalSelection>.NativeClassPtr, "_changeWorldButton");
+		NativeFieldInfoPtr__simpleChangeWorldButton = IL2CPP.GetIl2CppField(Il2CppClassPointerStore<FinalSelection>.NativeClassPtr, "_simpleChangeWorldButton");
+		NativeFieldInfoPtr__backToWorldSelectButton = IL2CPP.GetIl2CppField(Il2CppClassPointerStore<FinalSelection>.NativeClassPtr, "_backToWorldSelectButton");
+		NativeFieldInfoPtr__backToLobbySelectButton = IL2CPP.GetIl2CppField(Il2CppClassPointerStore<FinalSelection>.NativeClassPtr, "_backToLobbySelectButton");
+		NativeFieldInfoPtr__personalLootMirrorToggles = IL2CPP.GetIl2CppField(Il2CppClassPointerStore<FinalSelection>.NativeClassPtr, "_personalLootMirrorToggles");
+		NativeFieldInfoPtr__textInputViews = IL2CPP.GetIl2CppField(Il2CppClassPointerStore<FinalSelection>.NativeClassPtr, "_textInputViews");
+		NativeFieldInfoPtr__notReadyCoroutine = IL2CPP.GetIl2CppField(Il2CppClassPointerStore<FinalSelection>.NativeClassPtr, "_notReadyCoroutine");
+		NativeFieldInfoPtr__playerFile = IL2CPP.GetIl2CppField(Il2CppClassPointerStore<FinalSelection>.NativeClassPtr, "_playerFile");
+		NativeFieldInfoPtr__worldFile = IL2CPP.GetIl2CppField(Il2CppClassPointerStore<FinalSelection>.NativeClassPtr, "_worldFile");
+		NativeFieldInfoPtr__localPlayers = IL2CPP.GetIl2CppField(Il2CppClassPointerStore<FinalSelection>.NativeClassPtr, "_localPlayers");
+		NativeFieldInfoPtr__isNewWorldMode = IL2CPP.GetIl2CppField(Il2CppClassPointerStore<FinalSelection>.NativeClassPtr, "_isNewWorldMode");
+		NativeFieldInfoPtr__userChangedWorld = IL2CPP.GetIl2CppField(Il2CppClassPointerStore<FinalSelection>.NativeClassPtr, "_userChangedWorld");
+		NativeFieldInfoPtr__worldChoiceOwner = IL2CPP.GetIl2CppField(Il2CppClassPointerStore<FinalSelection>.NativeClassPtr, "_worldChoiceOwner");
+		NativeFieldInfoPtr__privacyListenersWired = IL2CPP.GetIl2CppField(Il2CppClassPointerStore<FinalSelection>.NativeClassPtr, "_privacyListenersWired");
+		NativeFieldInfoPtr__personalLootListenerWired = IL2CPP.GetIl2CppField(Il2CppClassPointerStore<FinalSelection>.NativeClassPtr, "_personalLootListenerWired");
+		NativeFieldInfoPtr__personalLootDirty = IL2CPP.GetIl2CppField(Il2CppClassPointerStore<FinalSelection>.NativeClassPtr, "_personalLootDirty");
+		NativeFieldInfoPtr__difficultyListenerWired = IL2CPP.GetIl2CppField(Il2CppClassPointerStore<FinalSelection>.NativeClassPtr, "_difficultyListenerWired");
+		NativeFieldInfoPtr__selectedDifficulty = IL2CPP.GetIl2CppField(Il2CppClassPointerStore<FinalSelection>.NativeClassPtr, "_selectedDifficulty");
+		NativeFieldInfoPtr__focusScope = IL2CPP.GetIl2CppField(Il2CppClassPointerStore<FinalSelection>.NativeClassPtr, "_focusScope");
+		NativeFieldInfoPtr__node = IL2CPP.GetIl2CppField(Il2CppClassPointerStore<FinalSelection>.NativeClassPtr, "_node");
+		NativeFieldInfoPtr__tabNavigator = IL2CPP.GetIl2CppField(Il2CppClassPointerStore<FinalSelection>.NativeClassPtr, "_tabNavigator");
+		NativeFieldInfoPtr__tabNavigatorCoordinator = IL2CPP.GetIl2CppField(Il2CppClassPointerStore<FinalSelection>.NativeClassPtr, "_tabNavigatorCoordinator");
+		NativeFieldInfoPtr__textInputPresenters = IL2CPP.GetIl2CppField(Il2CppClassPointerStore<FinalSelection>.NativeClassPtr, "_textInputPresenters");
+		NativeFieldInfoPtr__maxPlayersReturnSelectable = IL2CPP.GetIl2CppField(Il2CppClassPointerStore<FinalSelection>.NativeClassPtr, "_maxPlayersReturnSelectable");
+		NativeFieldInfoPtr__lastCoordinatorSelection = IL2CPP.GetIl2CppField(Il2CppClassPointerStore<FinalSelection>.NativeClassPtr, "_lastCoordinatorSelection");
+		NativeFieldInfoPtr__selectionTrackedCoordinator = IL2CPP.GetIl2CppField(Il2CppClassPointerStore<FinalSelection>.NativeClassPtr, "_selectionTrackedCoordinator");
+		NativeFieldInfoPtr_MinSeats = IL2CPP.GetIl2CppField(Il2CppClassPointerStore<FinalSelection>.NativeClassPtr, "MinSeats");
+		NativeFieldInfoPtr_PrefLastMaxPlayers = IL2CPP.GetIl2CppField(Il2CppClassPointerStore<FinalSelection>.NativeClassPtr, "PrefLastMaxPlayers");
+		NativeFieldInfoPtr_PrefLastLobbyType = IL2CPP.GetIl2CppField(Il2CppClassPointerStore<FinalSelection>.NativeClassPtr, "PrefLastLobbyType");
+		NativeFieldInfoPtr_PrefLastSessionMultiplayer = IL2CPP.GetIl2CppField(Il2CppClassPointerStore<FinalSelection>.NativeClassPtr, "PrefLastSessionMultiplayer");
+		NativeMethodInfoPtr_Awake_Private_Void_0 = IL2CPP.GetIl2CppMethodByToken(Il2CppClassPointerStore<FinalSelection>.NativeClassPtr, 100687051);
+		NativeMethodInfoPtr_OnDestroy_Private_Void_0 = IL2CPP.GetIl2CppMethodByToken(Il2CppClassPointerStore<FinalSelection>.NativeClassPtr, 100687052);
+		NativeMethodInfoPtr_Back_Private_Void_0 = IL2CPP.GetIl2CppMethodByToken(Il2CppClassPointerStore<FinalSelection>.NativeClassPtr, 100687053);
+		NativeMethodInfoPtr_ChangeWorld_Private_Void_0 = IL2CPP.GetIl2CppMethodByToken(Il2CppClassPointerStore<FinalSelection>.NativeClassPtr, 100687054);
+		NativeMethodInfoPtr_OnPersonalLootMirrorChanged_Private_Void_Boolean_0 = IL2CPP.GetIl2CppMethodByToken(Il2CppClassPointerStore<FinalSelection>.NativeClassPtr, 100687055);
+		NativeMethodInfoPtr_WirePersonalLootToggle_Private_Void_0 = IL2CPP.GetIl2CppMethodByToken(Il2CppClassPointerStore<FinalSelection>.NativeClassPtr, 100687056);
+		NativeMethodInfoPtr_OnPersonalLootChanged_Private_Void_Boolean_0 = IL2CPP.GetIl2CppMethodByToken(Il2CppClassPointerStore<FinalSelection>.NativeClassPtr, 100687057);
+		NativeMethodInfoPtr_WireTextInputPresenters_Private_Void_0 = IL2CPP.GetIl2CppMethodByToken(Il2CppClassPointerStore<FinalSelection>.NativeClassPtr, 100687058);
+		NativeMethodInfoPtr_WireSelectionTracking_Private_Void_0 = IL2CPP.GetIl2CppMethodByToken(Il2CppClassPointerStore<FinalSelection>.NativeClassPtr, 100687059);
+		NativeMethodInfoPtr_WireTabNavigator_Private_Void_0 = IL2CPP.GetIl2CppMethodByToken(Il2CppClassPointerStore<FinalSelection>.NativeClassPtr, 100687060);
+		NativeMethodInfoPtr_PanelEnd_Private_Selectable_Boolean_0 = IL2CPP.GetIl2CppMethodByToken(Il2CppClassPointerStore<FinalSelection>.NativeClassPtr, 100687061);
+		NativeMethodInfoPtr_OnCoordinatorSelectionChanged_Private_Void_GameObject_0 = IL2CPP.GetIl2CppMethodByToken(Il2CppClassPointerStore<FinalSelection>.NativeClassPtr, 100687062);
+		NativeMethodInfoPtr_IsMaxPlayersFocused_Private_Boolean_0 = IL2CPP.GetIl2CppMethodByToken(Il2CppClassPointerStore<FinalSelection>.NativeClassPtr, 100687063);
+		NativeMethodInfoPtr_ResolveChangeWorldButton_Private_Button_0 = IL2CPP.GetIl2CppMethodByToken(Il2CppClassPointerStore<FinalSelection>.NativeClassPtr, 100687064);
+		NativeMethodInfoPtr_CanHandle_Public_Boolean_byref_UIActionContext_0 = IL2CPP.GetIl2CppMethodByToken(Il2CppClassPointerStore<FinalSelection>.NativeClassPtr, 100687065);
+		NativeMethodInfoPtr_Handle_Public_UIActionResult_byref_UIActionContext_0 = IL2CPP.GetIl2CppMethodByToken(Il2CppClassPointerStore<FinalSelection>.NativeClassPtr, 100687066);
+		NativeMethodInfoPtr_NotifyUserChangedWorld_Public_Void_0 = IL2CPP.GetIl2CppMethodByToken(Il2CppClassPointerStore<FinalSelection>.NativeClassPtr, 100687067);
+		NativeMethodInfoPtr_RearmWorldChoiceForCharacter_Private_Void_String_0 = IL2CPP.GetIl2CppMethodByToken(Il2CppClassPointerStore<FinalSelection>.NativeClassPtr, 100687068);
+		NativeMethodInfoPtr_ResolveNewWorldMode_Private_Boolean_Boolean_Boolean_0 = IL2CPP.GetIl2CppMethodByToken(Il2CppClassPointerStore<FinalSelection>.NativeClassPtr, 100687069);
+		NativeMethodInfoPtr_InitializeFinalSelection_Public_Void_0 = IL2CPP.GetIl2CppMethodByToken(Il2CppClassPointerStore<FinalSelection>.NativeClassPtr, 100687070);
+		NativeMethodInfoPtr_ApplyWorldTypeLabel_Private_Void_Boolean_0 = IL2CPP.GetIl2CppMethodByToken(Il2CppClassPointerStore<FinalSelection>.NativeClassPtr, 100687071);
+		NativeMethodInfoPtr_FirstControllerTarget_Private_Selectable_0 = IL2CPP.GetIl2CppMethodByToken(Il2CppClassPointerStore<FinalSelection>.NativeClassPtr, 100687072);
+		NativeMethodInfoPtr_IsTargetable_Private_Static_Boolean_Selectable_0 = IL2CPP.GetIl2CppMethodByToken(Il2CppClassPointerStore<FinalSelection>.NativeClassPtr, 100687073);
+		NativeMethodInfoPtr_SetInitialControllerSelection_Private_IEnumerator_0 = IL2CPP.GetIl2CppMethodByToken(Il2CppClassPointerStore<FinalSelection>.NativeClassPtr, 100687074);
+		NativeMethodInfoPtr_OnEnable_Private_Void_0 = IL2CPP.GetIl2CppMethodByToken(Il2CppClassPointerStore<FinalSelection>.NativeClassPtr, 100687075);
+		NativeMethodInfoPtr_SeedInitialControllerSelection_Private_Void_0 = IL2CPP.GetIl2CppMethodByToken(Il2CppClassPointerStore<FinalSelection>.NativeClassPtr, 100687076);
+		NativeMethodInfoPtr_SetupPanels_Private_Void_0 = IL2CPP.GetIl2CppMethodByToken(Il2CppClassPointerStore<FinalSelection>.NativeClassPtr, 100687077);
+		NativeMethodInfoPtr_SetupSimpleWorld_Private_Void_0 = IL2CPP.GetIl2CppMethodByToken(Il2CppClassPointerStore<FinalSelection>.NativeClassPtr, 100687078);
+		NativeMethodInfoPtr_Update_Private_Void_0 = IL2CPP.GetIl2CppMethodByToken(Il2CppClassPointerStore<FinalSelection>.NativeClassPtr, 100687079);
+		NativeMethodInfoPtr_OnSimpleWorldNameUpdate_Public_Void_0 = IL2CPP.GetIl2CppMethodByToken(Il2CppClassPointerStore<FinalSelection>.NativeClassPtr, 100687080);
+		NativeMethodInfoPtr_NormalizedWorldName_Private_String_0 = IL2CPP.GetIl2CppMethodByToken(Il2CppClassPointerStore<FinalSelection>.NativeClassPtr, 100687081);
+		NativeMethodInfoPtr_ValidateSimpleWorldName_Private_ValueTuple_2_Boolean_String_0 = IL2CPP.GetIl2CppMethodByToken(Il2CppClassPointerStore<FinalSelection>.NativeClassPtr, 100687082);
+		NativeMethodInfoPtr_UpdateLobbyCount_Public_Void_Int32_Int32_0 = IL2CPP.GetIl2CppMethodByToken(Il2CppClassPointerStore<FinalSelection>.NativeClassPtr, 100687083);
+		NativeMethodInfoPtr_IncreaseMaxPlayers_Public_Void_0 = IL2CPP.GetIl2CppMethodByToken(Il2CppClassPointerStore<FinalSelection>.NativeClassPtr, 100687084);
+		NativeMethodInfoPtr_DecreaseMaxPlayers_Public_Void_0 = IL2CPP.GetIl2CppMethodByToken(Il2CppClassPointerStore<FinalSelection>.NativeClassPtr, 100687085);
+		NativeMethodInfoPtr_WirePrivacyToggleListeners_Private_Void_0 = IL2CPP.GetIl2CppMethodByToken(Il2CppClassPointerStore<FinalSelection>.NativeClassPtr, 100687086);
+		NativeMethodInfoPtr_WireDifficultySlider_Private_Void_0 = IL2CPP.GetIl2CppMethodByToken(Il2CppClassPointerStore<FinalSelection>.NativeClassPtr, 100687087);
+		NativeMethodInfoPtr_ReadSliderDifficulty_Private_Difficulty_0 = IL2CPP.GetIl2CppMethodByToken(Il2CppClassPointerStore<FinalSelection>.NativeClassPtr, 100687088);
+		NativeMethodInfoPtr_OnDifficultySliderChanged_Private_Void_Single_0 = IL2CPP.GetIl2CppMethodByToken(Il2CppClassPointerStore<FinalSelection>.NativeClassPtr, 100687089);
+		NativeMethodInfoPtr_SetAdjustDifficultyHintVisible_Private_Void_Boolean_0 = IL2CPP.GetIl2CppMethodByToken(Il2CppClassPointerStore<FinalSelection>.NativeClassPtr, 100687090);
+		NativeMethodInfoPtr_SetAdjustPlayerLimitHintVisible_Private_Void_Boolean_0 = IL2CPP.GetIl2CppMethodByToken(Il2CppClassPointerStore<FinalSelection>.NativeClassPtr, 100687091);
+		NativeMethodInfoPtr_SetSelectedDifficulty_Private_Void_Difficulty_0 = IL2CPP.GetIl2CppMethodByToken(Il2CppClassPointerStore<FinalSelection>.NativeClassPtr, 100687092);
+		NativeMethodInfoPtr_OnPlayerCountChanged_Private_Void_0 = IL2CPP.GetIl2CppMethodByToken(Il2CppClassPointerStore<FinalSelection>.NativeClassPtr, 100687093);
+		NativeMethodInfoPtr_ShowCharacterPreview_Private_Static_Void_GameObject_Race_Gender_AppearanceColors_0 = IL2CPP.GetIl2CppMethodByToken(Il2CppClassPointerStore<FinalSelection>.NativeClassPtr, 100687094);
+		NativeMethodInfoPtr_FillInPlayerValues_Private_Void_0 = IL2CPP.GetIl2CppMethodByToken(Il2CppClassPointerStore<FinalSelection>.NativeClassPtr, 100687095);
+		NativeMethodInfoPtr_FillInWorldValues_Private_Void_0 = IL2CPP.GetIl2CppMethodByToken(Il2CppClassPointerStore<FinalSelection>.NativeClassPtr, 100687096);
+		NativeMethodInfoPtr_RestoreLobbyPrivacyChoice_Private_Void_0 = IL2CPP.GetIl2CppMethodByToken(Il2CppClassPointerStore<FinalSelection>.NativeClassPtr, 100687097);
+		NativeMethodInfoPtr_SetSteamLobbyOptions_Private_Void_0 = IL2CPP.GetIl2CppMethodByToken(Il2CppClassPointerStore<FinalSelection>.NativeClassPtr, 100687098);
+		NativeMethodInfoPtr_StartGame_Public_Void_0 = IL2CPP.GetIl2CppMethodByToken(Il2CppClassPointerStore<FinalSelection>.NativeClassPtr, 100687099);
+		NativeMethodInfoPtr_ShowNewCharactersOnlyPopup_Private_Void_0 = IL2CPP.GetIl2CppMethodByToken(Il2CppClassPointerStore<FinalSelection>.NativeClassPtr, 100687100);
+		NativeMethodInfoPtr_GetLocalizedError_Private_String_String_String_0 = IL2CPP.GetIl2CppMethodByToken(Il2CppClassPointerStore<FinalSelection>.NativeClassPtr, 100687101);
+		NativeMethodInfoPtr_FadeOutNotReadyPopup_Private_IEnumerator_Single_0 = IL2CPP.GetIl2CppMethodByToken(Il2CppClassPointerStore<FinalSelection>.NativeClassPtr, 100687102);
+		NativeMethodInfoPtr_IsCharacterAllowedForWorld_Private_Boolean_0 = IL2CPP.GetIl2CppMethodByToken(Il2CppClassPointerStore<FinalSelection>.NativeClassPtr, 100687103);
+		NativeMethodInfoPtr_IsCharacterAllowedForServer_Private_Boolean_0 = IL2CPP.GetIl2CppMethodByToken(Il2CppClassPointerStore<FinalSelection>.NativeClassPtr, 100687104);
+		NativeMethodInfoPtr__ctor_Public_Void_0 = IL2CPP.GetIl2CppMethodByToken(Il2CppClassPointerStore<FinalSelection>.NativeClassPtr, 100687105);
+		NativeMethodInfoPtr_IUIActionReceiver_CanHandle_Private_Virtual_Final_New_Boolean_byref_UIActionContext_0 = IL2CPP.GetIl2CppMethodByToken(Il2CppClassPointerStore<FinalSelection>.NativeClassPtr, 100687106);
+		NativeMethodInfoPtr_IUIActionReceiver_Handle_Private_Virtual_Final_New_UIActionResult_byref_UIActionContext_0 = IL2CPP.GetIl2CppMethodByToken(Il2CppClassPointerStore<FinalSelection>.NativeClassPtr, 100687107);
+		NativeMethodInfoPtr__WireTabNavigator_b__89_0_Private_Selectable_0 = IL2CPP.GetIl2CppMethodByToken(Il2CppClassPointerStore<FinalSelection>.NativeClassPtr, 100687108);
+		NativeMethodInfoPtr__WireTabNavigator_b__89_1_Private_Selectable_0 = IL2CPP.GetIl2CppMethodByToken(Il2CppClassPointerStore<FinalSelection>.NativeClassPtr, 100687109);
+		NativeMethodInfoPtr__WirePrivacyToggleListeners_b__115_0_Private_Void_Boolean_0 = IL2CPP.GetIl2CppMethodByToken(Il2CppClassPointerStore<FinalSelection>.NativeClassPtr, 100687110);
+	}
+
+	[CallerCount(0)]
+	[CachedScanResults(RefRangeStart = 0, RefRangeEnd = 0, XrefRangeStart = 379674, XrefRangeEnd = 379873, MetadataInitTokenRva = 0L, MetadataInitFlagRva = 0L)]
+	public unsafe void Awake()
+	{
+		IL2CPP.Il2CppObjectBaseToPtrNotNull(this);
+		System.IntPtr* param = null;
+		Unsafe.SkipInit(out System.IntPtr exc);
+		System.IntPtr intPtr = IL2CPP.il2cpp_runtime_invoke(NativeMethodInfoPtr_Awake_Private_Void_0, IL2CPP.Il2CppObjectBaseToPtrNotNull(this), (void**)param, ref exc);
+		Il2CppInterop.Runtime.Il2CppException.RaiseExceptionIfNecessary(exc);
+	}
+
+	[CallerCount(0)]
+	[CachedScanResults(RefRangeStart = 0, RefRangeEnd = 0, XrefRangeStart = 379873, XrefRangeEnd = 379910, MetadataInitTokenRva = 0L, MetadataInitFlagRva = 0L)]
+	public unsafe void OnDestroy()
+	{
+		IL2CPP.Il2CppObjectBaseToPtrNotNull(this);
+		System.IntPtr* param = null;
+		Unsafe.SkipInit(out System.IntPtr exc);
+		System.IntPtr intPtr = IL2CPP.il2cpp_runtime_invoke(NativeMethodInfoPtr_OnDestroy_Private_Void_0, IL2CPP.Il2CppObjectBaseToPtrNotNull(this), (void**)param, ref exc);
+		Il2CppInterop.Runtime.Il2CppException.RaiseExceptionIfNecessary(exc);
+	}
+
+	[CallerCount(0)]
+	[CachedScanResults(RefRangeStart = 0, RefRangeEnd = 0, XrefRangeStart = 379910, XrefRangeEnd = 379914, MetadataInitTokenRva = 0L, MetadataInitFlagRva = 0L)]
+	public unsafe void Back()
+	{
+		IL2CPP.Il2CppObjectBaseToPtrNotNull(this);
+		System.IntPtr* param = null;
+		Unsafe.SkipInit(out System.IntPtr exc);
+		System.IntPtr intPtr = IL2CPP.il2cpp_runtime_invoke(NativeMethodInfoPtr_Back_Private_Void_0, IL2CPP.Il2CppObjectBaseToPtrNotNull(this), (void**)param, ref exc);
+		Il2CppInterop.Runtime.Il2CppException.RaiseExceptionIfNecessary(exc);
+	}
+
+	[CallerCount(0)]
+	[CachedScanResults(RefRangeStart = 0, RefRangeEnd = 0, XrefRangeStart = 379914, XrefRangeEnd = 379920, MetadataInitTokenRva = 0L, MetadataInitFlagRva = 0L)]
+	public unsafe void ChangeWorld()
+	{
+		IL2CPP.Il2CppObjectBaseToPtrNotNull(this);
+		System.IntPtr* param = null;
+		Unsafe.SkipInit(out System.IntPtr exc);
+		System.IntPtr intPtr = IL2CPP.il2cpp_runtime_invoke(NativeMethodInfoPtr_ChangeWorld_Private_Void_0, IL2CPP.Il2CppObjectBaseToPtrNotNull(this), (void**)param, ref exc);
+		Il2CppInterop.Runtime.Il2CppException.RaiseExceptionIfNecessary(exc);
+	}
+
+	[CallerCount(0)]
+	[CachedScanResults(RefRangeStart = 0, RefRangeEnd = 0, XrefRangeStart = 379920, XrefRangeEnd = 379923, MetadataInitTokenRva = 0L, MetadataInitFlagRva = 0L)]
+	public unsafe void OnPersonalLootMirrorChanged(bool _)
+	{
+		IL2CPP.Il2CppObjectBaseToPtrNotNull(this);
+		System.IntPtr* ptr = stackalloc System.IntPtr[1];
+		*ptr = (nint)(&_);
+		Unsafe.SkipInit(out System.IntPtr exc);
+		System.IntPtr intPtr = IL2CPP.il2cpp_runtime_invoke(NativeMethodInfoPtr_OnPersonalLootMirrorChanged_Private_Void_Boolean_0, IL2CPP.Il2CppObjectBaseToPtrNotNull(this), (void**)ptr, ref exc);
+		Il2CppInterop.Runtime.Il2CppException.RaiseExceptionIfNecessary(exc);
+	}
+
+	[CallerCount(0)]
+	[CachedScanResults(RefRangeStart = 0, RefRangeEnd = 0, XrefRangeStart = 379923, XrefRangeEnd = 379936, MetadataInitTokenRva = 0L, MetadataInitFlagRva = 0L)]
+	public unsafe void WirePersonalLootToggle()
+	{
+		IL2CPP.Il2CppObjectBaseToPtrNotNull(this);
+		System.IntPtr* param = null;
+		Unsafe.SkipInit(out System.IntPtr exc);
+		System.IntPtr intPtr = IL2CPP.il2cpp_runtime_invoke(NativeMethodInfoPtr_WirePersonalLootToggle_Private_Void_0, IL2CPP.Il2CppObjectBaseToPtrNotNull(this), (void**)param, ref exc);
+		Il2CppInterop.Runtime.Il2CppException.RaiseExceptionIfNecessary(exc);
+	}
+
+	[CallerCount(0)]
+	[CachedScanResults(RefRangeStart = 0, RefRangeEnd = 0, XrefRangeStart = 379936, XrefRangeEnd = 379937, MetadataInitTokenRva = 0L, MetadataInitFlagRva = 0L)]
+	public unsafe void OnPersonalLootChanged(bool value)
+	{
+		IL2CPP.Il2CppObjectBaseToPtrNotNull(this);
+		System.IntPtr* ptr = stackalloc System.IntPtr[1];
+		*ptr = (nint)(&value);
+		Unsafe.SkipInit(out System.IntPtr exc);
+		System.IntPtr intPtr = IL2CPP.il2cpp_runtime_invoke(NativeMethodInfoPtr_OnPersonalLootChanged_Private_Void_Boolean_0, IL2CPP.Il2CppObjectBaseToPtrNotNull(this), (void**)ptr, ref exc);
+		Il2CppInterop.Runtime.Il2CppException.RaiseExceptionIfNecessary(exc);
+	}
+
+	[CallerCount(2)]
+	[CachedScanResults(RefRangeStart = 379976, RefRangeEnd = 379978, XrefRangeStart = 379937, XrefRangeEnd = 379976, MetadataInitTokenRva = 0L, MetadataInitFlagRva = 0L)]
+	public unsafe void WireTextInputPresenters()
+	{
+		IL2CPP.Il2CppObjectBaseToPtrNotNull(this);
+		System.IntPtr* param = null;
+		Unsafe.SkipInit(out System.IntPtr exc);
+		System.IntPtr intPtr = IL2CPP.il2cpp_runtime_invoke(NativeMethodInfoPtr_WireTextInputPresenters_Private_Void_0, IL2CPP.Il2CppObjectBaseToPtrNotNull(this), (void**)param, ref exc);
+		Il2CppInterop.Runtime.Il2CppException.RaiseExceptionIfNecessary(exc);
+	}
+
+	[CallerCount(2)]
+	[CachedScanResults(RefRangeStart = 379995, RefRangeEnd = 379997, XrefRangeStart = 379978, XrefRangeEnd = 379995, MetadataInitTokenRva = 0L, MetadataInitFlagRva = 0L)]
+	public unsafe void WireSelectionTracking()
+	{
+		IL2CPP.Il2CppObjectBaseToPtrNotNull(this);
+		System.IntPtr* param = null;
+		Unsafe.SkipInit(out System.IntPtr exc);
+		System.IntPtr intPtr = IL2CPP.il2cpp_runtime_invoke(NativeMethodInfoPtr_WireSelectionTracking_Private_Void_0, IL2CPP.Il2CppObjectBaseToPtrNotNull(this), (void**)param, ref exc);
+		Il2CppInterop.Runtime.Il2CppException.RaiseExceptionIfNecessary(exc);
+	}
+
+	[CallerCount(2)]
+	[CachedScanResults(RefRangeStart = 380035, RefRangeEnd = 380037, XrefRangeStart = 379997, XrefRangeEnd = 380035, MetadataInitTokenRva = 0L, MetadataInitFlagRva = 0L)]
+	public unsafe void WireTabNavigator()
+	{
+		IL2CPP.Il2CppObjectBaseToPtrNotNull(this);
+		System.IntPtr* param = null;
+		Unsafe.SkipInit(out System.IntPtr exc);
+		System.IntPtr intPtr = IL2CPP.il2cpp_runtime_invoke(NativeMethodInfoPtr_WireTabNavigator_Private_Void_0, IL2CPP.Il2CppObjectBaseToPtrNotNull(this), (void**)param, ref exc);
+		Il2CppInterop.Runtime.Il2CppException.RaiseExceptionIfNecessary(exc);
+	}
+
+	[CallerCount(2)]
+	[CachedScanResults(RefRangeStart = 380059, RefRangeEnd = 380061, XrefRangeStart = 380037, XrefRangeEnd = 380059, MetadataInitTokenRva = 0L, MetadataInitFlagRva = 0L)]
+	public unsafe Selectable PanelEnd(bool top)
+	{
+		IL2CPP.Il2CppObjectBaseToPtrNotNull(this);
+		System.IntPtr* ptr = stackalloc System.IntPtr[1];
+		*ptr = (nint)(&top);
+		Unsafe.SkipInit(out System.IntPtr exc);
+		System.IntPtr intPtr = IL2CPP.il2cpp_runtime_invoke(NativeMethodInfoPtr_PanelEnd_Private_Selectable_Boolean_0, IL2CPP.Il2CppObjectBaseToPtrNotNull(this), (void**)ptr, ref exc);
+		Il2CppInterop.Runtime.Il2CppException.RaiseExceptionIfNecessary(exc);
+		return (intPtr != (System.IntPtr)0) ? Il2CppObjectPool.Get<Selectable>(intPtr) : null;
+	}
+
+	[CallerCount(0)]
+	[CachedScanResults(RefRangeStart = 0, RefRangeEnd = 0, XrefRangeStart = 380061, XrefRangeEnd = 380081, MetadataInitTokenRva = 0L, MetadataInitFlagRva = 0L)]
+	public unsafe void OnCoordinatorSelectionChanged(GameObject selected)
+	{
+		IL2CPP.Il2CppObjectBaseToPtrNotNull(this);
+		System.IntPtr* ptr = stackalloc System.IntPtr[1];
+		*ptr = IL2CPP.Il2CppObjectBaseToPtr(selected);
+		Unsafe.SkipInit(out System.IntPtr exc);
+		System.IntPtr intPtr = IL2CPP.il2cpp_runtime_invoke(NativeMethodInfoPtr_OnCoordinatorSelectionChanged_Private_Void_GameObject_0, IL2CPP.Il2CppObjectBaseToPtrNotNull(this), (void**)ptr, ref exc);
+		Il2CppInterop.Runtime.Il2CppException.RaiseExceptionIfNecessary(exc);
+	}
+
+	[CallerCount(1)]
+	[CachedScanResults(RefRangeStart = 380099, RefRangeEnd = 380100, XrefRangeStart = 380081, XrefRangeEnd = 380099, MetadataInitTokenRva = 0L, MetadataInitFlagRva = 0L)]
+	public unsafe bool IsMaxPlayersFocused()
+	{
+		IL2CPP.Il2CppObjectBaseToPtrNotNull(this);
+		System.IntPtr* param = null;
+		Unsafe.SkipInit(out System.IntPtr exc);
+		System.IntPtr obj = IL2CPP.il2cpp_runtime_invoke(NativeMethodInfoPtr_IsMaxPlayersFocused_Private_Boolean_0, IL2CPP.Il2CppObjectBaseToPtrNotNull(this), (void**)param, ref exc);
+		Il2CppInterop.Runtime.Il2CppException.RaiseExceptionIfNecessary(exc);
+		return *(bool*)IL2CPP.il2cpp_object_unbox(obj);
+	}
+
+	[CallerCount(0)]
+	[CachedScanResults(RefRangeStart = 0, RefRangeEnd = 0, XrefRangeStart = 380100, XrefRangeEnd = 380106, MetadataInitTokenRva = 0L, MetadataInitFlagRva = 0L)]
+	public unsafe Button ResolveChangeWorldButton()
+	{
+		IL2CPP.Il2CppObjectBaseToPtrNotNull(this);
+		System.IntPtr* param = null;
+		Unsafe.SkipInit(out System.IntPtr exc);
+		System.IntPtr intPtr = IL2CPP.il2cpp_runtime_invoke(NativeMethodInfoPtr_ResolveChangeWorldButton_Private_Button_0, IL2CPP.Il2CppObjectBaseToPtrNotNull(this), (void**)param, ref exc);
+		Il2CppInterop.Runtime.Il2CppException.RaiseExceptionIfNecessary(exc);
+		return (intPtr != (System.IntPtr)0) ? Il2CppObjectPool.Get<Button>(intPtr) : null;
+	}
+
+	[CallerCount(1)]
+	[CachedScanResults(RefRangeStart = 380121, RefRangeEnd = 380122, XrefRangeStart = 380106, XrefRangeEnd = 380121, MetadataInitTokenRva = 0L, MetadataInitFlagRva = 0L)]
+	public unsafe bool CanHandle([In] ref UIActionContext ctx)
+	{
+		IL2CPP.Il2CppObjectBaseToPtrNotNull(this);
+		System.IntPtr* ptr = stackalloc System.IntPtr[1];
+		*ptr = IL2CPP.il2cpp_object_unbox(IL2CPP.Il2CppObjectBaseToPtrNotNull(ctx));
+		Unsafe.SkipInit(out System.IntPtr exc);
+		System.IntPtr obj = IL2CPP.il2cpp_runtime_invoke(NativeMethodInfoPtr_CanHandle_Public_Boolean_byref_UIActionContext_0, IL2CPP.Il2CppObjectBaseToPtrNotNull(this), (void**)ptr, ref exc);
+		Il2CppInterop.Runtime.Il2CppException.RaiseExceptionIfNecessary(exc);
+		return *(bool*)IL2CPP.il2cpp_object_unbox(obj);
+	}
+
+	[CallerCount(1)]
+	[CachedScanResults(RefRangeStart = 380162, RefRangeEnd = 380163, XrefRangeStart = 380122, XrefRangeEnd = 380162, MetadataInitTokenRva = 0L, MetadataInitFlagRva = 0L)]
+	public unsafe UIActionResult Handle([In] ref UIActionContext ctx)
+	{
+		IL2CPP.Il2CppObjectBaseToPtrNotNull(this);
+		System.IntPtr* ptr = stackalloc System.IntPtr[1];
+		*ptr = IL2CPP.il2cpp_object_unbox(IL2CPP.Il2CppObjectBaseToPtrNotNull(ctx));
+		Unsafe.SkipInit(out System.IntPtr exc);
+		System.IntPtr obj = IL2CPP.il2cpp_runtime_invoke(NativeMethodInfoPtr_Handle_Public_UIActionResult_byref_UIActionContext_0, IL2CPP.Il2CppObjectBaseToPtrNotNull(this), (void**)ptr, ref exc);
+		Il2CppInterop.Runtime.Il2CppException.RaiseExceptionIfNecessary(exc);
+		return *(UIActionResult*)IL2CPP.il2cpp_object_unbox(obj);
+	}
+
+	[CallerCount(1)]
+	[CachedScanResults(RefRangeStart = 380163, RefRangeEnd = 380164, XrefRangeStart = 380163, XrefRangeEnd = 380163, MetadataInitTokenRva = 0L, MetadataInitFlagRva = 0L)]
+	public unsafe void NotifyUserChangedWorld()
+	{
+		IL2CPP.Il2CppObjectBaseToPtrNotNull(this);
+		System.IntPtr* param = null;
+		Unsafe.SkipInit(out System.IntPtr exc);
+		System.IntPtr intPtr = IL2CPP.il2cpp_runtime_invoke(NativeMethodInfoPtr_NotifyUserChangedWorld_Public_Void_0, IL2CPP.Il2CppObjectBaseToPtrNotNull(this), (void**)param, ref exc);
+		Il2CppInterop.Runtime.Il2CppException.RaiseExceptionIfNecessary(exc);
+	}
+
+	[CallerCount(0)]
+	[CachedScanResults(RefRangeStart = 0, RefRangeEnd = 0, XrefRangeStart = 380164, XrefRangeEnd = 380166, MetadataInitTokenRva = 0L, MetadataInitFlagRva = 0L)]
+	public unsafe void RearmWorldChoiceForCharacter(string characterName)
+	{
+		IL2CPP.Il2CppObjectBaseToPtrNotNull(this);
+		System.IntPtr* ptr = stackalloc System.IntPtr[1];
+		*ptr = IL2CPP.ManagedStringToIl2Cpp(characterName);
+		Unsafe.SkipInit(out System.IntPtr exc);
+		System.IntPtr intPtr = IL2CPP.il2cpp_runtime_invoke(NativeMethodInfoPtr_RearmWorldChoiceForCharacter_Private_Void_String_0, IL2CPP.Il2CppObjectBaseToPtrNotNull(this), (void**)ptr, ref exc);
+		Il2CppInterop.Runtime.Il2CppException.RaiseExceptionIfNecessary(exc);
+	}
+
+	[CallerCount(0)]
+	[CachedScanResults(RefRangeStart = 0, RefRangeEnd = 0, XrefRangeStart = 380166, XrefRangeEnd = 380167, MetadataInitTokenRva = 0L, MetadataInitFlagRva = 0L)]
+	public unsafe bool ResolveNewWorldMode(bool isNewCharacter, bool isMultiplayer)
+	{
+		IL2CPP.Il2CppObjectBaseToPtrNotNull(this);
+		System.IntPtr* ptr = stackalloc System.IntPtr[2];
+		*ptr = (nint)(&isNewCharacter);
+		*(bool**)((byte*)ptr + checked((nuint)1u * unchecked((nuint)sizeof(System.IntPtr)))) = &isMultiplayer;
+		Unsafe.SkipInit(out System.IntPtr exc);
+		System.IntPtr obj = IL2CPP.il2cpp_runtime_invoke(NativeMethodInfoPtr_ResolveNewWorldMode_Private_Boolean_Boolean_Boolean_0, IL2CPP.Il2CppObjectBaseToPtrNotNull(this), (void**)ptr, ref exc);
+		Il2CppInterop.Runtime.Il2CppException.RaiseExceptionIfNecessary(exc);
+		return *(bool*)IL2CPP.il2cpp_object_unbox(obj);
+	}
+
+	[CallerCount(4)]
+	[CachedScanResults(RefRangeStart = 380285, RefRangeEnd = 380289, XrefRangeStart = 380167, XrefRangeEnd = 380285, MetadataInitTokenRva = 0L, MetadataInitFlagRva = 0L)]
+	public unsafe void InitializeFinalSelection()
+	{
+		IL2CPP.Il2CppObjectBaseToPtrNotNull(this);
+		System.IntPtr* param = null;
+		Unsafe.SkipInit(out System.IntPtr exc);
+		System.IntPtr intPtr = IL2CPP.il2cpp_runtime_invoke(NativeMethodInfoPtr_InitializeFinalSelection_Public_Void_0, IL2CPP.Il2CppObjectBaseToPtrNotNull(this), (void**)param, ref exc);
+		Il2CppInterop.Runtime.Il2CppException.RaiseExceptionIfNecessary(exc);
+	}
+
+	[CallerCount(1)]
+	[CachedScanResults(RefRangeStart = 380343, RefRangeEnd = 380344, XrefRangeStart = 380289, XrefRangeEnd = 380343, MetadataInitTokenRva = 0L, MetadataInitFlagRva = 0L)]
+	public unsafe void ApplyWorldTypeLabel(bool isMultiplayer)
+	{
+		IL2CPP.Il2CppObjectBaseToPtrNotNull(this);
+		System.IntPtr* ptr = stackalloc System.IntPtr[1];
+		*ptr = (nint)(&isMultiplayer);
+		Unsafe.SkipInit(out System.IntPtr exc);
+		System.IntPtr intPtr = IL2CPP.il2cpp_runtime_invoke(NativeMethodInfoPtr_ApplyWorldTypeLabel_Private_Void_Boolean_0, IL2CPP.Il2CppObjectBaseToPtrNotNull(this), (void**)ptr, ref exc);
+		Il2CppInterop.Runtime.Il2CppException.RaiseExceptionIfNecessary(exc);
+	}
+
+	[CallerCount(2)]
+	[CachedScanResults(RefRangeStart = 380350, RefRangeEnd = 380352, XrefRangeStart = 380344, XrefRangeEnd = 380350, MetadataInitTokenRva = 0L, MetadataInitFlagRva = 0L)]
+	public unsafe Selectable FirstControllerTarget()
+	{
+		IL2CPP.Il2CppObjectBaseToPtrNotNull(this);
+		System.IntPtr* param = null;
+		Unsafe.SkipInit(out System.IntPtr exc);
+		System.IntPtr intPtr = IL2CPP.il2cpp_runtime_invoke(NativeMethodInfoPtr_FirstControllerTarget_Private_Selectable_0, IL2CPP.Il2CppObjectBaseToPtrNotNull(this), (void**)param, ref exc);
+		Il2CppInterop.Runtime.Il2CppException.RaiseExceptionIfNecessary(exc);
+		return (intPtr != (System.IntPtr)0) ? Il2CppObjectPool.Get<Selectable>(intPtr) : null;
+	}
+
+	[CallerCount(0)]
+	[CachedScanResults(RefRangeStart = 0, RefRangeEnd = 0, XrefRangeStart = 380352, XrefRangeEnd = 380358, MetadataInitTokenRva = 0L, MetadataInitFlagRva = 0L)]
+	public unsafe static bool IsTargetable(Selectable s)
+	{
+		System.IntPtr* ptr = stackalloc System.IntPtr[1];
+		*ptr = IL2CPP.Il2CppObjectBaseToPtr(s);
+		Unsafe.SkipInit(out System.IntPtr exc);
+		System.IntPtr obj = IL2CPP.il2cpp_runtime_invoke(NativeMethodInfoPtr_IsTargetable_Private_Static_Boolean_Selectable_0, (System.IntPtr)0, (void**)ptr, ref exc);
+		Il2CppInterop.Runtime.Il2CppException.RaiseExceptionIfNecessary(exc);
+		return *(bool*)IL2CPP.il2cpp_object_unbox(obj);
+	}
+
+	[CallerCount(0)]
+	[CachedScanResults(RefRangeStart = 0, RefRangeEnd = 0, XrefRangeStart = 380358, XrefRangeEnd = 380363, MetadataInitTokenRva = 0L, MetadataInitFlagRva = 0L)]
+	public unsafe IEnumerator SetInitialControllerSelection()
+	{
+		IL2CPP.Il2CppObjectBaseToPtrNotNull(this);
+		System.IntPtr* param = null;
+		Unsafe.SkipInit(out System.IntPtr exc);
+		System.IntPtr intPtr = IL2CPP.il2cpp_runtime_invoke(NativeMethodInfoPtr_SetInitialControllerSelection_Private_IEnumerator_0, IL2CPP.Il2CppObjectBaseToPtrNotNull(this), (void**)param, ref exc);
+		Il2CppInterop.Runtime.Il2CppException.RaiseExceptionIfNecessary(exc);
+		return (intPtr != (System.IntPtr)0) ? Il2CppObjectPool.Get<IEnumerator>(intPtr) : null;
+	}
+
+	[CallerCount(0)]
+	[CachedScanResults(RefRangeStart = 0, RefRangeEnd = 0, XrefRangeStart = 380363, XrefRangeEnd = 380364, MetadataInitTokenRva = 0L, MetadataInitFlagRva = 0L)]
+	public unsafe void OnEnable()
+	{
+		IL2CPP.Il2CppObjectBaseToPtrNotNull(this);
+		System.IntPtr* param = null;
+		Unsafe.SkipInit(out System.IntPtr exc);
+		System.IntPtr intPtr = IL2CPP.il2cpp_runtime_invoke(NativeMethodInfoPtr_OnEnable_Private_Void_0, IL2CPP.Il2CppObjectBaseToPtrNotNull(this), (void**)param, ref exc);
+		Il2CppInterop.Runtime.Il2CppException.RaiseExceptionIfNecessary(exc);
+	}
+
+	[CallerCount(1)]
+	[CachedScanResults(RefRangeStart = 380384, RefRangeEnd = 380385, XrefRangeStart = 380364, XrefRangeEnd = 380384, MetadataInitTokenRva = 0L, MetadataInitFlagRva = 0L)]
+	public unsafe void SeedInitialControllerSelection()
+	{
+		IL2CPP.Il2CppObjectBaseToPtrNotNull(this);
+		System.IntPtr* param = null;
+		Unsafe.SkipInit(out System.IntPtr exc);
+		System.IntPtr intPtr = IL2CPP.il2cpp_runtime_invoke(NativeMethodInfoPtr_SeedInitialControllerSelection_Private_Void_0, IL2CPP.Il2CppObjectBaseToPtrNotNull(this), (void**)param, ref exc);
+		Il2CppInterop.Runtime.Il2CppException.RaiseExceptionIfNecessary(exc);
+	}
+
+	[CallerCount(1)]
+	[CachedScanResults(RefRangeStart = 380431, RefRangeEnd = 380432, XrefRangeStart = 380385, XrefRangeEnd = 380431, MetadataInitTokenRva = 0L, MetadataInitFlagRva = 0L)]
+	public unsafe void SetupPanels()
+	{
+		IL2CPP.Il2CppObjectBaseToPtrNotNull(this);
+		System.IntPtr* param = null;
+		Unsafe.SkipInit(out System.IntPtr exc);
+		System.IntPtr intPtr = IL2CPP.il2cpp_runtime_invoke(NativeMethodInfoPtr_SetupPanels_Private_Void_0, IL2CPP.Il2CppObjectBaseToPtrNotNull(this), (void**)param, ref exc);
+		Il2CppInterop.Runtime.Il2CppException.RaiseExceptionIfNecessary(exc);
+	}
+
+	[CallerCount(0)]
+	[CachedScanResults(RefRangeStart = 0, RefRangeEnd = 0, XrefRangeStart = 380432, XrefRangeEnd = 380441, MetadataInitTokenRva = 0L, MetadataInitFlagRva = 0L)]
+	public unsafe void SetupSimpleWorld()
+	{
+		IL2CPP.Il2CppObjectBaseToPtrNotNull(this);
+		System.IntPtr* param = null;
+		Unsafe.SkipInit(out System.IntPtr exc);
+		System.IntPtr intPtr = IL2CPP.il2cpp_runtime_invoke(NativeMethodInfoPtr_SetupSimpleWorld_Private_Void_0, IL2CPP.Il2CppObjectBaseToPtrNotNull(this), (void**)param, ref exc);
+		Il2CppInterop.Runtime.Il2CppException.RaiseExceptionIfNecessary(exc);
+	}
+
+	[CallerCount(0)]
+	[CachedScanResults(RefRangeStart = 0, RefRangeEnd = 0, XrefRangeStart = 380441, XrefRangeEnd = 380498, MetadataInitTokenRva = 0L, MetadataInitFlagRva = 0L)]
+	public unsafe void Update()
+	{
+		IL2CPP.Il2CppObjectBaseToPtrNotNull(this);
+		System.IntPtr* param = null;
+		Unsafe.SkipInit(out System.IntPtr exc);
+		System.IntPtr intPtr = IL2CPP.il2cpp_runtime_invoke(NativeMethodInfoPtr_Update_Private_Void_0, IL2CPP.Il2CppObjectBaseToPtrNotNull(this), (void**)param, ref exc);
+		Il2CppInterop.Runtime.Il2CppException.RaiseExceptionIfNecessary(exc);
+	}
+
+	[CallerCount(1)]
+	[CachedScanResults(RefRangeStart = 380510, RefRangeEnd = 380511, XrefRangeStart = 380498, XrefRangeEnd = 380510, MetadataInitTokenRva = 0L, MetadataInitFlagRva = 0L)]
+	public unsafe void OnSimpleWorldNameUpdate()
+	{
+		IL2CPP.Il2CppObjectBaseToPtrNotNull(this);
+		System.IntPtr* param = null;
+		Unsafe.SkipInit(out System.IntPtr exc);
+		System.IntPtr intPtr = IL2CPP.il2cpp_runtime_invoke(NativeMethodInfoPtr_OnSimpleWorldNameUpdate_Public_Void_0, IL2CPP.Il2CppObjectBaseToPtrNotNull(this), (void**)param, ref exc);
+		Il2CppInterop.Runtime.Il2CppException.RaiseExceptionIfNecessary(exc);
+	}
+
+	[CallerCount(1)]
+	[CachedScanResults(RefRangeStart = 380522, RefRangeEnd = 380523, XrefRangeStart = 380511, XrefRangeEnd = 380522, MetadataInitTokenRva = 0L, MetadataInitFlagRva = 0L)]
+	public unsafe string NormalizedWorldName()
+	{
+		IL2CPP.Il2CppObjectBaseToPtrNotNull(this);
+		System.IntPtr* param = null;
+		Unsafe.SkipInit(out System.IntPtr exc);
+		System.IntPtr il2CppString = IL2CPP.il2cpp_runtime_invoke(NativeMethodInfoPtr_NormalizedWorldName_Private_String_0, IL2CPP.Il2CppObjectBaseToPtrNotNull(this), (void**)param, ref exc);
+		Il2CppInterop.Runtime.Il2CppException.RaiseExceptionIfNecessary(exc);
+		return IL2CPP.Il2CppStringToManaged(il2CppString);
+	}
+
+	[CallerCount(1)]
+	[CachedScanResults(RefRangeStart = 380569, RefRangeEnd = 380570, XrefRangeStart = 380523, XrefRangeEnd = 380569, MetadataInitTokenRva = 0L, MetadataInitFlagRva = 0L)]
+	public unsafe Il2CppSystem.ValueTuple<bool, string> ValidateSimpleWorldName()
+	{
+		IL2CPP.Il2CppObjectBaseToPtrNotNull(this);
+		System.IntPtr* param = null;
+		Unsafe.SkipInit(out System.IntPtr exc);
+		System.IntPtr pointer = IL2CPP.il2cpp_runtime_invoke(NativeMethodInfoPtr_ValidateSimpleWorldName_Private_ValueTuple_2_Boolean_String_0, IL2CPP.Il2CppObjectBaseToPtrNotNull(this), (void**)param, ref exc);
+		Il2CppInterop.Runtime.Il2CppException.RaiseExceptionIfNecessary(exc);
+		return new Il2CppSystem.ValueTuple<bool, string>(pointer);
+	}
+
+	[CallerCount(1)]
+	[CachedScanResults(RefRangeStart = 380572, RefRangeEnd = 380573, XrefRangeStart = 380570, XrefRangeEnd = 380572, MetadataInitTokenRva = 0L, MetadataInitFlagRva = 0L)]
+	public unsafe void UpdateLobbyCount(int lobbyCount, int maxMembers)
+	{
+		IL2CPP.Il2CppObjectBaseToPtrNotNull(this);
+		System.IntPtr* ptr = stackalloc System.IntPtr[2];
+		*ptr = (nint)(&lobbyCount);
+		*(int**)((byte*)ptr + checked((nuint)1u * unchecked((nuint)sizeof(System.IntPtr)))) = &maxMembers;
+		Unsafe.SkipInit(out System.IntPtr exc);
+		System.IntPtr intPtr = IL2CPP.il2cpp_runtime_invoke(NativeMethodInfoPtr_UpdateLobbyCount_Public_Void_Int32_Int32_0, IL2CPP.Il2CppObjectBaseToPtrNotNull(this), (void**)ptr, ref exc);
+		Il2CppInterop.Runtime.Il2CppException.RaiseExceptionIfNecessary(exc);
+	}
+
+	[CallerCount(0)]
+	[CachedScanResults(RefRangeStart = 0, RefRangeEnd = 0, XrefRangeStart = 380573, XrefRangeEnd = 380578, MetadataInitTokenRva = 0L, MetadataInitFlagRva = 0L)]
+	public unsafe void IncreaseMaxPlayers()
+	{
+		IL2CPP.Il2CppObjectBaseToPtrNotNull(this);
+		System.IntPtr* param = null;
+		Unsafe.SkipInit(out System.IntPtr exc);
+		System.IntPtr intPtr = IL2CPP.il2cpp_runtime_invoke(NativeMethodInfoPtr_IncreaseMaxPlayers_Public_Void_0, IL2CPP.Il2CppObjectBaseToPtrNotNull(this), (void**)param, ref exc);
+		Il2CppInterop.Runtime.Il2CppException.RaiseExceptionIfNecessary(exc);
+	}
+
+	[CallerCount(0)]
+	[CachedScanResults(RefRangeStart = 0, RefRangeEnd = 0, XrefRangeStart = 380578, XrefRangeEnd = 380579, MetadataInitTokenRva = 0L, MetadataInitFlagRva = 0L)]
+	public unsafe void DecreaseMaxPlayers()
+	{
+		IL2CPP.Il2CppObjectBaseToPtrNotNull(this);
+		System.IntPtr* param = null;
+		Unsafe.SkipInit(out System.IntPtr exc);
+		System.IntPtr intPtr = IL2CPP.il2cpp_runtime_invoke(NativeMethodInfoPtr_DecreaseMaxPlayers_Public_Void_0, IL2CPP.Il2CppObjectBaseToPtrNotNull(this), (void**)param, ref exc);
+		Il2CppInterop.Runtime.Il2CppException.RaiseExceptionIfNecessary(exc);
+	}
+
+	[CallerCount(0)]
+	[CachedScanResults(RefRangeStart = 0, RefRangeEnd = 0, XrefRangeStart = 380579, XrefRangeEnd = 380592, MetadataInitTokenRva = 0L, MetadataInitFlagRva = 0L)]
+	public unsafe void WirePrivacyToggleListeners()
+	{
+		IL2CPP.Il2CppObjectBaseToPtrNotNull(this);
+		System.IntPtr* param = null;
+		Unsafe.SkipInit(out System.IntPtr exc);
+		System.IntPtr intPtr = IL2CPP.il2cpp_runtime_invoke(NativeMethodInfoPtr_WirePrivacyToggleListeners_Private_Void_0, IL2CPP.Il2CppObjectBaseToPtrNotNull(this), (void**)param, ref exc);
+		Il2CppInterop.Runtime.Il2CppException.RaiseExceptionIfNecessary(exc);
+	}
+
+	[CallerCount(0)]
+	[CachedScanResults(RefRangeStart = 0, RefRangeEnd = 0, XrefRangeStart = 380592, XrefRangeEnd = 380605, MetadataInitTokenRva = 0L, MetadataInitFlagRva = 0L)]
+	public unsafe void WireDifficultySlider()
+	{
+		IL2CPP.Il2CppObjectBaseToPtrNotNull(this);
+		System.IntPtr* param = null;
+		Unsafe.SkipInit(out System.IntPtr exc);
+		System.IntPtr intPtr = IL2CPP.il2cpp_runtime_invoke(NativeMethodInfoPtr_WireDifficultySlider_Private_Void_0, IL2CPP.Il2CppObjectBaseToPtrNotNull(this), (void**)param, ref exc);
+		Il2CppInterop.Runtime.Il2CppException.RaiseExceptionIfNecessary(exc);
+	}
+
+	[CallerCount(2)]
+	[CachedScanResults(RefRangeStart = 380610, RefRangeEnd = 380612, XrefRangeStart = 380605, XrefRangeEnd = 380610, MetadataInitTokenRva = 0L, MetadataInitFlagRva = 0L)]
+	public unsafe Difficulty ReadSliderDifficulty()
+	{
+		IL2CPP.Il2CppObjectBaseToPtrNotNull(this);
+		System.IntPtr* param = null;
+		Unsafe.SkipInit(out System.IntPtr exc);
+		System.IntPtr obj = IL2CPP.il2cpp_runtime_invoke(NativeMethodInfoPtr_ReadSliderDifficulty_Private_Difficulty_0, IL2CPP.Il2CppObjectBaseToPtrNotNull(this), (void**)param, ref exc);
+		Il2CppInterop.Runtime.Il2CppException.RaiseExceptionIfNecessary(exc);
+		return *(Difficulty*)IL2CPP.il2cpp_object_unbox(obj);
+	}
+
+	[CallerCount(0)]
+	[CachedScanResults(RefRangeStart = 0, RefRangeEnd = 0, XrefRangeStart = 380612, XrefRangeEnd = 380614, MetadataInitTokenRva = 0L, MetadataInitFlagRva = 0L)]
+	public unsafe void OnDifficultySliderChanged(float _)
+	{
+		IL2CPP.Il2CppObjectBaseToPtrNotNull(this);
+		System.IntPtr* ptr = stackalloc System.IntPtr[1];
+		*ptr = (nint)(&_);
+		Unsafe.SkipInit(out System.IntPtr exc);
+		System.IntPtr intPtr = IL2CPP.il2cpp_runtime_invoke(NativeMethodInfoPtr_OnDifficultySliderChanged_Private_Void_Single_0, IL2CPP.Il2CppObjectBaseToPtrNotNull(this), (void**)ptr, ref exc);
+		Il2CppInterop.Runtime.Il2CppException.RaiseExceptionIfNecessary(exc);
+	}
+
+	[CallerCount(2)]
+	[CachedScanResults(RefRangeStart = 380619, RefRangeEnd = 380621, XrefRangeStart = 380614, XrefRangeEnd = 380619, MetadataInitTokenRva = 0L, MetadataInitFlagRva = 0L)]
+	public unsafe void SetAdjustDifficultyHintVisible(bool visible)
+	{
+		IL2CPP.Il2CppObjectBaseToPtrNotNull(this);
+		System.IntPtr* ptr = stackalloc System.IntPtr[1];
+		*ptr = (nint)(&visible);
+		Unsafe.SkipInit(out System.IntPtr exc);
+		System.IntPtr intPtr = IL2CPP.il2cpp_runtime_invoke(NativeMethodInfoPtr_SetAdjustDifficultyHintVisible_Private_Void_Boolean_0, IL2CPP.Il2CppObjectBaseToPtrNotNull(this), (void**)ptr, ref exc);
+		Il2CppInterop.Runtime.Il2CppException.RaiseExceptionIfNecessary(exc);
+	}
+
+	[CallerCount(2)]
+	[CachedScanResults(RefRangeStart = 380626, RefRangeEnd = 380628, XrefRangeStart = 380621, XrefRangeEnd = 380626, MetadataInitTokenRva = 0L, MetadataInitFlagRva = 0L)]
+	public unsafe void SetAdjustPlayerLimitHintVisible(bool visible)
+	{
+		IL2CPP.Il2CppObjectBaseToPtrNotNull(this);
+		System.IntPtr* ptr = stackalloc System.IntPtr[1];
+		*ptr = (nint)(&visible);
+		Unsafe.SkipInit(out System.IntPtr exc);
+		System.IntPtr intPtr = IL2CPP.il2cpp_runtime_invoke(NativeMethodInfoPtr_SetAdjustPlayerLimitHintVisible_Private_Void_Boolean_0, IL2CPP.Il2CppObjectBaseToPtrNotNull(this), (void**)ptr, ref exc);
+		Il2CppInterop.Runtime.Il2CppException.RaiseExceptionIfNecessary(exc);
+	}
+
+	[CallerCount(1)]
+	[CachedScanResults(RefRangeStart = 380667, RefRangeEnd = 380668, XrefRangeStart = 380628, XrefRangeEnd = 380667, MetadataInitTokenRva = 0L, MetadataInitFlagRva = 0L)]
+	public unsafe void SetSelectedDifficulty(Difficulty difficulty)
+	{
+		IL2CPP.Il2CppObjectBaseToPtrNotNull(this);
+		System.IntPtr* ptr = stackalloc System.IntPtr[1];
+		*ptr = (nint)(&difficulty);
+		Unsafe.SkipInit(out System.IntPtr exc);
+		System.IntPtr intPtr = IL2CPP.il2cpp_runtime_invoke(NativeMethodInfoPtr_SetSelectedDifficulty_Private_Void_Difficulty_0, IL2CPP.Il2CppObjectBaseToPtrNotNull(this), (void**)ptr, ref exc);
+		Il2CppInterop.Runtime.Il2CppException.RaiseExceptionIfNecessary(exc);
+	}
+
+	[CallerCount(4)]
+	[CachedScanResults(RefRangeStart = 380694, RefRangeEnd = 380698, XrefRangeStart = 380668, XrefRangeEnd = 380694, MetadataInitTokenRva = 0L, MetadataInitFlagRva = 0L)]
+	public unsafe void OnPlayerCountChanged()
+	{
+		IL2CPP.Il2CppObjectBaseToPtrNotNull(this);
+		System.IntPtr* param = null;
+		Unsafe.SkipInit(out System.IntPtr exc);
+		System.IntPtr intPtr = IL2CPP.il2cpp_runtime_invoke(NativeMethodInfoPtr_OnPlayerCountChanged_Private_Void_0, IL2CPP.Il2CppObjectBaseToPtrNotNull(this), (void**)param, ref exc);
+		Il2CppInterop.Runtime.Il2CppException.RaiseExceptionIfNecessary(exc);
+	}
+
+	[CallerCount(1)]
+	[CachedScanResults(RefRangeStart = 380734, RefRangeEnd = 380735, XrefRangeStart = 380698, XrefRangeEnd = 380734, MetadataInitTokenRva = 0L, MetadataInitFlagRva = 0L)]
+	public unsafe static void ShowCharacterPreview(GameObject previewObject, Race race, Gender gender, AppearanceColors colors)
+	{
+		System.IntPtr* ptr = stackalloc System.IntPtr[4];
+		*ptr = IL2CPP.Il2CppObjectBaseToPtr(previewObject);
+		*(Race**)((byte*)ptr + checked((nuint)1u * unchecked((nuint)sizeof(System.IntPtr)))) = &race;
+		*(Gender**)((byte*)ptr + checked((nuint)2u * unchecked((nuint)sizeof(System.IntPtr)))) = &gender;
+		*(AppearanceColors**)((byte*)ptr + checked((nuint)3u * unchecked((nuint)sizeof(System.IntPtr)))) = &colors;
+		Unsafe.SkipInit(out System.IntPtr exc);
+		System.IntPtr intPtr = IL2CPP.il2cpp_runtime_invoke(NativeMethodInfoPtr_ShowCharacterPreview_Private_Static_Void_GameObject_Race_Gender_AppearanceColors_0, (System.IntPtr)0, (void**)ptr, ref exc);
+		Il2CppInterop.Runtime.Il2CppException.RaiseExceptionIfNecessary(exc);
+	}
+
+	[CallerCount(1)]
+	[CachedScanResults(RefRangeStart = 380852, RefRangeEnd = 380853, XrefRangeStart = 380735, XrefRangeEnd = 380852, MetadataInitTokenRva = 0L, MetadataInitFlagRva = 0L)]
+	public unsafe void FillInPlayerValues()
+	{
+		IL2CPP.Il2CppObjectBaseToPtrNotNull(this);
+		System.IntPtr* param = null;
+		Unsafe.SkipInit(out System.IntPtr exc);
+		System.IntPtr intPtr = IL2CPP.il2cpp_runtime_invoke(NativeMethodInfoPtr_FillInPlayerValues_Private_Void_0, IL2CPP.Il2CppObjectBaseToPtrNotNull(this), (void**)param, ref exc);
+		Il2CppInterop.Runtime.Il2CppException.RaiseExceptionIfNecessary(exc);
+	}
+
+	[CallerCount(1)]
+	[CachedScanResults(RefRangeStart = 381086, RefRangeEnd = 381087, XrefRangeStart = 380853, XrefRangeEnd = 381086, MetadataInitTokenRva = 0L, MetadataInitFlagRva = 0L)]
+	public unsafe void FillInWorldValues()
+	{
+		IL2CPP.Il2CppObjectBaseToPtrNotNull(this);
+		System.IntPtr* param = null;
+		Unsafe.SkipInit(out System.IntPtr exc);
+		System.IntPtr intPtr = IL2CPP.il2cpp_runtime_invoke(NativeMethodInfoPtr_FillInWorldValues_Private_Void_0, IL2CPP.Il2CppObjectBaseToPtrNotNull(this), (void**)param, ref exc);
+		Il2CppInterop.Runtime.Il2CppException.RaiseExceptionIfNecessary(exc);
+	}
+
+	[CallerCount(0)]
+	[CachedScanResults(RefRangeStart = 0, RefRangeEnd = 0, XrefRangeStart = 381087, XrefRangeEnd = 381103, MetadataInitTokenRva = 0L, MetadataInitFlagRva = 0L)]
+	public unsafe void RestoreLobbyPrivacyChoice()
+	{
+		IL2CPP.Il2CppObjectBaseToPtrNotNull(this);
+		System.IntPtr* param = null;
+		Unsafe.SkipInit(out System.IntPtr exc);
+		System.IntPtr intPtr = IL2CPP.il2cpp_runtime_invoke(NativeMethodInfoPtr_RestoreLobbyPrivacyChoice_Private_Void_0, IL2CPP.Il2CppObjectBaseToPtrNotNull(this), (void**)param, ref exc);
+		Il2CppInterop.Runtime.Il2CppException.RaiseExceptionIfNecessary(exc);
+	}
+
+	[CallerCount(0)]
+	[CachedScanResults(RefRangeStart = 0, RefRangeEnd = 0, XrefRangeStart = 381103, XrefRangeEnd = 381114, MetadataInitTokenRva = 0L, MetadataInitFlagRva = 0L)]
+	public unsafe void SetSteamLobbyOptions()
+	{
+		IL2CPP.Il2CppObjectBaseToPtrNotNull(this);
+		System.IntPtr* param = null;
+		Unsafe.SkipInit(out System.IntPtr exc);
+		System.IntPtr intPtr = IL2CPP.il2cpp_runtime_invoke(NativeMethodInfoPtr_SetSteamLobbyOptions_Private_Void_0, IL2CPP.Il2CppObjectBaseToPtrNotNull(this), (void**)param, ref exc);
+		Il2CppInterop.Runtime.Il2CppException.RaiseExceptionIfNecessary(exc);
+	}
+
+	[CallerCount(0)]
+	[CachedScanResults(RefRangeStart = 0, RefRangeEnd = 0, XrefRangeStart = 381114, XrefRangeEnd = 381172, MetadataInitTokenRva = 0L, MetadataInitFlagRva = 0L)]
+	public unsafe void StartGame()
+	{
+		IL2CPP.Il2CppObjectBaseToPtrNotNull(this);
+		System.IntPtr* param = null;
+		Unsafe.SkipInit(out System.IntPtr exc);
+		System.IntPtr intPtr = IL2CPP.il2cpp_runtime_invoke(NativeMethodInfoPtr_StartGame_Public_Void_0, IL2CPP.Il2CppObjectBaseToPtrNotNull(this), (void**)param, ref exc);
+		Il2CppInterop.Runtime.Il2CppException.RaiseExceptionIfNecessary(exc);
+	}
+
+	[CallerCount(1)]
+	[CachedScanResults(RefRangeStart = 381224, RefRangeEnd = 381225, XrefRangeStart = 381172, XrefRangeEnd = 381224, MetadataInitTokenRva = 0L, MetadataInitFlagRva = 0L)]
+	public unsafe void ShowNewCharactersOnlyPopup()
+	{
+		IL2CPP.Il2CppObjectBaseToPtrNotNull(this);
+		System.IntPtr* param = null;
+		Unsafe.SkipInit(out System.IntPtr exc);
+		System.IntPtr intPtr = IL2CPP.il2cpp_runtime_invoke(NativeMethodInfoPtr_ShowNewCharactersOnlyPopup_Private_Void_0, IL2CPP.Il2CppObjectBaseToPtrNotNull(this), (void**)param, ref exc);
+		Il2CppInterop.Runtime.Il2CppException.RaiseExceptionIfNecessary(exc);
+	}
+
+	[CallerCount(0)]
+	[CachedScanResults(RefRangeStart = 0, RefRangeEnd = 0, XrefRangeStart = 381225, XrefRangeEnd = 381243, MetadataInitTokenRva = 0L, MetadataInitFlagRva = 0L)]
+	public unsafe string GetLocalizedError(string key, string fallback)
+	{
+		IL2CPP.Il2CppObjectBaseToPtrNotNull(this);
+		System.IntPtr* ptr = stackalloc System.IntPtr[2];
+		*ptr = IL2CPP.ManagedStringToIl2Cpp(key);
+		*(System.IntPtr*)((byte*)ptr + checked((nuint)1u * unchecked((nuint)sizeof(System.IntPtr)))) = IL2CPP.ManagedStringToIl2Cpp(fallback);
+		Unsafe.SkipInit(out System.IntPtr exc);
+		System.IntPtr il2CppString = IL2CPP.il2cpp_runtime_invoke(NativeMethodInfoPtr_GetLocalizedError_Private_String_String_String_0, IL2CPP.Il2CppObjectBaseToPtrNotNull(this), (void**)ptr, ref exc);
+		Il2CppInterop.Runtime.Il2CppException.RaiseExceptionIfNecessary(exc);
+		return IL2CPP.Il2CppStringToManaged(il2CppString);
+	}
+
+	[CallerCount(0)]
+	[CachedScanResults(RefRangeStart = 0, RefRangeEnd = 0, XrefRangeStart = 381243, XrefRangeEnd = 381248, MetadataInitTokenRva = 0L, MetadataInitFlagRva = 0L)]
+	public unsafe IEnumerator FadeOutNotReadyPopup(float delayBeforeFade)
+	{
+		IL2CPP.Il2CppObjectBaseToPtrNotNull(this);
+		System.IntPtr* ptr = stackalloc System.IntPtr[1];
+		*ptr = (nint)(&delayBeforeFade);
+		Unsafe.SkipInit(out System.IntPtr exc);
+		System.IntPtr intPtr = IL2CPP.il2cpp_runtime_invoke(NativeMethodInfoPtr_FadeOutNotReadyPopup_Private_IEnumerator_Single_0, IL2CPP.Il2CppObjectBaseToPtrNotNull(this), (void**)ptr, ref exc);
+		Il2CppInterop.Runtime.Il2CppException.RaiseExceptionIfNecessary(exc);
+		return (intPtr != (System.IntPtr)0) ? Il2CppObjectPool.Get<IEnumerator>(intPtr) : null;
+	}
+
+	[CallerCount(0)]
+	[CachedScanResults(RefRangeStart = 0, RefRangeEnd = 0, XrefRangeStart = 381248, XrefRangeEnd = 381256, MetadataInitTokenRva = 0L, MetadataInitFlagRva = 0L)]
+	public unsafe bool IsCharacterAllowedForWorld()
+	{
+		IL2CPP.Il2CppObjectBaseToPtrNotNull(this);
+		System.IntPtr* param = null;
+		Unsafe.SkipInit(out System.IntPtr exc);
+		System.IntPtr obj = IL2CPP.il2cpp_runtime_invoke(NativeMethodInfoPtr_IsCharacterAllowedForWorld_Private_Boolean_0, IL2CPP.Il2CppObjectBaseToPtrNotNull(this), (void**)param, ref exc);
+		Il2CppInterop.Runtime.Il2CppException.RaiseExceptionIfNecessary(exc);
+		return *(bool*)IL2CPP.il2cpp_object_unbox(obj);
+	}
+
+	[CallerCount(0)]
+	[CachedScanResults(RefRangeStart = 0, RefRangeEnd = 0, XrefRangeStart = 381256, XrefRangeEnd = 381273, MetadataInitTokenRva = 0L, MetadataInitFlagRva = 0L)]
+	public unsafe bool IsCharacterAllowedForServer()
+	{
+		IL2CPP.Il2CppObjectBaseToPtrNotNull(this);
+		System.IntPtr* param = null;
+		Unsafe.SkipInit(out System.IntPtr exc);
+		System.IntPtr obj = IL2CPP.il2cpp_runtime_invoke(NativeMethodInfoPtr_IsCharacterAllowedForServer_Private_Boolean_0, IL2CPP.Il2CppObjectBaseToPtrNotNull(this), (void**)param, ref exc);
+		Il2CppInterop.Runtime.Il2CppException.RaiseExceptionIfNecessary(exc);
+		return *(bool*)IL2CPP.il2cpp_object_unbox(obj);
+	}
+
+	[CallerCount(0)]
+	[CachedScanResults(RefRangeStart = 0, RefRangeEnd = 0, XrefRangeStart = 381273, XrefRangeEnd = 381316, MetadataInitTokenRva = 0L, MetadataInitFlagRva = 0L)]
+	public unsafe FinalSelection()
+		: this(IL2CPP.il2cpp_object_new(Il2CppClassPointerStore<FinalSelection>.NativeClassPtr))
+	{
+		System.IntPtr* param = null;
+		Unsafe.SkipInit(out System.IntPtr exc);
+		System.IntPtr intPtr = IL2CPP.il2cpp_runtime_invoke(NativeMethodInfoPtr__ctor_Public_Void_0, IL2CPP.Il2CppObjectBaseToPtrNotNull(this), (void**)param, ref exc);
+		Il2CppInterop.Runtime.Il2CppException.RaiseExceptionIfNecessary(exc);
+	}
+
+	[CallerCount(0)]
+	[CachedScanResults(RefRangeStart = 0, RefRangeEnd = 0, XrefRangeStart = 381316, XrefRangeEnd = 381317, MetadataInitTokenRva = 0L, MetadataInitFlagRva = 0L)]
+	public unsafe virtual bool IUIActionReceiver_CanHandle([In] ref UIActionContext ctx)
+	{
+		IL2CPP.Il2CppObjectBaseToPtrNotNull(this);
+		System.IntPtr* ptr = stackalloc System.IntPtr[1];
+		*ptr = IL2CPP.il2cpp_object_unbox(IL2CPP.Il2CppObjectBaseToPtrNotNull(ctx));
+		Unsafe.SkipInit(out System.IntPtr exc);
+		System.IntPtr obj = IL2CPP.il2cpp_runtime_invoke(NativeMethodInfoPtr_IUIActionReceiver_CanHandle_Private_Virtual_Final_New_Boolean_byref_UIActionContext_0, IL2CPP.Il2CppObjectBaseToPtrNotNull(this), (void**)ptr, ref exc);
+		Il2CppInterop.Runtime.Il2CppException.RaiseExceptionIfNecessary(exc);
+		return *(bool*)IL2CPP.il2cpp_object_unbox(obj);
+	}
+
+	[CallerCount(0)]
+	[CachedScanResults(RefRangeStart = 0, RefRangeEnd = 0, XrefRangeStart = 381317, XrefRangeEnd = 381318, MetadataInitTokenRva = 0L, MetadataInitFlagRva = 0L)]
+	public unsafe virtual UIActionResult IUIActionReceiver_Handle([In] ref UIActionContext ctx)
+	{
+		IL2CPP.Il2CppObjectBaseToPtrNotNull(this);
+		System.IntPtr* ptr = stackalloc System.IntPtr[1];
+		*ptr = IL2CPP.il2cpp_object_unbox(IL2CPP.Il2CppObjectBaseToPtrNotNull(ctx));
+		Unsafe.SkipInit(out System.IntPtr exc);
+		System.IntPtr obj = IL2CPP.il2cpp_runtime_invoke(NativeMethodInfoPtr_IUIActionReceiver_Handle_Private_Virtual_Final_New_UIActionResult_byref_UIActionContext_0, IL2CPP.Il2CppObjectBaseToPtrNotNull(this), (void**)ptr, ref exc);
+		Il2CppInterop.Runtime.Il2CppException.RaiseExceptionIfNecessary(exc);
+		return *(UIActionResult*)IL2CPP.il2cpp_object_unbox(obj);
+	}
+
+	[CallerCount(0)]
+	[CachedScanResults(RefRangeStart = 0, RefRangeEnd = 0, XrefRangeStart = 381318, XrefRangeEnd = 381319, MetadataInitTokenRva = 0L, MetadataInitFlagRva = 0L)]
+	public unsafe Selectable _WireTabNavigator_b__89_0()
+	{
+		IL2CPP.Il2CppObjectBaseToPtrNotNull(this);
+		System.IntPtr* param = null;
+		Unsafe.SkipInit(out System.IntPtr exc);
+		System.IntPtr intPtr = IL2CPP.il2cpp_runtime_invoke(NativeMethodInfoPtr__WireTabNavigator_b__89_0_Private_Selectable_0, IL2CPP.Il2CppObjectBaseToPtrNotNull(this), (void**)param, ref exc);
+		Il2CppInterop.Runtime.Il2CppException.RaiseExceptionIfNecessary(exc);
+		return (intPtr != (System.IntPtr)0) ? Il2CppObjectPool.Get<Selectable>(intPtr) : null;
+	}
+
+	[CallerCount(0)]
+	[CachedScanResults(RefRangeStart = 0, RefRangeEnd = 0, XrefRangeStart = 381319, XrefRangeEnd = 381320, MetadataInitTokenRva = 0L, MetadataInitFlagRva = 0L)]
+	public unsafe Selectable _WireTabNavigator_b__89_1()
+	{
+		IL2CPP.Il2CppObjectBaseToPtrNotNull(this);
+		System.IntPtr* param = null;
+		Unsafe.SkipInit(out System.IntPtr exc);
+		System.IntPtr intPtr = IL2CPP.il2cpp_runtime_invoke(NativeMethodInfoPtr__WireTabNavigator_b__89_1_Private_Selectable_0, IL2CPP.Il2CppObjectBaseToPtrNotNull(this), (void**)param, ref exc);
+		Il2CppInterop.Runtime.Il2CppException.RaiseExceptionIfNecessary(exc);
+		return (intPtr != (System.IntPtr)0) ? Il2CppObjectPool.Get<Selectable>(intPtr) : null;
+	}
+
+	[CallerCount(0)]
+	[CachedScanResults(RefRangeStart = 0, RefRangeEnd = 0, XrefRangeStart = 381320, XrefRangeEnd = 381321, MetadataInitTokenRva = 0L, MetadataInitFlagRva = 0L)]
+	public unsafe void _WirePrivacyToggleListeners_b__115_0(bool _)
+	{
+		IL2CPP.Il2CppObjectBaseToPtrNotNull(this);
+		System.IntPtr* ptr = stackalloc System.IntPtr[1];
+		*ptr = (nint)(&_);
+		Unsafe.SkipInit(out System.IntPtr exc);
+		System.IntPtr intPtr = IL2CPP.il2cpp_runtime_invoke(NativeMethodInfoPtr__WirePrivacyToggleListeners_b__115_0_Private_Void_Boolean_0, IL2CPP.Il2CppObjectBaseToPtrNotNull(this), (void**)ptr, ref exc);
+		Il2CppInterop.Runtime.Il2CppException.RaiseExceptionIfNecessary(exc);
+	}
+
+	public FinalSelection(System.IntPtr pointer)
+		: base(pointer)
+	{
+	}
+}

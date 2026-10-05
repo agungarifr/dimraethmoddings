@@ -1,0 +1,351 @@
+using System;
+using System.Collections;
+using System.Collections.Generic;
+using System.Diagnostics;
+using System.Runtime.CompilerServices;
+using Cpp2ILInjected;
+using Unity.Collections;
+using Unity.Netcode;
+using UnityEngine;
+
+[RequireComponent(typeof(NetworkObject))]
+[Token(Token = "0x2000D0B")]
+public class ProductiveBuilding : ChestBasic
+{
+	[CompilerGenerated]
+	[Token(Token = "0x2000D0C")]
+	private sealed class <ReplicateProgressRoutine>d__21 : IEnumerator<object>, IEnumerator, IDisposable
+	{
+		[Token(Token = "0x4006357")]
+		[FieldOffset(Offset = "0x10")]
+		private int <>1__state;
+
+		[Token(Token = "0x4006358")]
+		[FieldOffset(Offset = "0x18")]
+		private object <>2__current;
+
+		[Token(Token = "0x4006359")]
+		[FieldOffset(Offset = "0x20")]
+		public ProductiveBuilding <>4__this;
+
+		[Token(Token = "0x400635A")]
+		[FieldOffset(Offset = "0x28")]
+		private WaitForSeconds <wait>5__2;
+
+		[Token(Token = "0x17000B49")]
+		object IEnumerator<object>.Current
+		{
+			[DebuggerHidden]
+			[Token(Token = "0x6006A2C")]
+			[Address(RVA = "0x6B1E50", Offset = "0x6B0E50", Length = "0x5")]
+			get
+			{
+				return null;
+			}
+		}
+
+		[Token(Token = "0x17000B4A")]
+		object IEnumerator.Current
+		{
+			[DebuggerHidden]
+			[Token(Token = "0x6006A2E")]
+			[Address(RVA = "0x6B1E50", Offset = "0x6B0E50", Length = "0x5")]
+			get
+			{
+				return null;
+			}
+		}
+
+		[DebuggerHidden]
+		[Token(Token = "0x6006A29")]
+		[Address(RVA = "0x6B1EA0", Offset = "0x6B0EA0", Length = "0x24")]
+		public <ReplicateProgressRoutine>d__21(int <>1__state)
+		{
+		}
+
+		[DebuggerHidden]
+		[Token(Token = "0x6006A2A")]
+		[Address(RVA = "0x6AAC60", Offset = "0x6A9C60", Length = "0x3")]
+		void IDisposable.Dispose()
+		{
+		}
+
+		[Token(Token = "0x6006A2B")]
+		[Address(RVA = "0x10D6000", Offset = "0x10D5000", Length = "0xDE")]
+		private bool MoveNext()
+		{
+			return false;
+		}
+
+		bool IEnumerator.MoveNext()
+		{
+			//ILSpy generated this explicit interface implementation from .override directive in MoveNext
+			return this.MoveNext();
+		}
+
+		[DebuggerHidden]
+		[Token(Token = "0x6006A2D")]
+		[Address(RVA = "0x10D60E0", Offset = "0x10D50E0", Length = "0x3E")]
+		void IEnumerator.Reset()
+		{
+		}
+	}
+
+	[Token(Token = "0x4006351")]
+	[FieldOffset(Offset = "0x180")]
+	private readonly NetworkVariable<bool> _active;
+
+	[Token(Token = "0x4006352")]
+	[FieldOffset(Offset = "0x188")]
+	private NetworkList<float> _progressSeconds;
+
+	[CompilerGenerated]
+	[Token(Token = "0x4006353")]
+	[FieldOffset(Offset = "0x190")]
+	private Action m_OnProductionStateChanged;
+
+	[Token(Token = "0x4006354")]
+	[FieldOffset(Offset = "0x198")]
+	private BuildItemType _cachedBuildItem;
+
+	[Token(Token = "0x4006355")]
+	private const float ProgressReplicateInterval = 0.5f;
+
+	[Token(Token = "0x4006356")]
+	[FieldOffset(Offset = "0x1A0")]
+	private Coroutine _progressRoutine;
+
+	[Token(Token = "0x17000B43")]
+	public bool IsActive
+	{
+		[Token(Token = "0x6006A0C")]
+		[Address(RVA = "0x6E6AE0", Offset = "0x6E5AE0", Length = "0x2A")]
+		get
+		{
+			return false;
+		}
+	}
+
+	[Token(Token = "0x17000B44")]
+	protected override PlayerUIState OwningUIState
+	{
+		[Token(Token = "0x6006A0D")]
+		[Address(RVA = "0x10B5F20", Offset = "0x10B4F20", Length = "0x6")]
+		get
+		{
+			return default(PlayerUIState);
+		}
+	}
+
+	[Token(Token = "0x17000B45")]
+	public override bool IsMaterialSupplyContainer
+	{
+		[Token(Token = "0x6006A0E")]
+		[Address(RVA = "0x6BBA80", Offset = "0x6BAA80", Length = "0x3")]
+		get
+		{
+			return false;
+		}
+	}
+
+	[Token(Token = "0x17000B46")]
+	private string RowKey
+	{
+		[Token(Token = "0x6006A17")]
+		[Address(RVA = "0x10B5F30", Offset = "0x10B4F30", Length = "0xE5")]
+		get
+		{
+			return null;
+		}
+	}
+
+	[Token(Token = "0x17000B47")]
+	public ProductionDefinition Definition
+	{
+		[Token(Token = "0x6006A20")]
+		[Address(RVA = "0x10B5DC0", Offset = "0x10B4DC0", Length = "0xB5")]
+		get
+		{
+			return null;
+		}
+	}
+
+	[Token(Token = "0x17000B48")]
+	public int EntryCount
+	{
+		[Token(Token = "0x6006A21")]
+		[Address(RVA = "0x10B5E80", Offset = "0x10B4E80", Length = "0x91")]
+		get
+		{
+			return 0;
+		}
+	}
+
+	[Token(Token = "0x1400007E")]
+	public event Action OnProductionStateChanged
+	{
+		[CompilerGenerated]
+		[Token(Token = "0x6006A0A")]
+		[Address(RVA = "0x10B5D10", Offset = "0x10B4D10", Length = "0xA2")]
+		add
+		{
+		}
+		[CompilerGenerated]
+		[Token(Token = "0x6006A0B")]
+		[Address(RVA = "0x10B6020", Offset = "0x10B5020", Length = "0xA2")]
+		remove
+		{
+		}
+	}
+
+	[Token(Token = "0x6006A0F")]
+	[Address(RVA = "0x10B4280", Offset = "0x10B3280", Length = "0xD3")]
+	protected override void Awake()
+	{
+	}
+
+	[Token(Token = "0x6006A10")]
+	[Address(RVA = "0x10B5320", Offset = "0x10B4320", Length = "0x2A6")]
+	protected override void Start()
+	{
+	}
+
+	[Token(Token = "0x6006A11")]
+	[Address(RVA = "0x10B4B80", Offset = "0x10B3B80", Length = "0x2A5")]
+	public override void OnNetworkSpawn()
+	{
+	}
+
+	[Token(Token = "0x6006A12")]
+	[Address(RVA = "0x10B4960", Offset = "0x10B3960", Length = "0x21C")]
+	public override void OnNetworkDespawn()
+	{
+	}
+
+	[Token(Token = "0x6006A13")]
+	[Address(RVA = "0xA196F0", Offset = "0xA186F0", Length = "0x19")]
+	private void HandleActiveChanged(bool _, bool __)
+	{
+	}
+
+	[Token(Token = "0x6006A14")]
+	[Address(RVA = "0xA196F0", Offset = "0xA186F0", Length = "0x19")]
+	private void HandleProgressChanged(NetworkListEvent<float> _)
+	{
+	}
+
+	[Token(Token = "0x6006A15")]
+	[Address(RVA = "0xA196F0", Offset = "0xA186F0", Length = "0x19")]
+	private void HandleInventoryChanged(NetworkListEvent<InventoryEntry> _)
+	{
+	}
+
+	[IteratorStateMachine(typeof(<ReplicateProgressRoutine>d__21))]
+	[Token(Token = "0x6006A16")]
+	[Address(RVA = "0x10B4FF0", Offset = "0x10B3FF0", Length = "0x67")]
+	private IEnumerator ReplicateProgressRoutine()
+	{
+		return null;
+	}
+
+	[Token(Token = "0x6006A18")]
+	[Address(RVA = "0x10B4830", Offset = "0x10B3830", Length = "0x121")]
+	private ProductionData GetRow()
+	{
+		return null;
+	}
+
+	[Token(Token = "0x6006A19")]
+	[Address(RVA = "0x10B4600", Offset = "0x10B3600", Length = "0x22F")]
+	private ProductionData GetOrCreateRow()
+	{
+		return null;
+	}
+
+	[Token(Token = "0x6006A1A")]
+	[Address(RVA = "0x10B5060", Offset = "0x10B4060", Length = "0xE8")]
+	private BuildItemType ResolveBuildItem()
+	{
+		return default(BuildItemType);
+	}
+
+	[Token(Token = "0x6006A1B")]
+	[Address(RVA = "0x10B56C0", Offset = "0x10B46C0", Length = "0x1E7")]
+	private void WriteProgressSnapshot(ProductionData row)
+	{
+	}
+
+	[Token(Token = "0x6006A1C")]
+	[Address(RVA = "0x10B4FE0", Offset = "0x10B3FE0", Length = "0xE")]
+	public void PushStorageToClients()
+	{
+	}
+
+	[Token(Token = "0x6006A1D")]
+	[Address(RVA = "0x10B4360", Offset = "0x10B3360", Length = "0x124")]
+	public static ProductiveBuilding FindSpawned(FixedString64Bytes buildingName)
+	{
+		return null;
+	}
+
+	[ServerRpc(RequireOwnership = false)]
+	[Token(Token = "0x6006A1E")]
+	[Address(RVA = "0x10B5150", Offset = "0x10B4150", Length = "0x1CF")]
+	public void SetProductionActiveServerRpc(bool active)
+	{
+	}
+
+	[Token(Token = "0x6006A1F")]
+	[Address(RVA = "0x10B4E30", Offset = "0x10B3E30", Length = "0x1AE")]
+	public override void OpenChest()
+	{
+	}
+
+	[Token(Token = "0x6006A22")]
+	[Address(RVA = "0x10B55D0", Offset = "0x10B45D0", Length = "0xE6")]
+	public bool TryGetEntry(int index, out ItemType item, out int quantity, out float productionTime)
+	{
+		item = default(ItemType);
+		quantity = default(int);
+		productionTime = default(float);
+		return false;
+	}
+
+	[Token(Token = "0x6006A23")]
+	[Address(RVA = "0x10B4490", Offset = "0x10B3490", Length = "0x16D")]
+	public float GetEntryProgress01(int index)
+	{
+		return 0f;
+	}
+
+	[Token(Token = "0x6006A24")]
+	[Address(RVA = "0x10B5C80", Offset = "0x10B4C80", Length = "0x8A")]
+	public ProductiveBuilding()
+	{
+	}
+
+	[Token(Token = "0x6006A25")]
+	[Address(RVA = "0x10B5980", Offset = "0x10B4980", Length = "0x195")]
+	protected override void __initializeVariables()
+	{
+	}
+
+	[Token(Token = "0x6006A26")]
+	[Address(RVA = "0x10B58E0", Offset = "0x10B48E0", Length = "0x98")]
+	protected override void __initializeRpcs()
+	{
+	}
+
+	[Token(Token = "0x6006A27")]
+	[Address(RVA = "0x10B5B20", Offset = "0x10B4B20", Length = "0x159")]
+	private static void __rpc_handler_1920426440(NetworkBehaviour target, FastBufferReader reader, __RpcParams rpcParams)
+	{
+	}
+
+	[Token(Token = "0x6006A28")]
+	[Address(RVA = "0x10B58B0", Offset = "0x10B48B0", Length = "0x2C")]
+	protected internal override string __getTypeName()
+	{
+		return null;
+	}
+}
