@@ -13,7 +13,10 @@ namespace ContagionTuner
     /// <summary>
     /// BepInEx 6 (IL2CPP) plugin that tunes the Contagion spell:
     ///   * Area of Effect: Increased by +50% (scale and radius multiplier 1.50x).
-    ///   * Ticks: Increased by 2x (damage and poison tick every 0.5s instead of 1.0s, delivering 12 ticks in 6s).
+    ///   * Ticks: 12 ticks spread evenly across an 8s wall-clock duration (TickInterval 0.667s per tick,
+    ///     vs vanilla 6 ticks over 6s at 1.0s).
+    ///   * Damage: Each tick deals half damage (DamagePerTickMultiplier 0.5), so the 12 ticks total
+    ///     exactly 1x the vanilla total damage.
     ///   * Black Hole Suction: Drags all surrounding enemies into the infected target host using the game's
     ///     own <c>BaseSpellLibrary.DashTargetToPosition</c> (the exact primitive Black Hole uses) on cast and
     ///     on every tick - a 2-per-second, full-distance yank. The infected host itself is never pulled.
@@ -23,7 +26,7 @@ namespace ContagionTuner
     {
         public const string GUID = "com.custom.contagiontuner";
         public const string NAME = "Contagion Tuner";
-        public const string VERSION = "1.0.0";
+        public const string VERSION = "1.1.0";
 
         internal static new ManualLogSource Log;
         internal static ContagionTunerPlugin Instance;
@@ -32,6 +35,7 @@ namespace ContagionTuner
         public static ConfigEntry<float> AreaMultiplier;
         public static ConfigEntry<float> TickCountMultiplier;
         public static ConfigEntry<float> TickInterval;
+        public static ConfigEntry<float> DamagePerTickMultiplier;
         public static ConfigEntry<float> LifetimeSafetyBuffer;
         public static ConfigEntry<bool> DiagnosticLogging;
 
@@ -58,6 +62,7 @@ namespace ContagionTuner
         internal static int CenterOffset = 0x338;
         internal static int EndedOffset = 0x354;
         internal static int InfectedTargetOffset = 0x330;
+        internal static int DamageMultOffset = 0x344;
 
         public override void Load()
         {
@@ -71,10 +76,16 @@ namespace ContagionTuner
                 "Target area and radius multiplier for Contagion (1.50 = +50% area/radius). (Default: 1.50)");
 
             TickCountMultiplier = Config.Bind("Contagion", "TickCountMultiplier", 2.0f,
-                "Multiplier for total ticks across the spell duration (2.0 = 2x ticks, e.g. 12 ticks instead of 6). (Default: 2.0)");
+                "Multiplier for total ticks across the spell duration (2.0 = 2x ticks, i.e. 12 ticks instead of 6). (Default: 2.0)");
 
-            TickInterval = Config.Bind("Contagion", "TickInterval", 0.5f,
-                "Seconds between damage and poison ticks for Contagion (0.5 = tick every half-second). (Default: 0.5)");
+            TickInterval = Config.Bind("Contagion", "TickInterval", 0.6667f,
+                "Seconds between damage and poison ticks for Contagion. 0.6667 = 12 ticks spread evenly over " +
+                "8s wall-clock (vanilla was 1.0s over 6s). (Default: 0.6667)");
+
+            DamagePerTickMultiplier = Config.Bind("Contagion", "DamagePerTickMultiplier", 0.5f,
+                "Multiplier applied to Contagion's per-tick damage (_damageMult). 0.5 = each of the 12 ticks " +
+                "deals half damage, so the total tick damage equals 1x the vanilla total. " +
+                "Does NOT scale poison stacks (those stay 1 per tick). (Default: 0.5)");
 
             LifetimeSafetyBuffer = Config.Bind("Contagion", "LifetimeSafetyBuffer", 0.35f,
                 "Safety buffer in seconds added to MaxTimeAlive to ensure the final tick and zone ending complete cleanly before despawn. (Default: 0.35)");
@@ -120,8 +131,9 @@ namespace ContagionTuner
             Log.LogInfo($"{NAME} v{VERSION} loaded.");
             Log.LogInfo($"Enabled: {Enabled.Value}");
             Log.LogInfo($"AreaMultiplier: {AreaMultiplier.Value} (+50% AoE)");
-            Log.LogInfo($"TickCountMultiplier: {TickCountMultiplier.Value} (2x ticks)");
-            Log.LogInfo($"TickInterval: {TickInterval.Value}s (half-second ticks)");
+            Log.LogInfo($"TickCountMultiplier: {TickCountMultiplier.Value} ({TickCountMultiplier.Value * 6f:F0} ticks total)");
+            Log.LogInfo($"TickInterval: {TickInterval.Value}s ({TickInterval.Value * TickCountMultiplier.Value * 6f:F2}s wall-clock)");
+            Log.LogInfo($"DamagePerTickMultiplier: {DamagePerTickMultiplier.Value} (per-tick damage)");
             Log.LogInfo($"BlackHoleSuction: {SuctionEnabled.Value} (activate={SuctionOnActivate.Value}, tick={SuctionOnTick.Value}, radiusX{SuctionRadiusMultiplier.Value}, distX{SuctionDistanceMultiplier.Value}, dashTime={SuctionDashTime.Value}s)");
             Log.LogInfo("=================================================");
         }
@@ -480,6 +492,7 @@ namespace ContagionTuner
                     CenterOffset = GetFieldOffset(cpClass, "_center", 0x338);
                     EndedOffset = GetFieldOffset(cpClass, "_ended", 0x354);
                     InfectedTargetOffset = GetFieldOffset(cpClass, "_infectedTarget", 0x330);
+                    DamageMultOffset = GetFieldOffset(cpClass, "_damageMult", 0x344);
                 }
 
                 var bslClass = Il2CppClassPointerStore<BaseSpellLibrary>.NativeClassPtr;
@@ -490,7 +503,7 @@ namespace ContagionTuner
 
                 if (DiagnosticLogging.Value)
                 {
-                    Log.LogInfo($"[Offsets] _radius=0x{RadiusOffset:X}, _vfx=0x{VfxOffset:X}, _zoneRemaining=0x{ZoneRemainingOffset:X}, _center=0x{CenterOffset:X}, _ended=0x{EndedOffset:X}, _infectedTarget=0x{InfectedTargetOffset:X}, _maxTimeAlive=0x{MaxTimeAliveOffset:X}");
+                    Log.LogInfo($"[Offsets] _radius=0x{RadiusOffset:X}, _vfx=0x{VfxOffset:X}, _zoneRemaining=0x{ZoneRemainingOffset:X}, _center=0x{CenterOffset:X}, _ended=0x{EndedOffset:X}, _infectedTarget=0x{InfectedTargetOffset:X}, _damageMult=0x{DamageMultOffset:X}, _maxTimeAlive=0x{MaxTimeAliveOffset:X}");
                 }
             }
             catch (Exception ex)
@@ -565,9 +578,35 @@ namespace ContagionTuner
                     __instance._vfx.transform.localScale = curScale * mult;
                 }
 
-                // Add a small safety buffer to _maxTimeAlive so the 12th tick always finishes cleanly before BaseSpell despawn
+                // [2026-10-05] Halve the per-tick damage. _damageMult (0x344) is the value ZoneRoutine.MoveNext
+                // copies into SendDamageToTarget on every tick; scaling it here makes each of the 12 ticks deal
+                // half damage so the total tick damage stays 1x vanilla. Poison stacks are NOT affected.
+                float* pDamageMult = (float*)(ptr + ContagionTunerPlugin.DamageMultOffset);
+                float oldDamageMult = *pDamageMult;
+                *pDamageMult = oldDamageMult * ContagionTunerPlugin.DamagePerTickMultiplier.Value;
+
+                // [2026-10-05] Obsolete: the old code assumed the tick schedule still fit inside the vanilla
+                // ~6s _maxTimeAlive and only needed a small safety buffer. With 12 ticks spread over 8s the zone
+                // would despawn ~2s early (losing the last ~3 ticks), so extend _maxTimeAlive to cover the schedule.
+                // float* pMaxTime = (float*)(ptr + ContagionTunerPlugin.MaxTimeAliveOffset);
+                // *pMaxTime += ContagionTunerPlugin.LifetimeSafetyBuffer.Value;
                 float* pMaxTime = (float*)(ptr + ContagionTunerPlugin.MaxTimeAliveOffset);
-                *pMaxTime += ContagionTunerPlugin.LifetimeSafetyBuffer.Value;
+                float* pZoneRemaining = (float*)(ptr + ContagionTunerPlugin.ZoneRemainingOffset);
+                float ticks = *pZoneRemaining;
+                float tickMul = ContagionTunerPlugin.TickCountMultiplier.Value;
+                if (ticks > 0f && tickMul > 0f)
+                {
+                    // Vanilla lifetime contribution of these ticks at the 1.0s cadence is ticks/tickMul seconds;
+                    // the new schedule needs ticks*TickInterval seconds. Add only the difference (+ safety buffer).
+                    float vanillaSpan = ticks / tickMul;
+                    float neededSpan = ticks * ContagionTunerPlugin.TickInterval.Value;
+                    float extra = neededSpan - vanillaSpan + ContagionTunerPlugin.LifetimeSafetyBuffer.Value;
+                    if (extra > 0f) *pMaxTime += extra;
+                }
+                else
+                {
+                    *pMaxTime += ContagionTunerPlugin.LifetimeSafetyBuffer.Value;
+                }
 
                 // [2026-10-05 09:15] Re-enabled Black Hole drag on Activate, now via the game's own
                 // DashTargetToPosition (ApplySuction) instead of the old glitchy NavMeshAgent.Move pulse.
@@ -579,7 +618,9 @@ namespace ContagionTuner
                 if (ContagionTunerPlugin.DiagnosticLogging.Value)
                 {
                     ContagionTunerPlugin.Log.LogInfo(
-                        $"[ContagionTuner] Activate: radius {oldRadius:F2} -> {*pRadius:F2} (x{mult:F2}), MaxTimeAlive now {*pMaxTime:F2}s");
+                        $"[ContagionTuner] Activate: radius {oldRadius:F2} -> {*pRadius:F2} (x{mult:F2}), " +
+                        $"damageMult {oldDamageMult:F2} -> {*pDamageMult:F2} (x{ContagionTunerPlugin.DamagePerTickMultiplier.Value:F2}), " +
+                        $"ticks {ticks:F0} @ {ContagionTunerPlugin.TickInterval.Value:F3}s, MaxTimeAlive now {*pMaxTime:F2}s");
                 }
             }
             catch (Exception ex)
