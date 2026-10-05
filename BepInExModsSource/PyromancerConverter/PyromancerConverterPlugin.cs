@@ -144,8 +144,15 @@ namespace PyromancerConverter
             LogSwaps = Config.Bind("Diagnostics", "LogSwaps", true,
                 "Log every spell/node conversion to the BepInEx console. Turn off once the conversion set is known. (Default: true)");
 
-            DiagnosticLogging = Config.Bind("Diagnostics", "DiagnosticLogging", true,
-                "Deep audit: log every stack applied at the target (Stacking.AddStacksToTarget) and every BaseSpellLibrary stack call, once per (spell/effect/source). Use to find cold sources that bypass the normal path. (Default: true)");
+            // [2026-10-06] Default flipped true -> false: the deep audit did its job. It proved the only
+            // remaining Chill came from the player's PET (SavageFrostbite/ChillwingDescent, ownerPlayer=False
+            // ownerMonster=False) while every Magician cold source (Blizzard + its IcePool) converts cleanly.
+            // Pets are intentionally left cold, so the [audit-target] spew is no longer wanted in normal play.
+            // The old line is kept for reference; set DiagnosticLogging=true in the config to re-enable.
+            // DiagnosticLogging = Config.Bind("Diagnostics", "DiagnosticLogging", true,
+            //     "Deep audit: log every stack applied at the target (Stacking.AddStacksToTarget) and every BaseSpellLibrary stack call, once per (spell/effect/source). Use to find cold sources that bypass the normal path. (Default: true)");
+            DiagnosticLogging = Config.Bind("Diagnostics", "DiagnosticLogging", false,
+                "Deep audit: log every stack applied at the target (Stacking.AddStacksToTarget) and every BaseSpellLibrary stack call, once per (spell/effect/source). Re-enable only when hunting an unexplained cold source. (Default: false)");
 
             foreach (Spell s in KnownMagicianIce)
             {
