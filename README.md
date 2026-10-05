@@ -116,7 +116,7 @@ All under `modding\BepInExModsSource\`:
 - **LootModV2** — 10× loot only (monsters, harvesting, interactables).
 - **NavMeshFixMod** — fixes monster movement/navmesh glitches.
 - **PerfectParryMod** — improves perfect parry (window, stamina, effects).
-- **PlagueShardsHoming** — makes Plague Shards home in on enemies.
+- ~~**PlagueShardsHoming** — makes Plague Shards home in on enemies.~~ **broken**
 - **PursuingBlizzardTuner** — tunes the Pursuing Blizzard spell.
 - **RahanerChestMod** — open any chest and expand backpack slots.
 - **TwisterTuner** — tunes the Twister (Vortex) upgrade; optional black-hole pull.
