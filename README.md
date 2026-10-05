@@ -73,3 +73,38 @@ build output.
 ```
 
 The DLL loads the next time you start the game.
+
+---
+
+## Folders
+
+```
+D:\SteamLibrary\steamapps\common\Dimraeth\
+├─ Dimraeth.exe, GameAssembly.dll, Dimraeth_Data\   the game
+├─ winhttp.dll, doorstop_config.ini, dotnet\        BepInEx loader + its .NET runtime
+├─ BepInEx\                                         the loader the game runs
+│  ├─ core\                                          BepInEx / Harmony / Il2CppInterop DLLs
+│  ├─ interop\                                       generated C# wrappers for the game's classes
+│  ├─ plugins\                                       built mods land here
+│  ├─ config\                                        per-mod .cfg settings
+│  └─ LogOutput.log                                  BepInEx + mod log
+├─ dimraethmoddings\                                the cloned GitHub repo
+│  └─ BepInExModsSource\                             the mod projects
+└─ modding\                                         links the compiler builds through
+   ├─ BepInEx\             → ..\BepInEx             compiler reads core\ + interop\ here
+   └─ BepInExModsSource\   → ..\dimraethmoddings\BepInExModsSource
+```
+
+| Folder | What it is for |
+|---|---|
+| `BepInEx\` | The mod loader the game starts. |
+| `BepInEx\core\` | BepInEx, Harmony and Il2CppInterop themselves — what a mod is compiled against. |
+| `BepInEx\interop\` | C# wrappers for every game class, generated on first launch. Mods call the game through these. |
+| `BepInEx\plugins\` | Every built mod `.dll` is copied here; the game loads them on launch. |
+| `BepInEx\config\` | Per-mod settings (`.cfg`), editable. |
+| `BepInEx\LogOutput.log` | BepInEx and mod log — where you check whether a mod loaded. |
+| `dimraethmoddings\` | The cloned GitHub repository. |
+| `dimraethmoddings\BepInExModsSource\` | The mod projects (`.csproj` + `.cs`). |
+| `modding\BepInExModsSource\` | Link to the repo source — you edit and build through this path. |
+| `modding\BepInEx\` | Link to the real `BepInEx`. The `.csproj` files reference `..\..\BepInEx`, so the compiler needs `core\` + `interop\` inside `modding\`. It is never loaded at runtime. |
+| `dotnet\` | BepInEx's private .NET runtime (not the build SDK). |
