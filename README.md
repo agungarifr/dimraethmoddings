@@ -123,13 +123,11 @@ are capable **free editors and AI agents**. Paid tools are optional conveniences
 
 1. Open **Steam**.
 2. In your **Library**, right-click **Dimraeth** → **Manage** → **Browse local files**.
-3. A File Explorer window opens at the game root. A typical path is:
+3. A File Explorer window opens at the game root, for example:
 
    ```
    D:\SteamLibrary\steamapps\common\Dimraeth
    ```
-
-   (Your drive letter/folder may differ. Write your real path down — call it **`<GAME>`** from now on.)
 
 What a freshly installed game root looks like:
 
