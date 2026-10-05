@@ -646,6 +646,17 @@ namespace PyromancerConverter
         private const float FireMinSaturation = 0.60f;
 
         private static readonly HashSet<string> LoggedVfx = new HashSet<string>();
+        private static readonly HashSet<string> LoggedMats = new HashSet<string>();
+
+        // [2026-10-06] The ice colour is baked into the renderer material (particle startColor logs as #FFFFFF),
+        // so we tint every common colour property the shader exposes.
+        private static readonly string[] ColorProps =
+        {
+            "_Color", "_TintColor", "_BaseColor", "_MainColor", "_EmissionColor",
+            "_GlowColor", "_RimColor", "_Tint", "_MainTint", "_OverlayColor",
+            "_AllIn1VfxColor", "_AllIn1VfxMainColor", "_AllIn1VfxTintColor",
+            "_All1VfxColor", "_All1VfxMainColor", "_AllIn1VfxEmissionColor",
+        };
 
         internal static bool IsCold(Color c)
         {
@@ -688,6 +699,7 @@ namespace PyromancerConverter
                     if (sr != null)
                     {
                         if (RecolorColor(sr, sr.color, c => sr.color = c, tag, "Sprite")) changed++;
+                        if (TintRendererMaterial(r, tag, "Sprite")) changed++;
                         continue;
                     }
 
@@ -697,6 +709,7 @@ namespace PyromancerConverter
                         bool a = RecolorColor(tr, tr.startColor, c => tr.startColor = c, tag, "Trail.start");
                         bool b = RecolorColor(tr, tr.endColor, c => tr.endColor = c, tag, "Trail.end");
                         if (a || b) changed++;
+                        if (TintRendererMaterial(r, tag, "Trail")) changed++;
                         continue;
                     }
 
@@ -706,6 +719,16 @@ namespace PyromancerConverter
                         bool a = RecolorColor(lr, lr.startColor, c => lr.startColor = c, tag, "Line.start");
                         bool b = RecolorColor(lr, lr.endColor, c => lr.endColor = c, tag, "Line.end");
                         if (a || b) changed++;
+                        if (TintRendererMaterial(r, tag, "Line")) changed++;
+                        continue;
+                    }
+
+                    // [2026-10-06] Particle startColor logs as #FFFFFF for almost every ice emitter, so the
+                    // actual blue is in the renderer material. Tint that as well.
+                    ParticleSystemRenderer pr = r.TryCast<ParticleSystemRenderer>();
+                    if (pr != null)
+                    {
+                        if (TintRendererMaterial(pr, tag, "Particle")) changed++;
                         continue;
                     }
                 }
@@ -736,6 +759,84 @@ namespace PyromancerConverter
             // material), so the recon shows where each color actually lives.
             LogVfx(tag, kind, owner != null ? owner.name : "?", before, after);
             return changed;
+        }
+
+        /// <summary>
+        /// [2026-10-06] Tint the material(s) a renderer draws with. This is where the ice colour actually lives
+        /// (particle startColor is white). ParticleSystemRenderer also has a separate trailMaterial.
+        /// </summary>
+        private static bool TintRendererMaterial(Renderer r, string tag, string kind)
+        {
+            bool changed = false;
+            try
+            {
+                Material m = null;
+                try { m = r.material; } catch { }
+                if (m != null) changed |= TintMaterial(m, tag, kind + ":" + r.name);
+
+                ParticleSystemRenderer pr = r.TryCast<ParticleSystemRenderer>();
+                if (pr != null)
+                {
+                    Material tm = null;
+                    try { tm = pr.trailMaterial; } catch { }
+                    if (tm != null) changed |= TintMaterial(tm, tag, kind + "Trail:" + r.name);
+                }
+            }
+            catch (Exception ex) { PyromancerConverterPlugin.Log?.LogError($"[vfx] mat {tag} {ex}"); }
+            return changed;
+        }
+
+        private static bool TintMaterial(Material m, string tag, string owner)
+        {
+            if (m == null) return false;
+
+            string shaderName = "?";
+            try { shaderName = m.shader != null ? m.shader.name : "?"; } catch { }
+            string texName = "?";
+            try { Texture t = m.mainTexture; if (t != null) texName = t.name; } catch { }
+            LogMaterialOnce(tag, m, owner, shaderName, texName);
+
+            bool changed = false;
+            foreach (string prop in ColorProps)
+            {
+                bool has = false;
+                try { has = m.HasProperty(prop); } catch { }
+                if (!has) continue;
+
+                Color before;
+                try { before = m.GetColor(prop); } catch { continue; }
+                Color after = ToFire(before);
+                if (after != before)
+                {
+                    try { m.SetColor(prop, after); } catch { }
+                    changed = true;
+                }
+                LogVfx(tag, "Mat." + prop, owner, before, after);
+            }
+            return changed;
+        }
+
+        private static void LogMaterialOnce(string tag, Material m, string owner, string shaderName, string texName)
+        {
+            if (!PyromancerConverterPlugin.LogVfx.Value) return;
+            string key = tag + "|mat|" + owner + "|" + m.name;
+            if (!LoggedMats.Add(key)) return;
+
+            string props = "";
+            try
+            {
+                int pc = m.shader != null ? m.shader.GetPropertyCount() : 0;
+                var names = new List<string>();
+                for (int i = 0; i < pc; i++)
+                {
+                    try { names.Add(m.shader.GetPropertyName(i)); } catch { }
+                }
+                props = string.Join(",", names);
+            }
+            catch { }
+
+            PyromancerConverterPlugin.Log.LogInfo(
+                $"[vfx] {tag}: material '{m.name}' shader '{shaderName}' tex '{texName}' props [{props}]");
         }
 
         private static bool RecolorParticleSystem(ParticleSystem ps, string tag)
