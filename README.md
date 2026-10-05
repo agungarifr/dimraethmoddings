@@ -223,7 +223,7 @@ D:\SteamLibrary\steamapps\common\Dimraeth\
 ├─ BepInEx\                     the game runtime (from step 4)
 ├─ dimraethmoddings\            the git clone
 │  └─ BepInExModsSource\        the mod projects
-└─ modding\                     links created in 6.3
+└─ modding\                     links created in 6.4
    ├─ BepInEx\                  → ..\BepInEx
    └─ BepInExModsSource\        → ..\dimraethmoddings\BepInExModsSource
 ```
@@ -231,39 +231,60 @@ D:\SteamLibrary\steamapps\common\Dimraeth\
 Two BepInEx folders, on purpose:
 
 - `Dimraeth\BepInEx\` — the **game** runs from here.
-- `Dimraeth\modding\BepInEx\` — the **compiler** reads `core\` + `interop\` here. Every `.csproj` uses `..\..\BepInEx\...`, which from `modding\BepInExModsSource\<Mod>\` points at `modding\`. It is never used at runtime; 6.3 links it to the real one so only one copy exists.
+- `Dimraeth\modding\BepInEx\` — the **compiler** reads `core\` + `interop\` here. Every `.csproj` uses `..\..\BepInEx\...`, which from `modding\BepInExModsSource\<Mod>\` points at `modding\`. It is never used at runtime; 6.4 links it to the real one so only one copy exists.
 
 On build, a mod's DLL is copied into `Dimraeth\BepInEx\plugins\` so it loads next launch.
 
-### 6.2 Clone the repository
+### 6.2 Open a terminal in the game folder
+
+1. Open **File Explorer** and go to `D:\SteamLibrary\steamapps\common\Dimraeth` (the folder with `Dimraeth.exe`).
+2. Click the **address bar** at the top, type `cmd`, and press **Enter**. A black **Command Prompt** window opens, already inside this folder.
+3. Leave that window open — you use it for 6.3, 6.4 and 6.5.
+
+### 6.3 Clone the repository
+
+In that Command Prompt, paste this line (**right-click** to paste) and press **Enter**:
 
 ```bat
-cd /d "D:\SteamLibrary\steamapps\common\Dimraeth"
 git clone https://github.com/agungarifr/dimraethmoddings.git dimraethmoddings
 ```
 
-### 6.3 Link the clone into `modding\`
+You should see `Cloning into 'dimraethmoddings'...` then `done.`, and a `dimraethmoddings` folder appears.
 
-A junction is a shortcut folder — no admin rights, no duplicated files.
+- **`'git' is not recognized`** → Git isn't installed. Install it from <https://git-scm.com/download/win>, close and reopen the terminal (step 6.2), try again.
+- **`already exists`** → you cloned it before; just continue.
+
+### 6.4 Link the clone into `modding\`
+
+Still in the **same Command Prompt**, paste these three lines **one at a time**, pressing **Enter** after each:
 
 ```bat
-cd /d "D:\SteamLibrary\steamapps\common\Dimraeth"
 mkdir modding
 mklink /J "modding\BepInExModsSource" "dimraethmoddings\BepInExModsSource"
 mklink /J "modding\BepInEx" "BepInEx"
 ```
 
-PowerShell equivalent:
+Each `mklink` prints `Junction created for modding\... <<===>> ...`.
+
+- **`You do not have sufficient privilege`** → you are in **PowerShell**, not Command Prompt. Close it and reopen with `cmd` from the address bar (step 6.2), then paste again.
+- **`mkdir` says `already exists`** → fine, ignore it.
+- **A junction already exists** → fine if it points to the right place.
+
+<details><summary>PowerShell version (only if you insist on PowerShell)</summary>
 
 ```powershell
+Set-Location "D:\SteamLibrary\steamapps\common\Dimraeth"
+mkdir modding
 New-Item -ItemType Junction -Path "modding\BepInExModsSource" -Target "dimraethmoddings\BepInExModsSource"
 New-Item -ItemType Junction -Path "modding\BepInEx" -Target "BepInEx"
 ```
+</details>
 
 <details><summary>Option B — plain copies instead of junctions</summary>
 
+Paste one at a time in the same Command Prompt:
+
 ```bat
-cd /d "D:\SteamLibrary\steamapps\common\Dimraeth"
 mkdir "modding\BepInEx"
 xcopy /E /I /Y "dimraethmoddings\BepInExModsSource" "modding\BepInExModsSource"
 xcopy /E /I /Y "BepInEx\core"    "modding\BepInEx\core"
@@ -273,14 +294,17 @@ xcopy /E /I /Y "BepInEx\interop" "modding\BepInEx\interop"
 Copy edits back into `dimraethmoddings\BepInExModsSource` before committing.
 </details>
 
-### 6.4 Confirm it worked
+### 6.5 Confirm it worked
 
-```powershell
-Test-Path "modding\BepInEx\core\BepInEx.Core.dll"
-Test-Path "modding\BepInEx\interop\Assembly-CSharp.dll"
+In the same Command Prompt, paste both lines. Each must print the file name:
+
+```bat
+dir "modding\BepInEx\core\BepInEx.Core.dll"
+dir "modding\BepInEx\interop\Assembly-CSharp.dll"
 ```
 
-If either is `False`, redo 6.3.
+- Shows the file → good, go to step 7.
+- **`File Not Found`** → the link is wrong; delete the `modding` folder and redo 6.4.
 
 ---
 
@@ -510,7 +534,7 @@ great way to learn the codebase.
 |---|---|---|
 | `dotnet` is not recognized | SDK not installed / not on `PATH` | Install the .NET SDK (step 5), reopen the terminal, or call the full path to `dotnet.exe` |
 | `Could not resolve this reference … Assembly-CSharp` / `UnityEngine.*` / `Il2Cppmscorlib` | Interop assemblies missing | Run the game once with BepInEx installed; confirm `D:\SteamLibrary\steamapps\common\Dimraeth\BepInEx\interop\Assembly-CSharp.dll` exists (step 4) |
-| `Could not resolve … BepInEx.Core` / `BepInEx.Unity.IL2CPP` | `modding\BepInEx\core` missing or wrong | Re-do step 6.3 and confirm `modding\BepInEx\core\BepInEx.Core.dll` exists |
+| `Could not resolve … BepInEx.Core` / `BepInEx.Unity.IL2CPP` | `modding\BepInEx\core` missing or wrong | Re-do step 6.4 and confirm `modding\BepInEx\core\BepInEx.Core.dll` exists |
 | `MSB3021` / "The process cannot access the file … because it is being used by another process" | The game is running and locking the DLL | **Close the game**, then rebuild |
 | `interop` folder is empty after first launch | Game didn't launch, or wrong BepInEx build | Reinstall the **IL2CPP x64** build, delete `BepInEx`, run the game again |
 | Mod builds but does not appear in `LogOutput.log` | DLL not in the right plugins folder, or game not restarted | Ensure it landed in `D:\SteamLibrary\steamapps\common\Dimraeth\BepInEx\plugins`; restart the game |
