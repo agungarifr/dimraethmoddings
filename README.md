@@ -308,18 +308,32 @@ dir "modding\BepInEx\interop\Assembly-CSharp.dll"
 
 ---
 
-## 7. Build your first mod
+## 7. Build your first mod (with an AI agent)
 
-We will build **ContagionTuner** (a small, self-contained mod). Any other mod works the same way.
+We will build **ContagionTuner**. You won't type build commands — you ask a coding agent to do it.
+Open your agent at the **game root** `D:\SteamLibrary\steamapps\common\Dimraeth`, then paste this
+prompt:
 
-In **Command Prompt** or **PowerShell**:
+> Build `modding\BepInExModsSource\ContagionTuner\ContagionTuner.csproj` in Release with
+> `dotnet build`. Then confirm `ContagionTuner.dll` was copied into `BepInEx\plugins` and show me the
+> build output.
 
-```bat
-cd /d "D:\SteamLibrary\steamapps\common\Dimraeth\modding\BepInExModsSource\ContagionTuner"
-dotnet build -c Release
-```
+If you have not set up an agent yet, do [section 11](#11-build-and-code-with-an-ai-assistant-opencode)
+(opencode) first, or use any tool below.
 
-Expected output:
+### 7.1 Example prompt by tool
+
+| Tool | What to do |
+|---|---|
+| **opencode** (free, open source) | `cd /d "D:\SteamLibrary\steamapps\common\Dimraeth"` then `opencode`, paste the prompt. Setup: section 11 |
+| **Claude Code** (paid, Anthropic) | install it, run `claude` from the game root, paste the prompt |
+| **Antigravity** (Google, free preview) | open the game root as the workspace, open the **Agent** panel, paste the prompt |
+| **Cursor / Windsurf / Copilot Chat / Cline / Aider** | open the game root, paste the prompt. Free vs paid: section 2.1 |
+
+Whichever tool you use, the agent runs the build, reads the compiler errors, edits the code, and
+rebuilds until it passes.
+
+### 7.2 What success looks like
 
 ```
   ContagionTuner -> D:\SteamLibrary\steamapps\common\Dimraeth\modding\BepInEx\plugins\ContagionTuner.dll
@@ -328,27 +342,34 @@ Build succeeded.
     0 Error(s)
 ```
 
-Two things just happened:
+The build compiles the mod, then a **post-build step copies** `ContagionTuner.dll` (and `.pdb`) into
+the game's `BepInEx\plugins\`. Confirm it landed:
 
-1. `dotnet` compiled the mod against the interop assemblies.
-2. A **post-build step copied** `ContagionTuner.dll` (and `.pdb`) into the **game's**
-   `D:\SteamLibrary\steamapps\common\Dimraeth\BepInEx\plugins\` folder. Verify it:
+```bat
+dir "D:\SteamLibrary\steamapps\common\Dimraeth\BepInEx\plugins\ContagionTuner.*"
+```
 
-   ```powershell
-   Get-ChildItem "D:\SteamLibrary\steamapps\common\Dimraeth\BepInEx\plugins\ContagionTuner.*"
-   ```
+You should see `ContagionTuner.dll` with today's timestamp.
 
-   You should see `ContagionTuner.dll` with today's timestamp.
+> **Close the game while building.** If it is running, the DLL in `BepInEx\plugins` is locked and the
+> copy step fails with a "file in use" error.
 
-> **The game must be closed while building.** If the game is running it holds the DLL in
-> `D:\SteamLibrary\steamapps\common\Dimraeth\BepInEx\plugins`, and the copy step fails with a "file in use" error. Close the game,
-> then rebuild.
+<details><summary>No agent? Build manually (exactly what the agent runs)</summary>
 
-> **Building every mod at once:** from `D:\SteamLibrary\steamapps\common\Dimraeth\modding\BepInExModsSource` you can loop over all
-> projects:
-> ```powershell
-> Get-ChildItem -Recurse -Filter *.csproj | ForEach-Object { dotnet build $_.FullName -c Release }
-> ```
+```bat
+cd /d "D:\SteamLibrary\steamapps\common\Dimraeth\modding\BepInExModsSource\ContagionTuner"
+dotnet build -c Release
+```
+
+If `dotnet` is "not recognized", this repository may ship a portable SDK — use
+`"D:\SteamLibrary\steamapps\common\Dimraeth\modding\dotnet-sdk\dotnet.exe" build -c Release` instead.
+
+To build **every** mod at once, from `modding\BepInExModsSource`:
+
+```powershell
+Get-ChildItem -Recurse -Filter *.csproj | ForEach-Object { dotnet build $_.FullName -c Release }
+```
+</details>
 
 ---
 
