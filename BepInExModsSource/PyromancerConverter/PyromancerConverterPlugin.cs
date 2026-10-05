@@ -730,32 +730,51 @@ namespace PyromancerConverter
         private static bool RecolorColor(UnityEngine.Object owner, Color before, Action<Color> set, string tag, string kind)
         {
             Color after = ToFire(before);
-            if (after == before) return false;
-            set(after);
+            bool changed = after != before;
+            if (changed) set(after);
+            // [2026-10-06] Log the inventory even when unchanged (e.g. a white SpriteRenderer tinted by its
+            // material), so the recon shows where each color actually lives.
             LogVfx(tag, kind, owner != null ? owner.name : "?", before, after);
-            return true;
+            return changed;
         }
 
         private static bool RecolorParticleSystem(ParticleSystem ps, string tag)
         {
-            bool changed = false;
-
-            var main = ps.main;
-            ParticleSystem.MinMaxGradient sc = main.startColor;
             // [2026-10-06] The interop exposes MinMaxGradient.color/gradient as read-only and
             // ColorOverLifetimeModule.color as write-only, so the only safe lever is main.startColor:
             // read it, build a shifted copy through a constructor, and assign that back. colorOverLifetime
             // is usually just an alpha fade (white RGB), so shifting startColor recolors the effect while
             // preserving the fade.
-            ParticleSystem.MinMaxGradient shifted;
-            if (TryShiftGradient(sc, out shifted))
-            {
-                main.startColor = shifted;
-                changed = true;
-            }
+            var main = ps.main;
+            ParticleSystem.MinMaxGradient sc = main.startColor;
 
-            if (changed) LogVfx(tag, "ParticleSystem", ps != null ? ps.name : "?", new Color(-1f, -1f, -1f, -1f), Color.white);
+            ParticleSystem.MinMaxGradient shifted;
+            bool changed = TryShiftGradient(sc, out shifted);
+            if (changed) main.startColor = shifted;
+
+            // [2026-10-06] Log the inventory even when nothing changed, so a blue effect whose color lives in
+            // the material/texture (not startColor) is still visible in the recon.
+            Color before = RepresentativeColor(sc);
+            Color after = changed ? RepresentativeColor(shifted) : before;
+            LogVfx(tag, "ParticleSystem", ps != null ? ps.name : "?", before, after);
             return changed;
+        }
+
+        private static Color RepresentativeColor(ParticleSystem.MinMaxGradient g)
+        {
+            switch (g.mode)
+            {
+                case ParticleSystemGradientMode.Color:
+                    return g.color;
+                case ParticleSystemGradientMode.TwoColors:
+                    return g.colorMin;
+                case ParticleSystemGradientMode.Gradient:
+                case ParticleSystemGradientMode.RandomColor:
+                    return g.gradient != null ? g.gradient.Evaluate(0.5f) : Color.white;
+                case ParticleSystemGradientMode.TwoGradients:
+                    return g.gradientMin != null ? g.gradientMin.Evaluate(0.5f) : Color.white;
+            }
+            return Color.white;
         }
 
         private static bool TryShiftGradient(ParticleSystem.MinMaxGradient g, out ParticleSystem.MinMaxGradient result)
