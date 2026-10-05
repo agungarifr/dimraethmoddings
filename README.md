@@ -123,8 +123,6 @@ All under `modding\BepInExModsSource\`:
 - **AutoPickupMod** — auto-picks up nearby loot.
 - **BarrageOfArrowsTuner** — tunes the Barrage of Arrows spell.
 - **CarryWeightMod** — raises/removes the carry-weight limit.
-- **ConfigurableLevelCapFreebuff** — replaces the level-25 cap with a configurable one (default 99).
-- **ConfigurableLevelCapFreebuff_Debug** — debug build of the same.
 - **ContagionTuner** — tunes the Contagion poison spell (ticks, duration, damage).
 - **DamageNumberTuner** — controls floating damage numbers (hotkey cycles modes).
 - **DayNightToggleMod** — toggles/controls the day-night cycle.
@@ -135,7 +133,6 @@ All under `modding\BepInExModsSource\`:
 - **EquipmentStatEditor** — in-game (F8) editor for equipped gear stats.
 - **EquippedStatModifier** — live editor for equipped gear secondary stats.
 - **FireballTuner** — tunes the Fireball spell.
-- **HellModeLevel75Freebuff** — adds Hell Mode + a level-75 cap at world creation.
 - **HellModeMod** — unlocks the Hell Mode difficulty.
 - **LootAndExpMod** — 10× loot and EXP (legacy).
 - **LootModV2** — 10× loot only (monsters, harvesting, interactables).

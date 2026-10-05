@@ -153,7 +153,12 @@ namespace HellModeMod
             Log.LogInfo($"Monster Move Speed: {MonsterSpeedMult.Value}x");
             Log.LogInfo($"Elite / Empowerment Chance: {EmpowermentChanceMult.Value}x");
             Log.LogInfo($"Dynamic Monster Level: PlayerLevel + {MonsterBonusLevelOverPlayer.Value}");
-            Log.LogInfo("Level cap is handled by ConfigurableLevelCapFreebuff (global, up to 99).");
+            /* [2026-10-05 22:50] Obsolete: the standalone ConfigurableLevelCapFreebuff mod (deployed as
+               customlevelcap.dll) was an early level-cap byte-patcher superseded by DimraethModPack's
+               LevelCapModule, and has now been removed from the source tree. Kept for history; the new
+               line below names the module that actually handles the cap.
+            Log.LogInfo("Level cap is handled by ConfigurableLevelCapFreebuff (global, up to 99)."); */
+            Log.LogInfo("Level cap is handled by DimraethModPack.LevelCapModule (global, up to 99).");
             Log.LogInfo($"Hell Mode Bonus EXP: {ExpMultiplier.Value}x (Gold & Loot vanilla 1.0x)");
             Log.LogInfo("Zero-lag event-driven architecture active.");
             Log.LogInfo("=================================================");
