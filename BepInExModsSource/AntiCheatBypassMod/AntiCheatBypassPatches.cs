@@ -42,19 +42,24 @@ namespace AntiCheatBypassMod
         // CorrectOverstated(List<Rune>,...). The old Inspect-only bypass never reached them, which
         // is why a successful EquipmentStatEditor write showed vanilla stats again.
         // CorrectOverstated returns the number of runes it rewrote -> force 0.
-        public static bool IntZeroResultPrefix(ref int __result)
-        {
-            __result = 0;
-            return false;
-        }
+        // [2026-10-05 v1.4.0] OBSOLETE/unused: the byref-Rune corrector targets were dropped after
+        // the v1.3.0 coreclr crash; the corrector is stopped via InspectStats/ExceedsValueCeiling.
+        // public static bool IntZeroResultPrefix(ref int __result)
+        // {
+        //     __result = 0;
+        //     return false;
+        // }
 
         // CollectContraband gathers offenders for the correction/destruction pass; return an empty
         // list so the pass has nothing to act on even if it runs off a path we do not patch.
-        public static bool EmptyRuneListPrefix(ref Il2CppSystem.Collections.Generic.List<Rune> __result)
-        {
-            __result = new Il2CppSystem.Collections.Generic.List<Rune>();
-            return false;
-        }
+        // [2026-10-05 v1.4.0] OBSOLETE/unused: the CollectContraband patch was dropped after the
+        // v1.3.0 coreclr crash (it was the only added prefix that allocates an interop List, and
+        // the corrector is already neutralized via CorrectIfOverstated/CorrectOverstated).
+        // public static bool EmptyRuneListPrefix(ref Il2CppSystem.Collections.Generic.List<Rune> __result)
+        // {
+        //     __result = new Il2CppSystem.Collections.Generic.List<Rune>();
+        //     return false;
+        // }
 
         // -------------------------------------------------------------------------------------
         // Character plausibility (docs/anticheat/05)

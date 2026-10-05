@@ -594,6 +594,8 @@ The real "inflated numbers are corrected" members are on `GearLegality`:
 | `GearLegality.InspectStats` | `private static Violation InspectStats(Rune)` | the private **core** check that `Inspect` and the corrector both call |
 | `GearLegality.CorrectIfOverstated` | `public static bool CorrectIfOverstated(ref Rune, string, string)` | rewrites an over-cap rune back to its exact legal value |
 | `GearLegality.CorrectOverstated` | `public static int CorrectOverstated(List<Rune>, string)` | batch version; returns how many runes were rewritten |
+| `GearLegality.ExceedsValueCeiling` | `private static bool ExceedsValueCeiling(Stat, bool, float)` | per-stat ceiling test the corrector consults |
+| `GearLegality.IsStatAllowedOnSlot` | `public static bool IsStatAllowedOnSlot(RuneSet, SlotType, Stat, bool)` | whether a stat may exist on the slot |
 | `GearLegality.CollectContraband` | `public static List<Rune> CollectContraband(List<Rune>, string)` | gathers offenders for the correct/destroy pass |
 | `GearLegality.IsContraband` | `public static bool IsContraband(Rune)` | predicate |
 | `GearLegality.DestroyIfChargesUnobtainable` | `public static bool DestroyIfChargesUnobtainable(ref InventoryEntry, string, string)` | charge-side destroy |
@@ -609,13 +611,22 @@ The real "inflated numbers are corrected" members are on `GearLegality`:
 > / `InspectStats`.
 
 **Impact on the bypass.** The pre-update `AntiCheatBypassMod` patched only the public
-`GearLegality.Inspect`, but the corrector reaches the stats through the private `InspectStats`
-and rewrites via `CorrectIfOverstated` / `CorrectOverstated`, so the old bypass never stopped
-it — this is why the Equipment Stat Editor reported a successful apply and then showed vanilla
-stats again. Fixed in `AntiCheatBypassMod` **v1.3.0** (2026-10-05): `InspectStats` → `None`,
-`CorrectIfOverstated` → `false`, `CorrectOverstated` → `0`, `CollectContraband` → empty list,
-`IsContraband` / `DestroyIfUnobtainable` / `IsChargeContraband` / `DestroyIfChargesUnobtainable`
-→ `false`, and both `Player.Periodic*Check` coroutines are stopped at their first `MoveNext`
-step. `Player.InitializeAntiCheat` is deliberately **not** skipped — it initializes
-`Player._runeSignatureStore`, which the editor needs to re-sign edits (the v1.2.0 skip left
-that store null, logged as `signature store count=-1`).
+`GearLegality.Inspect`, but the corrector reaches the stats through the private `InspectStats`,
+so the old bypass never stopped it — this is why the Equipment Stat Editor reported a
+successful apply and then showed vanilla stats again.
+
+**Crash during the fix (v1.3.0).** The first attempt (v1.3.0) patched the corrector directly —
+including `CorrectIfOverstated(ref Rune, …)` and `DestroyIfUnobtainable(ref Rune, …)` — and
+also stopped skipping `Player.InitializeAntiCheat`. That build hard-crashed with an access
+violation in **`coreclr.dll`** (`0xc0000005`, WER `APPCRASH`) right after the player spawned.
+The `ref Rune` targets were the only new Harmony signature shape introduced, so v1.4.0 drops
+every byref-struct target.
+
+**Final fix — `AntiCheatBypassMod` v1.4.0** (2026-10-05), by-value prefixes only:
+`Inspect` / `InspectStats` → `Violation.None`, `ExceedsValueCeiling` → `false`,
+`IsStatAllowedOnSlot` → `true` (these three stop the corrector at its decision points),
+`IsContraband` / `IsChargeContraband` → `false`, and both `Player.Periodic*Check` coroutines
+stopped at their first `MoveNext`. `Player.InitializeAntiCheat` / `SubscribeAntiCheatValueChangedHooks`
+/ `InitializeOwnerAntiCheatClientRpc` are skipped again (v1.2.0 behaviour, known stable). The
+rune signature store stays null (`signature store count=-1`), which is harmless once the
+validators and corrector are no-ops.

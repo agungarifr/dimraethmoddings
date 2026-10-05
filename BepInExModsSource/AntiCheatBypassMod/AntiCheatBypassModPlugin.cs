@@ -19,7 +19,7 @@ namespace AntiCheatBypassMod
     ///
     /// Covered mechanisms (one line each, see the patch table in ApplyPatches):
     ///   02 GearLegality item destruction        -> Inspect returns Violation.None
-    ///   02 GearLegality inflated-value correction-> InspectStats/CorrectIfOverstated/CorrectOverstated no-op
+    ///   02 GearLegality inflated-value correction-> InspectStats/ExceedsValueCeiling/IsStatAllowedOnSlot swept benign
     ///   04 Character identity (current build)    -> CharacterIdentityFromSkillTree.Reconcile skipped
     ///   05 CharacterPlausibility (hide + join)   -> FilterImplausible/IsImplausible/RejectsJoiningCharacter
     ///   03 Player XP/rune/attribute validators   -> always "clean"; kick/save-block/report disabled
@@ -53,7 +53,11 @@ namespace AntiCheatBypassMod
         // (GearLegality.InspectStats / CorrectIfOverstated / CorrectOverstated / CollectContraband),
         // drop the wrong QARune targets, and let InitializeAntiCheat run again so the rune signature
         // store is initialized (the editor needs it to re-sign edits).
-        public const string PluginVersion = "1.3.0";
+        // [2026-10-05] 1.3.0 -> 1.4.0: v1.3.0 hard-crashed in coreclr.dll right after player spawn.
+        // Re-skip Player.InitializeAntiCheat (v1.2.0 was stable), drop CollectContraband and every
+        // byref-Rune corrector target, and neutralize the corrector via by-value checks instead
+        // (InspectStats -> None, ExceedsValueCeiling -> false, IsStatAllowedOnSlot -> true).
+        public const string PluginVersion = "1.4.0";
 
         internal static new ManualLogSource Log;
 
@@ -82,30 +86,35 @@ namespace AntiCheatBypassMod
                 nameof(AntiCheatBypassPatches.InspectPrefix));
 
             // ----- 02) 2026-10-05 hotfix: the "inflated numbers are corrected" engine ------------
-            // New in the hotfix: GearLegality.InspectStats is the private core check, and
-            // CorrectIfOverstated(ref Rune,...) / CorrectOverstated(List<Rune>,...) are the mutators
-            // that rewrite an over-cap rune back to its exact legal value. They do NOT route through
-            // the public Inspect (patched above), so the old bypass left edited gear to be silently
-            // corrected to vanilla in game - the exact EquipmentStatEditor symptom.
-            // [2026-10-05 v1.3.0] Retargeted: ContrabandPreflight/Corrupt live on QARune (the QA
-            // spawner), not GearLegality; RepairRuneCounts lives on SaveSystem and only repairs
-            // count fields (harmless - the editor already sets counts), so neither is patched here.
+            // New in the hotfix, GearLegality.InspectStats is the private CORE check that both the
+            // public Inspect and the corrector call. Forcing it to Violation.None (plus the
+            // ceiling / allowed-stat / contraband predicates) stops the rewrite at its source.
+            // [2026-10-05 v1.4.0] The v1.3.0 run hard-crashed in coreclr.dll right after player
+            // spawn; the only new signature shape introduced then was byref-Rune
+            // (CorrectIfOverstated / DestroyIfUnobtainable), so those targets are dropped and only
+            // by-value bool/enum prefixes are used. This still neutralizes the corrector because it
+            // consults InspectStats/ExceedsValueCeiling/IsStatAllowedOnSlot before rewriting.
+            // [2026-10-05 v1.3.0] Retargeted from the wrong QARune names (ContrabandPreflight/
+            // Corrupt live on QARune, the QA spawner; RepairRuneCounts is on SaveSystem). Dropped.
             PatchByName(harmony, "GearLegality", "InspectStats",
                 nameof(AntiCheatBypassPatches.InspectPrefix));
-            PatchByName(harmony, "GearLegality", "CorrectIfOverstated",
+            PatchByName(harmony, "GearLegality", "ExceedsValueCeiling",
                 nameof(AntiCheatBypassPatches.FalseResultPrefix));
-            PatchByName(harmony, "GearLegality", "CorrectOverstated",
-                nameof(AntiCheatBypassPatches.IntZeroResultPrefix));
-            PatchByName(harmony, "GearLegality", "CollectContraband",
-                nameof(AntiCheatBypassPatches.EmptyRuneListPrefix));
+            PatchByName(harmony, "GearLegality", "IsStatAllowedOnSlot",
+                nameof(AntiCheatBypassPatches.TrueResultPrefix));
             PatchByName(harmony, "GearLegality", "IsContraband",
-                nameof(AntiCheatBypassPatches.FalseResultPrefix));
-            PatchByName(harmony, "GearLegality", "DestroyIfUnobtainable",
                 nameof(AntiCheatBypassPatches.FalseResultPrefix));
             PatchByName(harmony, "GearLegality", "IsChargeContraband",
                 nameof(AntiCheatBypassPatches.FalseResultPrefix));
-            PatchByName(harmony, "GearLegality", "DestroyIfChargesUnobtainable",
-                nameof(AntiCheatBypassPatches.FalseResultPrefix));
+            // [2026-10-05 v1.4.0] Dropped (byref-Rune): CorrectIfOverstated, CorrectOverstated,
+            // CollectContraband, DestroyIfUnobtainable, DestroyIfChargesUnobtainable. The
+            // InspectStats/ExceedsValueCeiling no-op already prevents any correction/destruction,
+            // and byref-struct Harmony targets are the suspected crash trigger.
+            // PatchByName(harmony, "GearLegality", "CorrectIfOverstated", ...);
+            // PatchByName(harmony, "GearLegality", "CorrectOverstated", ...);
+            // PatchByName(harmony, "GearLegality", "CollectContraband", ...);
+            // PatchByName(harmony, "GearLegality", "DestroyIfUnobtainable", ...);
+            // PatchByName(harmony, "GearLegality", "DestroyIfChargesUnobtainable", ...);
 
             // ----- 05) Character plausibility: stop hiding saves and stop the multiplayer join gate
             PatchByName(harmony, "CharacterPlausibility", "FilterImplausible",
@@ -191,13 +200,13 @@ namespace AntiCheatBypassMod
                 nameof(AntiCheatBypassPatches.FalseResultPrefix));
 
             // ----- 03) 2026-10-05 hotfix: anti-cheat bootstrap --------------------------------
-            // [2026-10-05 v1.3.0] Reverted the InitializeAntiCheat skip from v1.2.0: that method
-            // initializes Player._runeSignatureStore (the log showed "signature store count=-1",
-            // i.e. null, while it was skipped) and a null store breaks the editor's re-signing.
-            // The engine is already disarmed at the coroutine (MoveNext) and hook-subscription
-            // level, so letting initialization run has no enforcement downside.
-            // PatchByName(harmony, "Player", "InitializeAntiCheat",
-            //     nameof(AntiCheatBypassPatches.SkipPrefix));
+            // [2026-10-05 v1.4.0] RE-SKIPPED. v1.3.0 let InitializeAntiCheat run so that
+            // Player._runeSignatureStore would initialize, but that run hard-crashed in
+            // coreclr.dll (0xc0000005) right after "Player spawned". v1.2.0 skipped it and was
+            // stable, so it is skipped again. A null signature store only means the editor's
+            // Rebaseline cannot re-sign - harmless now that the corrector/validators are patched.
+            PatchByName(harmony, "Player", "InitializeAntiCheat",
+                nameof(AntiCheatBypassPatches.SkipPrefix));
             PatchByName(harmony, "Player", "SubscribeAntiCheatValueChangedHooks",
                 nameof(AntiCheatBypassPatches.SkipPrefix));
             PatchByName(harmony, "Player", "InitializeOwnerAntiCheatClientRpc",
