@@ -38,6 +38,11 @@ namespace PyromancerConverter
         public static ConfigEntry<bool> ConvertTree;
         public static ConfigEntry<bool> ConvertTooltips;
         public static ConfigEntry<bool> LogSwaps;
+        // [2026-10-06] Deep audit: logs every stack actually applied to a target through the low-level
+        // Stacking.AddStacksToTarget path. This is how a bypassing caller (e.g. the damage system
+        // auto-applying a spell definition's StackDatas, or a passive) would sneak Chill past the
+        // BaseSpellLibrary patch, so it is the authoritative way to find the source of a cold icon.
+        public static ConfigEntry<bool> DiagnosticLogging;
 
         /// <summary>Spells whose Ice/Chill output this mod rewrites. Seeded with the known Magician ice
         /// spells and extended at runtime by <see cref="Patch_SpellLibrary_ApplyDefinition"/>.</summary>
@@ -52,6 +57,11 @@ namespace PyromancerConverter
         // internal static readonly HashSet<Spell> LoggedStacks = new HashSet<Spell>();
         internal static readonly HashSet<long> LoggedStacks = new HashSet<long>();
 
+        // [2026-10-06] Audit keys so the deep diagnostics report each distinct application once.
+        internal static readonly HashSet<string> AuditedTargetStacks = new HashSet<string>();
+        internal static readonly HashSet<long> AuditedBaseStacks = new HashSet<long>();
+        internal static readonly HashSet<Spell> AuditedIceDamage = new HashSet<Spell>();
+
         internal static long StackKey(Spell spell, StackingEffect effect)
         {
             return ((long)(int)spell << 8) | (byte)effect;
@@ -65,6 +75,47 @@ namespace PyromancerConverter
             {
                 Log.LogInfo($"[status] {spell}: {from} -> {to}");
             }
+        }
+
+        /// <summary>
+        /// [2026-10-06] Deep audit of a stack that is actually being applied to a target through the
+        /// low-level Stacking component. Reports each distinct (path, effect, source) once.
+        /// </summary>
+        internal static void AuditTargetStack(string via, Stacking target, StackingEffect effect, int stacks, float duration, ulong sourceId)
+        {
+            if (!DiagnosticLogging.Value) return;
+            string key = via + "|" + (int)effect + "|" + sourceId;
+            if (!AuditedTargetStacks.Add(key)) return;
+            string obj = "?";
+            try { obj = target != null && target.gameObject != null ? target.gameObject.name : "?"; } catch { }
+            Log.LogInfo($"[audit-target] {via}: effect={effect} stacks={stacks} dur={duration:0.##} source={sourceId} on={obj}");
+        }
+
+        /// <summary>
+        /// [2026-10-06] Deep audit of a BaseSpellLibrary stack call, once per (spell, effect), with the
+        /// caster's player/monster flags so it is obvious whether a cold effect came from the player.
+        /// </summary>
+        internal static void AuditBaseStack(BaseSpellLibrary prefab, string via, StackingEffect effect, int amount)
+        {
+            if (!DiagnosticLogging.Value) return;
+            Spell spell = prefab != null ? prefab._spell : Spell.None;
+            if (!AuditedBaseStacks.Add(StackKey(spell, effect))) return;
+            ObjectsCommon owner = prefab != null ? prefab._owner : null;
+            bool ownerPlayer = owner != null && owner.IsPlayer;
+            bool ownerMonster = owner != null && owner.IsMonster;
+            Log.LogInfo($"[audit-bl] {via}: spell={spell} effect={effect} amount={amount} ownerPlayer={ownerPlayer} ownerMonster={ownerMonster}");
+        }
+
+        /// <summary>[2026-10-06] Deep audit of an Ice damage instance that this mod did NOT convert.</summary>
+        internal static void AuditIceDamage(BaseSpellLibrary prefab, string via)
+        {
+            if (!DiagnosticLogging.Value) return;
+            Spell spell = prefab != null ? prefab._spell : Spell.None;
+            if (!AuditedIceDamage.Add(spell)) return;
+            ObjectsCommon owner = prefab != null ? prefab._owner : null;
+            bool ownerPlayer = owner != null && owner.IsPlayer;
+            bool ownerMonster = owner != null && owner.IsMonster;
+            Log.LogInfo($"[audit-dmg] {via}: spell={spell} Ice ownerPlayer={ownerPlayer} ownerMonster={ownerMonster} (not converted)");
         }
 
         // Insurance: spells that must convert even if their definition does not report Element/DamageType Ice
@@ -93,6 +144,9 @@ namespace PyromancerConverter
             LogSwaps = Config.Bind("Diagnostics", "LogSwaps", true,
                 "Log every spell/node conversion to the BepInEx console. Turn off once the conversion set is known. (Default: true)");
 
+            DiagnosticLogging = Config.Bind("Diagnostics", "DiagnosticLogging", true,
+                "Deep audit: log every stack applied at the target (Stacking.AddStacksToTarget) and every BaseSpellLibrary stack call, once per (spell/effect/source). Use to find cold sources that bypass the normal path. (Default: true)");
+
             foreach (Spell s in KnownMagicianIce)
             {
                 Converted.Add(s);
@@ -103,6 +157,8 @@ namespace PyromancerConverter
             PatchOrLog(harmony, typeof(Patch_BaseSpellLibrary_SendDamageToTarget));
             PatchOrLog(harmony, typeof(Patch_BaseSpellLibrary_AddStacksToTarget));
             PatchOrLog(harmony, typeof(Patch_BaseSpellLibrary_AddStacksToCaster));
+            PatchOrLog(harmony, typeof(Patch_Stacking_AddStacksToTarget_StackData));
+            PatchOrLog(harmony, typeof(Patch_Stacking_AddStacksToTarget_List));
             PatchOrLog(harmony, typeof(Patch_SkillTree_LoadSkillTreeInitial));
             PatchOrLog(harmony, typeof(Patch_SkillTree_LoadNodeEffects));
             PatchOrLog(harmony, typeof(Patch_SkillTree_ApplySingleNodeEffect));
@@ -114,7 +170,8 @@ namespace PyromancerConverter
             Log.LogInfo("=================================================");
             Log.LogInfo($"{NAME} v{VERSION} loaded.");
             Log.LogInfo($"Enabled: {Enabled.Value}, ConvertDamage: {ConvertDamage.Value}, ConvertStatus: {ConvertStatus.Value}, " +
-                        $"ConvertTree: {ConvertTree.Value}, ConvertTooltips: {ConvertTooltips.Value}, LogSwaps: {LogSwaps.Value}");
+                        $"ConvertTree: {ConvertTree.Value}, ConvertTooltips: {ConvertTooltips.Value}, LogSwaps: {LogSwaps.Value}, " +
+                        $"DiagnosticLogging: {DiagnosticLogging.Value}");
             Log.LogInfo($"Seeded Magician ice spells: {string.Join(", ", KnownMagicianIce)}");
             Log.LogInfo("=================================================");
         }
@@ -236,7 +293,11 @@ namespace PyromancerConverter
                 if (!PyromancerConverterPlugin.Enabled.Value) return true;
                 if (!PyromancerConverterPlugin.ConvertDamage.Value) return true;
                 if (damageType != DamageType.Ice) return true;
-                if (!PyromancerConverterPlugin.ShouldConvert(__instance)) return true;
+                if (!PyromancerConverterPlugin.ShouldConvert(__instance))
+                {
+                    PyromancerConverterPlugin.AuditIceDamage(__instance, "SendDamageToTarget");
+                    return true;
+                }
 
                 __result = __instance.SendDamageToTarget(
                     target, DamageType.Fire, multiplier, isDamageOverTime, isThirdAttack, stunBuildupBonusPercent);
@@ -269,6 +330,7 @@ namespace PyromancerConverter
         {
             try
             {
+                PyromancerConverterPlugin.AuditBaseStack(__instance, "AddStacksToTarget", effect, amount);
                 if (!PyromancerConverterPlugin.Enabled.Value) return true;
                 if (!PyromancerConverterPlugin.ConvertStatus.Value) return true;
 
@@ -321,6 +383,7 @@ namespace PyromancerConverter
         {
             try
             {
+                PyromancerConverterPlugin.AuditBaseStack(__instance, "AddStacksToCaster", effect, amount);
                 if (!PyromancerConverterPlugin.Enabled.Value) return true;
                 if (!PyromancerConverterPlugin.ConvertStatus.Value) return true;
                 if (effect != StackingEffect.Frostbound) return true;
@@ -344,6 +407,51 @@ namespace PyromancerConverter
             {
                 PyromancerConverterPlugin.Log?.LogError($"[Patch_BaseSpellLibrary_AddStacksToCaster] {ex}");
                 return true;
+            }
+        }
+    }
+
+    /// <summary>
+    /// [2026-10-06] Deep audit on the target-side stack entry point. This is where a caller that bypasses
+    /// BaseSpellLibrary (e.g. a spell definition's StackDatas applied by the damage system, or a passive)
+    /// would apply Chill directly, so it is the ground truth for which effect icon lands on a target.
+    /// Diagnostic only: it never alters behaviour.
+    /// </summary>
+    [HarmonyPatch(typeof(Stacking), "AddStacksToTarget", new Type[] { typeof(StackData) })]
+    public static class Patch_Stacking_AddStacksToTarget_StackData
+    {
+        public static void Prefix(Stacking __instance, StackData stack)
+        {
+            try
+            {
+                PyromancerConverterPlugin.AuditTargetStack(
+                    "Stacking.AddStacksToTarget(StackData)", __instance, stack.Effect, stack.Stacks, stack.Duration, stack.SourceId);
+            }
+            catch (Exception ex)
+            {
+                PyromancerConverterPlugin.Log?.LogError($"[Patch_Stacking_AddStacksToTarget_StackData] {ex}");
+            }
+        }
+    }
+
+    [HarmonyPatch(typeof(Stacking), "AddStacksToTarget", new Type[] { typeof(Il2CppSystem.Collections.Generic.List<StackData>) })]
+    public static class Patch_Stacking_AddStacksToTarget_List
+    {
+        public static void Prefix(Stacking __instance, Il2CppSystem.Collections.Generic.List<StackData> stacks)
+        {
+            try
+            {
+                if (stacks == null) return;
+                for (int i = 0; i < stacks.Count; i++)
+                {
+                    StackData s = stacks[i];
+                    PyromancerConverterPlugin.AuditTargetStack(
+                        "Stacking.AddStacksToTarget(List)", __instance, s.Effect, s.Stacks, s.Duration, s.SourceId);
+                }
+            }
+            catch (Exception ex)
+            {
+                PyromancerConverterPlugin.Log?.LogError($"[Patch_Stacking_AddStacksToTarget_List] {ex}");
             }
         }
     }
