@@ -139,8 +139,8 @@ PatchByName("Player", "InitializeOwnerAntiCheatClientRpc",      SkipPrefix);
 | Ceiling | Value | Source |
 |---------|-------|--------|
 | Max Level | 37 | `CharacterPlausibility.ExceedsPlausibleCaps` |
-| Max Attribute Total | 84 | Sum of 8 attributes |
-| Max Skill Points Spent in Tree | 126 | Skill tree allocation |
+| Max Skill Points Spent in Tree | 84 | Skill tree allocation |
+| Max Total Attributes (sum of 8) | 126 | Attribute allocation |
 
 **Effect:** Characters exceeding these are hidden from the character-select list (`FilterImplausible`) and rejected from multiplayer joins (`RejectsJoiningCharacter`).
 
