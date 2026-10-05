@@ -18,42 +18,20 @@ Give it a model with `opencode auth login` (or add a provider in `opencode.json`
 
 ### 1.1 Optional agent helpers
 
-These make the AI better at this repo. **None are required to build mods.**
+Not needed to build mods. Once the agent is running (step 2), paste this and let it install and
+configure everything for you:
 
-- **CodeGraph** — code-graph index (the successor to graphify). Install and index:
-
-  ```bat
-  npm i -g @colbymchenry/codegraph
-  codegraph init "D:\SteamLibrary\steamapps\common\Dimraeth\modding\BepInExModsSource"
-  ```
-
-  Then add it to `opencode.json` as an MCP server:
-
-  ```jsonc
-  "mcp": { "servers": { "codegraph": {
-    "type": "local", "command": ["codegraph", "serve", "--mcp"],
-    "cwd": "modding/BepInExModsSource" } } }
-  ```
-
-- **Memento** — persistent memory across sessions. Install and add:
-
-  ```bat
-  npm i -g @iachilles/memento
-  ```
-
-  ```jsonc
-  "mcp": { "servers": { "memory": {
-    "type": "local", "command": ["memento"],
-    "environment": { "MEMORY_DB_PATH": "C:\\Users\\<you>\\.local\\share\\memento\\memory.db" } } } }
-  ```
-
-- **Karpathy guidelines** — coding-behavior skill used by this project:
-
-  ```bat
-  git clone https://github.com/multica-ai/andrej-karpathy-skills
-  ```
-
-  Then add its `skills\` folder to the `skills` list in your opencode config.
+```text
+Set up the optional agent helpers for this repo — install what's missing and configure it:
+- CodeGraph (code-graph index, the successor to graphify): install @colbymchenry/codegraph
+  globally, index modding\BepInExModsSource, and register it as an MCP server in opencode.json
+  (command: codegraph serve --mcp, cwd: modding/BepInExModsSource).
+- Memento (persistent memory): install @iachilles/memento globally and register it as an MCP
+  server (command: memento) with MEMORY_DB_PATH pointing at a database file.
+- Karpathy guidelines: clone https://github.com/multica-ai/andrej-karpathy-skills and add its
+  skills folder to the skills list in the opencode config.
+Restart opencode if the config changed.
+```
 
 ---
 
