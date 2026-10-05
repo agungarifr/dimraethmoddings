@@ -41,7 +41,11 @@ namespace AntiCheatBypassMod
     {
         public const string PluginGuid = "com.custom.anticheatbypassmod";
         public const string PluginName = "AntiCheatBypassMod";
-        public const string PluginVersion = "1.0.0";
+        // [2026-10-05] 1.0.0 -> 1.1.0: the 2026-10-05 hotfix added a second, Inspect-independent
+        // rune-correction engine (ContrabandPreflight / Corrupt / RepairRuneCounts +
+        // Player.PeriodicRuneIntegrityCheck / PeriodicAntiCheatCheck). Those are now bypassed too,
+        // so edited gear is no longer silently reverted to vanilla.
+        public const string PluginVersion = "1.1.0";
 
         internal static new ManualLogSource Log;
 
@@ -68,6 +72,19 @@ namespace AntiCheatBypassMod
             // ----- 02) Item destruction: all purge paths funnel through GearLegality.Inspect -----
             PatchByName(harmony, "GearLegality", "Inspect",
                 nameof(AntiCheatBypassPatches.InspectPrefix));
+
+            // ----- 02) 2026-10-05 hotfix: second correction path ("inflated numbers are corrected").
+            // The new periodic integrity engine does NOT call Inspect; it gates on ContrabandPreflight
+            // and mutates via Corrupt / RepairRuneCounts. Neutralize each so edited gear is neither
+            // destroyed nor silently rewritten back to vanilla.
+            PatchByName(harmony, "GearLegality", "ContrabandPreflight",
+                nameof(AntiCheatBypassPatches.FalseResultPrefix));
+            PatchByName(harmony, "GearLegality", "Corrupt",
+                nameof(AntiCheatBypassPatches.CorruptPrefix));
+            PatchByName(harmony, "GearLegality", "RepairRuneCounts",
+                nameof(AntiCheatBypassPatches.SkipPrefix));
+            PatchByName(harmony, "GearLegality", "IsChargeContraband",
+                nameof(AntiCheatBypassPatches.FalseResultPrefix));
 
             // ----- 05) Character plausibility: stop hiding saves and stop the multiplayer join gate
             PatchByName(harmony, "CharacterPlausibility", "FilterImplausible",
@@ -140,6 +157,16 @@ namespace AntiCheatBypassMod
             // (the periodic XP/rune loops do not need this: their only effect is a KickForCheat,
             // which is already a no-op and whose validators now always report clean).
             PatchCoroutineMoveNext(harmony, "Player", "SpeedHackDetectionRoutine",
+                nameof(AntiCheatBypassPatches.FalseResultPrefix));
+
+            // ----- 03) 2026-10-05 hotfix: periodic rune-integrity / anti-cheat coroutines --------
+            // These are the new "detect impossible stats then correct/destroy" engines. Stopping
+            // MoveNext on their first step kills the loop before it can touch edited runes or
+            // kick for cheat. Nested iterators are named Player+<PeriodicRuneIntegrityCheck>d__215
+            // and Player+<PeriodicAntiCheatCheck>d__204 in the 2026-10-05 interop.
+            PatchCoroutineMoveNext(harmony, "Player", "PeriodicRuneIntegrityCheck",
+                nameof(AntiCheatBypassPatches.FalseResultPrefix));
+            PatchCoroutineMoveNext(harmony, "Player", "PeriodicAntiCheatCheck",
                 nameof(AntiCheatBypassPatches.FalseResultPrefix));
         }
 

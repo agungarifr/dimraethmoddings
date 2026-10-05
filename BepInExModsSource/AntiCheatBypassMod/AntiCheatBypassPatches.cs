@@ -25,6 +25,19 @@ namespace AntiCheatBypassMod
             return false;
         }
 
+        // [2026-10-05] New: the 2026-10-05 hotfix added a second, Inspect-independent
+        // correction path ("Gear with impossible stats is destroyed; inflated numbers are
+        // corrected"). ContrabandPreflight is its cheap gate and Corrupt is the mutator that
+        // rewrites/repairs an offending rune - neither routes through Inspect, so the old
+        // Inspect-only bypass left edited gear to be silently reverted to vanilla in game.
+        // CorruptPrefix returns the caller's rune untouched (leaves it:false = do not run
+        // the original Corrupt body).
+        public static bool CorruptPrefix(Rune __0, ref Rune __result)
+        {
+            __result = __0;
+            return false;
+        }
+
         // -------------------------------------------------------------------------------------
         // Character plausibility (docs/anticheat/05)
         // -------------------------------------------------------------------------------------

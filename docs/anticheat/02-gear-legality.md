@@ -576,3 +576,33 @@ After every log line: `ClientDiagnostics.NoteContrabandDestroyed()` (parameterle
    (list/NetworkList setters), `0x18000A400` (`List<Rune>.Add`), `0x18000C080`
    (`InventoryEntry` setter) are **Inferred** from context and calling convention; none
    appear under resolved names in the ISIL sections.
+
+---
+
+## 11. Addendum — 2026-10-05 hotfix: second correction path
+
+The 2026-10-05 patch notes say *"Gear with impossible stats is destroyed; inflated numbers
+are corrected"*. The interop regenerated for that build (`BepInEx/interop/Assembly-CSharp.dll`,
+2026-10-05) adds a **second, `Inspect`-independent** engine. It was found by extracting the
+interop method-name heap; the signatures below are pinned by the interop field names
+(`NativeMethodInfoPtr_<Name>_<access>_<ret>_<params>_0`). **Verified against the 2026-10-05
+interop** (names/signatures); behavior mapping is **Inferred** from the names + patch notes.
+
+| Member | Signature (from interop) | Role (Inferred) |
+|---|---|---|
+| `GearLegality.ContrabandPreflight` | `private bool ContrabandPreflight()` | cheap gate before the correction pass |
+| `GearLegality.Corrupt` | `private static Rune Corrupt(Rune, ContrabandKind)` | the mutator that rewrites/"corrects" an offending rune |
+| `GearLegality.RepairRuneCounts` | `private static void RepairRuneCounts(List<Rune>)` | fixes a rune collection's count fields |
+| `GearLegality.IsChargeContraband` | `public static bool IsChargeContraband(InventoryEntry, ref float)` | charge/attribute equivalent of `Inspect` |
+| `Player.PeriodicRuneIntegrityCheck` | `private IEnumerator` (`Player+<PeriodicRuneIntegrityCheck>d__215`) | periodic loop that finds + corrects impossible runes |
+| `Player.PeriodicAntiCheatCheck` | `private IEnumerator` (`Player+<PeriodicAntiCheatCheck>d__204`) | periodic general anti-cheat loop |
+| `QARune` / `QARune.ContrabandKind` | enum + `SpawnContraband` / `SendContrabandToInventory` / `Contraband` / `ContrabandStatMultiplier` | new dev/QA contraband spawn system |
+
+**Impact on the bypass.** The pre-update `AntiCheatBypassMod` patched only
+`GearLegality.Inspect`, so the new pass rewrote edited runes back to vanilla without ever
+hitting `Inspect` — this is why the Equipment Stat Editor reported a successful apply and
+then showed vanilla stats again (and why its `VerifyPending` rolled the edit back). Fixed in
+`AntiCheatBypassMod` **v1.1.0** (2026-10-05): `ContrabandPreflight` → `false`,
+`Corrupt` → returns its input rune unchanged, `RepairRuneCounts` → skipped,
+`IsChargeContraband` → `false`, and both `Player.Periodic*Check` coroutines are stopped at
+their first `MoveNext` step (same technique as `SpeedHackDetectionRoutine`).
