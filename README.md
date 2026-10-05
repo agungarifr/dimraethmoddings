@@ -24,6 +24,7 @@ modded a Unity game before, follow it top to bottom. When you finish you will ha
 
 - [1. How modding works here (the mental model)](#1-how-modding-works-here-the-mental-model)
 - [2. Prerequisites](#2-prerequisites)
+  - [2.1 Free vs paid tools](#21-free-vs-paid-tools)
 - [3. Find your game folder](#3-find-your-game-folder)
 - [4. Install BepInEx 6 (IL2CPP)](#4-install-bepinex-6-il2cpp)
 - [5. Install the .NET SDK](#5-install-the-net-sdk)
@@ -76,13 +77,42 @@ Install these before you start. Everything is free.
 | **BepInEx 6 — IL2CPP, win-x64** (bleeding-edge "be" build) | Loads the mods and generates interop | <https://builds.bepinex.dev/projects/bepinex_be> — pick the newest artifact named `BepInEx-Unity.IL2CPP-win-x64-*.zip` |
 | **.NET SDK 6.0 or newer** | Compiles the C# mods | <https://dotnet.microsoft.com/download> |
 | **Git for Windows** | Clone/update this repository | <https://git-scm.com/download/win> |
-| A text editor or IDE | To read/edit code | VS Code, Visual Studio, or JetBrains Rider (all optional but recommended) |
+| A text editor or IDE | To read/edit code | any tool from [section 2.1](#21-free-vs-paid-tools) — all optional but recommended |
 
-Optional, for the AI workflow:
+### 2.1 Free vs paid tools
 
-| Tool | Why |
-|---|---|
-| **opencode** | An open-source AI coding agent (CLI) — see [section 11](#11-build-and-code-with-an-ai-assistant-opencode) |
+You do **not** have to pay anything to mod here. The **compiler is free** (the .NET SDK) and there
+are capable **free editors and AI agents**. Paid tools are optional conveniences, not requirements.
+
+**✅ Free to use** — the software itself costs nothing.
+
+| Tool | Type | Notes |
+|---|---|---|
+| **VS Code** | Editor | Free and lightweight. Add the **C#** extension for autocomplete. <https://code.visualstudio.com/> |
+| **Visual Studio Community** | IDE | Free for individuals / small teams (non-enterprise). Excellent .NET support. |
+| **JetBrains Rider** | IDE | **Free for non-commercial use** (paid only if you sell your work). Best-in-class C#/Unity tooling. <https://www.jetbrains.com/rider/> |
+| **Zed** | Editor | Free and fast, open source. |
+| **opencode** | CLI AI agent | Open source (MIT). The software is free — use its **free included models** or plug in any provider key. Optional paid plan (OpenCode Go, $10/mo) for more. Already configured for this repo — see [section 11](#11-build-and-code-with-an-ai-assistant-opencode). <https://opencode.ai> |
+| **Freebuff** | CLI + web AI agent | **Completely free**, ad-supported — no subscription, credits or API key. Uses GLM / DeepSeek / GPT backends. <https://freebuff.com/> |
+| **Cline** / **Roo Code** | VS Code AI extension | Free, open source. Bring your own model key (or a local model). |
+| **Aider** | CLI AI agent | Free, open source. Bring your own model key. |
+| **Google Antigravity** | Agentic IDE | **Free public preview** with rate limits (Gemini 3, Claude, GPT-OSS). Paid Google AI plans exist for higher quotas. <https://antigravity.google/> |
+
+**💰 Paid / subscription** — no real free tier, or the free tier is too limited for daily work.
+
+| Tool | Type | Typical cost |
+|---|---|---|
+| **Claude Code** | CLI AI agent | No free tier — requires Claude Pro (~$20/mo) or Max (~$100–$200/mo), or pay-as-you-go API credits. <https://claude.com/pricing> |
+| **GitHub Copilot** | IDE AI assistant | Free tier is very limited; **Pro ~$10/mo**, Pro+ ~$39/mo. |
+| **Cursor** | AI IDE | Free "Hobby" tier is limited; **Pro ~$20/mo**. |
+| **Windsurf** | AI IDE | Free tier is limited; **Pro ~$15/mo**. |
+| **JetBrains Rider (commercial)** | IDE | Paid only when used to build commercial products (individual ~$14–$19/mo); free for hobby/non-commercial. |
+
+> **Zero-budget beginner recipe:** **VS Code** + the **C#** extension to read and build the code,
+> and **Freebuff** (or **opencode** with free models) as your AI helper. Everything in this guide
+> can be done for **$0**. Claude Code / paid Cursor / Copilot are conveniences, not requirements.
+
+> Pricing was correct at the time of writing and changes often — check each tool's own pricing page.
 
 > **Not sure which BepInEx build?** You want the **IL2CPP** build, **x64**, not the Mono build.
 > The archive name always contains `Unity.IL2CPP` and `win-x64`.
