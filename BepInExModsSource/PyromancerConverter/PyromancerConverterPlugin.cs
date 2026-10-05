@@ -44,6 +44,8 @@ namespace PyromancerConverter
         internal static readonly HashSet<Spell> Converted = new HashSet<Spell>();
 
         internal static readonly HashSet<Spell> LoggedDamage = new HashSet<Spell>();
+        // [2026-10-05] Diagnostic roster: every Ice-typed spell definition seen, with its class, logged once.
+        internal static readonly HashSet<Spell> IceRoster = new HashSet<Spell>();
         // [2026-10-05] Was HashSet<Spell>: one line per spell hid the fact that a single spell applies
         // several distinct StackingEffects (Blizzard applies Chill AND Frostbound). Now keyed by
         // (spell, effect) so every pair is reported once.
@@ -129,10 +131,25 @@ namespace PyromancerConverter
             }
         }
 
-        /// <summary>True when the prefab belongs to a spell this mod rewrites and the master/feature gates allow it.</summary>
+        /// <summary>True when the prefab belongs to a spell this mod rewrites.</summary>
         internal static bool IsConverted(BaseSpellLibrary prefab)
         {
             return prefab != null && Converted.Contains(prefab._spell);
+        }
+
+        /// <summary>
+        /// True when cold output from this prefab should become fire/burn.
+        /// [2026-10-05] The converted-set gate alone left Chill in play: Blizzard/FrostGlide spawn an
+        /// Ice Pool whose SpellLibrary is not flagged ClassRequirement=Magician, so the pool's Chill was
+        /// never rewritten. Anything a PLAYER-owned spell emits is therefore converted; cold from a
+        /// monster (e.g. SavageFrostbite) is left alone because that prefab's _owner.IsPlayer is false.
+        /// </summary>
+        internal static bool ShouldConvert(BaseSpellLibrary prefab)
+        {
+            if (prefab == null) return false;
+            if (Converted.Contains(prefab._spell)) return true;
+            ObjectsCommon owner = prefab._owner;
+            return owner != null && owner.IsPlayer;
         }
     }
 
@@ -160,8 +177,18 @@ namespace PyromancerConverter
                 bool ice = element == Element.Ice || dmg == DamageType.Ice;
                 if (!ice) return;
 
-                bool known = PyromancerConverterPlugin.Converted.Contains(spell);
                 Class classReq = __instance.ClassRequirement;
+
+                // [2026-10-05] Diagnostic: name every Ice-typed spell and its class requirement once, so
+                // the true Magician ice roster can be confirmed from the log instead of guessed.
+                if (PyromancerConverterPlugin.LogSwaps.Value &&
+                    PyromancerConverterPlugin.IceRoster.Add(spell))
+                {
+                    PyromancerConverterPlugin.Log.LogInfo(
+                        $"[ice] {spell}: element {element}, damage {dmg}, classReq {classReq}");
+                }
+
+                bool known = PyromancerConverterPlugin.Converted.Contains(spell);
                 if (!known && classReq != Class.Magician) return;
 
                 bool newly = PyromancerConverterPlugin.Converted.Add(spell);
@@ -209,7 +236,7 @@ namespace PyromancerConverter
                 if (!PyromancerConverterPlugin.Enabled.Value) return true;
                 if (!PyromancerConverterPlugin.ConvertDamage.Value) return true;
                 if (damageType != DamageType.Ice) return true;
-                if (!PyromancerConverterPlugin.IsConverted(__instance)) return true;
+                if (!PyromancerConverterPlugin.ShouldConvert(__instance)) return true;
 
                 __result = __instance.SendDamageToTarget(
                     target, DamageType.Fire, multiplier, isDamageOverTime, isThirdAttack, stunBuildupBonusPercent);
@@ -248,7 +275,7 @@ namespace PyromancerConverter
                 // Only the cold effects are interesting here; anything else passes straight through.
                 if (effect != StackingEffect.Chill && effect != StackingEffect.Frostbound) return true;
 
-                if (!PyromancerConverterPlugin.IsConverted(__instance))
+                if (!PyromancerConverterPlugin.ShouldConvert(__instance))
                 {
                     // [2026-10-05] A cold stack from a spell that is NOT in the converted set means the
                     // discovery step (or the seed list) missed an ice spell. Name it once so the set can be
@@ -298,7 +325,7 @@ namespace PyromancerConverter
                 if (!PyromancerConverterPlugin.ConvertStatus.Value) return true;
                 if (effect != StackingEffect.Frostbound) return true;
 
-                if (!PyromancerConverterPlugin.IsConverted(__instance))
+                if (!PyromancerConverterPlugin.ShouldConvert(__instance))
                 {
                     if (PyromancerConverterPlugin.LogSwaps.Value &&
                         PyromancerConverterPlugin.LoggedStacks.Add(PyromancerConverterPlugin.StackKey(__instance._spell, effect)))
