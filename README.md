@@ -14,9 +14,9 @@ modded a Unity game before, follow it top to bottom. When you finish you will ha
 
 > **TL;DR (if you already know BepInEx):** install BepInEx 6 IL2CPP x64 into the game root,
 > run the game once so `BepInEx\interop` is generated, clone this repo into the game root, make
-> `<game>\modding\BepInExModsSource` and `<game>\modding\BepInEx` available (junction or copy),
+> `D:\SteamLibrary\steamapps\common\Dimraeth\modding\BepInExModsSource` and `D:\SteamLibrary\steamapps\common\Dimraeth\modding\BepInEx` available (junction or copy),
 > then `dotnet build` any `.csproj` under `BepInExModsSource`. The post-build step copies the DLL
-> into `<game>\BepInEx\plugins`. Full details below.
+> into `D:\SteamLibrary\steamapps\common\Dimraeth\BepInEx\plugins`. Full details below.
 
 ---
 
@@ -132,7 +132,7 @@ are capable **free editors and AI agents**. Paid tools are optional conveniences
 What a freshly installed game root looks like:
 
 ```
-<GAME>\
+D:\SteamLibrary\steamapps\common\Dimraeth\
 ├─ Dimraeth.exe              the game
 ├─ GameAssembly.dll          the game's native (IL2CPP) code
 ├─ UnityPlayer.dll
@@ -142,7 +142,7 @@ What a freshly installed game root looks like:
 
 If you do **not** see `GameAssembly.dll`, you are in the wrong folder.
 
-> **Important:** every step below places files **directly in the game root `<GAME>`** — never in a
+> **Important:** every step below places files **directly in the game root `D:\SteamLibrary\steamapps\common\Dimraeth`** — never in a
 > subfolder. BepInEx must sit next to `Dimraeth.exe`.
 
 ---
@@ -151,12 +151,12 @@ If you do **not** see `GameAssembly.dll`, you are in the wrong folder.
 
 1. Download the newest `BepInEx-Unity.IL2CPP-win-x64-*.zip` from
    <https://builds.bepinex.dev/projects/bepinex_be>.
-2. **Extract the contents of the zip directly into `<GAME>`** (the folder that contains
+2. **Extract the contents of the zip directly into `D:\SteamLibrary\steamapps\common\Dimraeth`** (the folder that contains
    `Dimraeth.exe`). Do *not* extract into a subfolder inside the asset zip.
-3. After extracting, `<GAME>` must contain these new items:
+3. After extracting, `D:\SteamLibrary\steamapps\common\Dimraeth` must contain these new items:
 
    ```
-   <GAME>\
+   D:\SteamLibrary\steamapps\common\Dimraeth\
    ├─ winhttp.dll              the loader (this is how BepInEx starts)
    ├─ doorstop_config.ini      tells the loader what to run
    ├─ .doorstop_version
@@ -172,7 +172,7 @@ If you do **not** see `GameAssembly.dll`, you are in the wrong folder.
 
    Close the game when you reach a menu.
 
-5. **Verify the install.** Open `<GAME>\BepInEx\LogOutput.log`. The first lines should look like:
+5. **Verify the install.** Open `D:\SteamLibrary\steamapps\common\Dimraeth\BepInEx\LogOutput.log`. The first lines should look like:
 
    ```
    [Message: Preloader] BepInEx 6.0.0-be.788 - Dimraeth (...)
@@ -180,7 +180,7 @@ If you do **not** see `GameAssembly.dll`, you are in the wrong folder.
    [Info   :   BepInEx] Running under Unity 6000.0.61f1
    ```
 
-   And `<GAME>\BepInEx\interop\` should contain ~180+ files, including:
+   And `D:\SteamLibrary\steamapps\common\Dimraeth\BepInEx\interop\` should contain ~180+ files, including:
 
    ```
    Assembly-CSharp.dll        ← the most important one: the game's own classes
@@ -210,7 +210,7 @@ newer works.
 
    > If `dotnet` is "not recognized", the SDK is not on your `PATH`. Reopen the terminal; if it
    > still fails, reinstall and tick "Add to PATH". This repository may also ship a portable SDK
-   > at `<GAME>\modding\dotnet-sdk\dotnet.exe`, which you can call by full path instead of `dotnet`.
+   > at `D:\SteamLibrary\steamapps\common\Dimraeth\modding\dotnet-sdk\dotnet.exe`, which you can call by full path instead of `dotnet`.
 
 ---
 
@@ -227,16 +227,16 @@ The mod `.csproj` files reference BepInEx with **relative paths**, like this:
 
 `..\..` means "up two folders". So, for every mod:
 
-- the **project** must live at `<GAME>\modding\BepInExModsSource\<ModName>\`, and
-- a **BepInEx folder** (with `core\` and `interop\`) must exist at `<GAME>\modding\BepInEx\`.
+- the **project** must live at `D:\SteamLibrary\steamapps\common\Dimraeth\modding\BepInExModsSource\<ModName>\`, and
+- a **BepInEx folder** (with `core\` and `interop\`) must exist at `D:\SteamLibrary\steamapps\common\Dimraeth\modding\BepInEx\`.
 
-The build finishes by **copying the DLL up three levels** into `<GAME>\BepInEx\plugins\` — that is
+The build finishes by **copying the DLL up three levels** into `D:\SteamLibrary\steamapps\common\Dimraeth\BepInEx\plugins\` — that is
 the game's real plugins folder, so your mod loads automatically next launch.
 
 In other words, the working layout looks like this:
 
 ```
-<GAME>\
+D:\SteamLibrary\steamapps\common\Dimraeth\
 ├─ BepInEx\                              the runtime the game loads (from step 4)
 │  ├─ core\  interop\  config\  plugins\ patchers\
 │  └─ LogOutput.log
@@ -250,30 +250,30 @@ In other words, the working layout looks like this:
 
 ### 6.2 Clone the repository
 
-Open **Command Prompt** (or PowerShell) and run (replace `<GAME>` with your real path):
+Open **Command Prompt** (or PowerShell) and run:
 
 ```bat
-cd /d "<GAME>"
+cd /d "D:\SteamLibrary\steamapps\common\Dimraeth"
 git clone https://github.com/agungarifr/dimraethmoddings.git dimraethmoddings
 ```
 
 You now have:
 
 ```
-<GAME>\dimraethmoddings\        ← the git clone (this repo)
-<GAME>\dimraethmoddings\BepInExModsSource\<Mod>\...
+D:\SteamLibrary\steamapps\common\Dimraeth\dimraethmoddings\        ← the git clone (this repo)
+D:\SteamLibrary\steamapps\common\Dimraeth\dimraethmoddings\BepInExModsSource\<Mod>\...
 ```
 
 ### 6.3 Point the compiler at the source and at BepInEx
 
-You need `<GAME>\modding\BepInExModsSource` and `<GAME>\modding\BepInEx` to exist **and to point
+You need `D:\SteamLibrary\steamapps\common\Dimraeth\modding\BepInExModsSource` and `D:\SteamLibrary\steamapps\common\Dimraeth\modding\BepInEx` to exist **and to point
 at the real files**. There are two ways — pick **Option A (recommended)** or Option B.
 
 **Option A — directory junctions (recommended: one copy, git tracks your edits directly).**
 A junction is a lightweight "shortcut folder"; it does **not** require administrator rights.
 
 ```bat
-cd /d "<GAME>"
+cd /d "D:\SteamLibrary\steamapps\common\Dimraeth"
 mkdir modding
 mklink /J "modding\BepInExModsSource" "dimraethmoddings\BepInExModsSource"
 mklink /J "modding\BepInEx" "BepInEx"
@@ -291,7 +291,7 @@ Now `modding\BepInExModsSource` **is** the clone's source folder (edit once, com
 **Option B — plain copies (no links; simpler to reason about, but you must keep them in sync).**
 
 ```bat
-cd /d "<GAME>"
+cd /d "D:\SteamLibrary\steamapps\common\Dimraeth"
 mkdir "modding\BepInEx"
 xcopy /E /I /Y "dimraethmoddings\BepInExModsSource" "modding\BepInExModsSource"
 xcopy /E /I /Y "BepInEx\core"    "modding\BepInEx\core"
@@ -319,14 +319,14 @@ We will build **ContagionTuner** (a small, self-contained mod). Any other mod wo
 In **Command Prompt** or **PowerShell**:
 
 ```bat
-cd /d "<GAME>\modding\BepInExModsSource\ContagionTuner"
+cd /d "D:\SteamLibrary\steamapps\common\Dimraeth\modding\BepInExModsSource\ContagionTuner"
 dotnet build -c Release
 ```
 
 Expected output:
 
 ```
-  ContagionTuner -> <GAME>\modding\BepInEx\plugins\ContagionTuner.dll
+  ContagionTuner -> D:\SteamLibrary\steamapps\common\Dimraeth\modding\BepInEx\plugins\ContagionTuner.dll
 Build succeeded.
     0 Warning(s)
     0 Error(s)
@@ -336,19 +336,19 @@ Two things just happened:
 
 1. `dotnet` compiled the mod against the interop assemblies.
 2. A **post-build step copied** `ContagionTuner.dll` (and `.pdb`) into the **game's**
-   `<GAME>\BepInEx\plugins\` folder. Verify it:
+   `D:\SteamLibrary\steamapps\common\Dimraeth\BepInEx\plugins\` folder. Verify it:
 
    ```powershell
-   Get-ChildItem "<GAME>\BepInEx\plugins\ContagionTuner.*"
+   Get-ChildItem "D:\SteamLibrary\steamapps\common\Dimraeth\BepInEx\plugins\ContagionTuner.*"
    ```
 
    You should see `ContagionTuner.dll` with today's timestamp.
 
 > **The game must be closed while building.** If the game is running it holds the DLL in
-> `<GAME>\BepInEx\plugins`, and the copy step fails with a "file in use" error. Close the game,
+> `D:\SteamLibrary\steamapps\common\Dimraeth\BepInEx\plugins`, and the copy step fails with a "file in use" error. Close the game,
 > then rebuild.
 
-> **Building every mod at once:** from `<GAME>\modding\BepInExModsSource` you can loop over all
+> **Building every mod at once:** from `D:\SteamLibrary\steamapps\common\Dimraeth\modding\BepInExModsSource` you can loop over all
 > projects:
 > ```powershell
 > Get-ChildItem -Recurse -Filter *.csproj | ForEach-Object { dotnet build $_.FullName -c Release }
@@ -359,7 +359,7 @@ Two things just happened:
 ## 8. Launch the game and verify
 
 1. Start Dimraeth normally (from Steam).
-2. Open `<GAME>\BepInEx\LogOutput.log` and search for your mod:
+2. Open `D:\SteamLibrary\steamapps\common\Dimraeth\BepInEx\LogOutput.log` and search for your mod:
 
    ```
    [Info   :   BepInEx] Loading [Contagion Tuner 1.1.0]
@@ -371,7 +371,7 @@ Two things just happened:
 3. Some mods print a banner to the log; some have in-game keys or config files. Check the mod's
    own `README.md` under `BepInExModsSource\<Mod>\`.
 
-**Where configs live:** each mod writes a `.cfg` file into `<GAME>\BepInEx\config\`. For example
+**Where configs live:** each mod writes a `.cfg` file into `D:\SteamLibrary\steamapps\common\Dimraeth\BepInEx\config\`. For example
 `DamageNumberTuner.cfg` (GUID `com.custom.damagenumbertuner`). You can edit the `.cfg` and, for
 most mods, changes apply on the next launch (some apply live).
 
@@ -384,19 +384,19 @@ This is the core daily workflow. Once set up, it is three steps:
 1. **Edit** a `.cs` file under `modding\BepInExModsSource\<Mod>\`.
 2. **Build** (close the game first):
    ```bat
-   dotnet build "<GAME>\modding\BepInExModsSource\<Mod>\<Mod>.csproj" -c Release
+   dotnet build "D:\SteamLibrary\steamapps\common\Dimraeth\modding\BepInExModsSource\<Mod>\<Mod>.csproj" -c Release
    ```
 3. **Launch the game** and check `LogOutput.log`.
 
 Tips:
 
-- Keep a terminal open in `<GAME>` so you can build quickly.
+- Keep a terminal open in `D:\SteamLibrary\steamapps\common\Dimraeth` so you can build quickly.
 - For quick iteration, build only the one project you changed.
 - If a change has no visible effect, confirm the DLL timestamp in `BepInEx\plugins` changed — a
   failed copy means the game was still running.
 - Commit your source changes from inside the clone:
   ```bat
-  cd /d "<GAME>\dimraethmoddings"
+  cd /d "D:\SteamLibrary\steamapps\common\Dimraeth\dimraethmoddings"
   git status
   git add -A
   git commit -m "Describe your change"
@@ -412,7 +412,7 @@ Tips:
 You do **not** need an IDE — `dotnet build` is enough. But an IDE gives you autocomplete against
 the game's classes, which makes modding much easier.
 
-**The golden rule for all IDEs:** open the **game root** (`<GAME>`) as your workspace/folder. All
+**The golden rule for all IDEs:** open the **game root** (`D:\SteamLibrary\steamapps\common\Dimraeth`) as your workspace/folder. All
 paths (`modding\...`, `BepInEx\...`) are relative to it, and the AI/agent configs in this repo
 assume that too.
 
@@ -422,7 +422,7 @@ assume that too.
 2. Install the **C#** extension (by Microsoft) from the Extensions tab.
 3. Open the game root:
    ```
-   Open Folder… → <GAME>
+   Open Folder… → D:\SteamLibrary\steamapps\common\Dimraeth
    ```
 4. Open any mod's `.csproj`; VS Code loads it as the project. Build with **Ctrl+Shift+B**, or run
    the same `dotnet build` command in the integrated terminal.
@@ -430,14 +430,14 @@ assume that too.
 ### Visual Studio 2022 (Windows)
 
 1. **File → Open → Project/Solution…** and open
-   `<GAME>\dimraethmoddings\BepInExModsSource\<Mod>\<Mod>.csproj`.
+   `D:\SteamLibrary\steamapps\common\Dimraeth\dimraethmoddings\BepInExModsSource\<Mod>\<Mod>.csproj`.
    (You can also create a solution that contains several mod projects.)
 2. Choose the **Release** configuration and **Build → Build Solution**.
 3. The post-build step deploys automatically.
 
 ### JetBrains Rider
 
-1. **Open** `<GAME>\dimraethmoddings\BepInExModsSource\<Mod>\<Mod>.csproj`.
+1. **Open** `D:\SteamLibrary\steamapps\common\Dimraeth\dimraethmoddings\BepInExModsSource\<Mod>\<Mod>.csproj`.
 2. Build the project (Ctrl+F9). The post-build copy handles deployment.
 
 > **Autocomplete against game types:** once the project loads, types such as `ObjectsCommon`,
@@ -467,7 +467,7 @@ opencode --version
 This repo ships a **redacted sample** config, `opencode.example.json`. Copy it and edit it:
 
 ```bat
-cd /d "<GAME>\dimraethmoddings"
+cd /d "D:\SteamLibrary\steamapps\common\Dimraeth\dimraethmoddings"
 copy opencode.example.json opencode.json
 ```
 
@@ -507,7 +507,7 @@ They are convenient but optional — delete those blocks if you do not want them
 ### 11.3 Start it in the game root
 
 ```bat
-cd /d "<GAME>"
+cd /d "D:\SteamLibrary\steamapps\common\Dimraeth"
 opencode
 ```
 
@@ -537,11 +537,11 @@ great way to learn the codebase.
 | Symptom | Likely cause | Fix |
 |---|---|---|
 | `dotnet` is not recognized | SDK not installed / not on `PATH` | Install the .NET SDK (step 5), reopen the terminal, or call the full path to `dotnet.exe` |
-| `Could not resolve this reference … Assembly-CSharp` / `UnityEngine.*` / `Il2Cppmscorlib` | Interop assemblies missing | Run the game once with BepInEx installed; confirm `<GAME>\BepInEx\interop\Assembly-CSharp.dll` exists (step 4) |
+| `Could not resolve this reference … Assembly-CSharp` / `UnityEngine.*` / `Il2Cppmscorlib` | Interop assemblies missing | Run the game once with BepInEx installed; confirm `D:\SteamLibrary\steamapps\common\Dimraeth\BepInEx\interop\Assembly-CSharp.dll` exists (step 4) |
 | `Could not resolve … BepInEx.Core` / `BepInEx.Unity.IL2CPP` | `modding\BepInEx\core` missing or wrong | Re-do step 6.3 and confirm `modding\BepInEx\core\BepInEx.Core.dll` exists |
 | `MSB3021` / "The process cannot access the file … because it is being used by another process" | The game is running and locking the DLL | **Close the game**, then rebuild |
 | `interop` folder is empty after first launch | Game didn't launch, or wrong BepInEx build | Reinstall the **IL2CPP x64** build, delete `BepInEx`, run the game again |
-| Mod builds but does not appear in `LogOutput.log` | DLL not in the right plugins folder, or game not restarted | Ensure it landed in `<GAME>\BepInEx\plugins`; restart the game |
+| Mod builds but does not appear in `LogOutput.log` | DLL not in the right plugins folder, or game not restarted | Ensure it landed in `D:\SteamLibrary\steamapps\common\Dimraeth\BepInEx\plugins`; restart the game |
 | Log shows `Loading [MyMod]` immediately followed by an exception | A Harmony patch target no longer exists (game updated) | Update the method/class names to match the current game dump |
 | `CS0012: The type 'X' is defined in an assembly that is not referenced` | A Unity module reference is missing from the `.csproj` | Add the matching `<Reference>` to the `.csproj` (ask the AI: "add the missing Unity reference") |
 | Changes have no effect | The build's copy step failed silently, or old DLL cached | Check the DLL timestamp in `BepInEx\plugins`; close game, rebuild |
@@ -549,9 +549,9 @@ great way to learn the codebase.
 
 **Useful files when debugging**
 
-- `<GAME>\BepInEx\LogOutput.log` — everything BepInEx and the mods log.
-- `<GAME>\BepInEx\ErrorLog.log` — fatal startup errors.
-- `<GAME>\BepInEx\config\<ModGuid>.cfg` — per-mod settings.
+- `D:\SteamLibrary\steamapps\common\Dimraeth\BepInEx\LogOutput.log` — everything BepInEx and the mods log.
+- `D:\SteamLibrary\steamapps\common\Dimraeth\BepInEx\ErrorLog.log` — fatal startup errors.
+- `D:\SteamLibrary\steamapps\common\Dimraeth\BepInEx\config\<ModGuid>.cfg` — per-mod settings.
 
 ---
 
@@ -624,8 +624,8 @@ dump to be useful.
 `SerDump`, `SerParse`.
 
 > Some tools hard-code the game path. For example `RelationshipMultiplier.csproj` defines
-> `<GameRoot>D:\SteamLibrary\steamapps\common\Dimraeth</GameRoot>` — **edit that line to your own
-> `<GAME>` path** before building, or the references will not resolve.
+> `<GameRoot>D:\SteamLibrary\steamapps\common\Dimraeth</GameRoot>` — if your game is installed
+> elsewhere, edit that line before building, or the references will not resolve.
 
 ---
 
@@ -650,11 +650,11 @@ dump to be useful.
 
 | I want to… | Do this |
 |---|---|
-| See if BepInEx is installed | Check `<GAME>\winhttp.dll` and `<GAME>\BepInEx\interop\Assembly-CSharp.dll` |
-| Build one mod | `dotnet build "<GAME>\modding\BepInExModsSource\<Mod>\<Mod>.csproj" -c Release` |
-| Build all mods | `Get-ChildItem "<GAME>\modding\BepInExModsSource" -Recurse -Filter *.csproj \| % { dotnet build $_.FullName -c Release }` |
-| Find where a mod deployed | Check `<GAME>\BepInEx\plugins\<Mod>.dll` timestamp |
-| Read the log | `<GAME>\BepInEx\LogOutput.log` |
-| Change a mod's settings | `<GAME>\BepInEx\config\<ModGuid>.cfg` |
-| Commit a change | From `<GAME>\dimraethmoddings`: `git add -A && git commit -m "..." && git push` |
-| Ask an AI for help | Run `opencode` in `<GAME>` and describe what you want |
+| See if BepInEx is installed | Check `D:\SteamLibrary\steamapps\common\Dimraeth\winhttp.dll` and `D:\SteamLibrary\steamapps\common\Dimraeth\BepInEx\interop\Assembly-CSharp.dll` |
+| Build one mod | `dotnet build "D:\SteamLibrary\steamapps\common\Dimraeth\modding\BepInExModsSource\<Mod>\<Mod>.csproj" -c Release` |
+| Build all mods | `Get-ChildItem "D:\SteamLibrary\steamapps\common\Dimraeth\modding\BepInExModsSource" -Recurse -Filter *.csproj \| % { dotnet build $_.FullName -c Release }` |
+| Find where a mod deployed | Check `D:\SteamLibrary\steamapps\common\Dimraeth\BepInEx\plugins\<Mod>.dll` timestamp |
+| Read the log | `D:\SteamLibrary\steamapps\common\Dimraeth\BepInEx\LogOutput.log` |
+| Change a mod's settings | `D:\SteamLibrary\steamapps\common\Dimraeth\BepInEx\config\<ModGuid>.cfg` |
+| Commit a change | From `D:\SteamLibrary\steamapps\common\Dimraeth\dimraethmoddings`: `git add -A && git commit -m "..." && git push` |
+| Ask an AI for help | Run `opencode` in `D:\SteamLibrary\steamapps\common\Dimraeth` and describe what you want |
