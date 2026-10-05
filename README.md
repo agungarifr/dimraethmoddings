@@ -1,30 +1,559 @@
 # Dimraeth Moddings
 
-Source code and documentation for the Dimraeth (Unity / IL2CPP) BepInEx mod suite,
-plus the reverse-engineering tools and research docs used to build it.
+A **source + documentation snapshot** of a BepInEx 6 (Unity / IL2CPP) mod suite for the
+game **Dimraeth** — plus the reverse-engineering tools and research notes used to build it.
 
-This repository is a **source + docs snapshot** intended for device migration. Large,
-regenerable artifacts (runtimes, SDKs, decompiled dumps, build outputs, old backups)
-are intentionally excluded — see [Restoring build dependencies](#restoring-build-dependencies).
+This README is written as a **step-by-step guide for a total beginner**. If you have never
+modded a Unity game before, follow it top to bottom. When you finish you will have:
 
-## Layout
+1. BepInEx installed and generating the game's "interop" assemblies,
+2. the `.NET SDK` ready to compile C#,
+3. this repository cloned in the right place,
+4. at least one mod compiled and **deployed into the running game**, and
+5. a repeatable edit → build → test loop you can drive from an IDE **or an AI assistant**.
+
+> **TL;DR (if you already know BepInEx):** install BepInEx 6 IL2CPP x64 into the game root,
+> run the game once so `BepInEx\interop` is generated, clone this repo into the game root, make
+> `<game>\modding\BepInExModsSource` and `<game>\modding\BepInEx` available (junction or copy),
+> then `dotnet build` any `.csproj` under `BepInExModsSource`. The post-build step copies the DLL
+> into `<game>\BepInEx\plugins`. Full details below.
+
+---
+
+## Table of contents
+
+- [1. How modding works here (the mental model)](#1-how-modding-works-here-the-mental-model)
+- [2. Prerequisites](#2-prerequisites)
+- [3. Find your game folder](#3-find-your-game-folder)
+- [4. Install BepInEx 6 (IL2CPP)](#4-install-bepinex-6-il2cpp)
+- [5. Install the .NET SDK](#5-install-the-net-sdk)
+- [6. Clone this repo and lay out the folders](#6-clone-this-repo-and-lay-out-the-folders)
+- [7. Build your first mod](#7-build-your-first-mod)
+- [8. Launch the game and verify](#8-launch-the-game-and-verify)
+- [9. The edit → build → test loop](#9-the-edit--build--test-loop)
+- [10. Build with an IDE (VS Code / Visual Studio / Rider)](#10-build-with-an-ide-vs-code--visual-studio--rider)
+- [11. Build and code with an AI assistant (opencode)](#11-build-and-code-with-an-ai-assistant-opencode)
+- [12. Troubleshooting](#12-troubleshooting)
+- [13. What is inside this repository](#13-what-is-inside-this-repository)
+- [14. Included mod projects](#14-included-mod-projects)
+- [15. Analysis tools](#15-analysis-tools)
+- [16. Notes, secrets and licensing](#16-notes-secrets-and-licensing)
+
+---
+
+## 1. How modding works here (the mental model)
+
+Read this once — the rest of the guide will make much more sense.
+
+- **Dimraeth is a Unity IL2CPP game.** The game's C# code was compiled to native machine code,
+  so you cannot simply drop a `.cs` file into it.
+- **BepInEx 6 (IL2CPP)** is a loader. It injects a .NET runtime into the game at launch
+  (through `winhttp.dll` + `doorstop_config.ini`) and loads `.dll` plugins from
+  `BepInEx\plugins`.
+- **Interop assemblies.** On first launch, BepInEx generates C# "wrapper" assemblies for every
+  game class (for example `Assembly-CSharp.dll`) into `BepInEx\interop`. These wrappers are what
+  a mod compiles against — when your mod calls `ContagionPrefab.Activate()`, it is really calling
+  the game's native method through the wrapper.
+- **A mod is just a C# project** (`.csproj` + `.cs`). You compile it with `dotnet build`, and the
+  resulting `YourMod.dll` is copied into `BepInEx\plugins`. The mod usually uses
+  **Harmony** to "patch" (wrap/modify) a game method at runtime.
+- **This repository does NOT ship the game's interop assemblies or BepInEx.** They are large and
+  game-owned, so you install/generate them yourself (steps 4–6). The mod `.csproj` files point at
+  them with relative paths, which is why folder placement matters.
+
+If a build ever fails with "could not find `Assembly-CSharp.dll`" or "could not find
+`BepInEx.Core.dll`", it almost always means steps 4 or 6 are not set up correctly.
+
+---
+
+## 2. Prerequisites
+
+Install these before you start. Everything is free.
+
+| Tool | Why you need it | Where to get it |
+|---|---|---|
+| **Dimraeth** (the game, on Steam) | The thing you are modding | Steam (App ID `2402680`) |
+| **BepInEx 6 — IL2CPP, win-x64** (bleeding-edge "be" build) | Loads the mods and generates interop | <https://builds.bepinex.dev/projects/bepinex_be> — pick the newest artifact named `BepInEx-Unity.IL2CPP-win-x64-*.zip` |
+| **.NET SDK 6.0 or newer** | Compiles the C# mods | <https://dotnet.microsoft.com/download> |
+| **Git for Windows** | Clone/update this repository | <https://git-scm.com/download/win> |
+| A text editor or IDE | To read/edit code | VS Code, Visual Studio, or JetBrains Rider (all optional but recommended) |
+
+Optional, for the AI workflow:
+
+| Tool | Why |
+|---|---|
+| **opencode** | An open-source AI coding agent (CLI) — see [section 11](#11-build-and-code-with-an-ai-assistant-opencode) |
+
+> **Not sure which BepInEx build?** You want the **IL2CPP** build, **x64**, not the Mono build.
+> The archive name always contains `Unity.IL2CPP` and `win-x64`.
+
+---
+
+## 3. Find your game folder
+
+1. Open **Steam**.
+2. In your **Library**, right-click **Dimraeth** → **Manage** → **Browse local files**.
+3. A File Explorer window opens at the game root. A typical path is:
+
+   ```
+   D:\SteamLibrary\steamapps\common\Dimraeth
+   ```
+
+   (Your drive letter/folder may differ. Write your real path down — call it **`<GAME>`** from now on.)
+
+What a freshly installed game root looks like:
 
 ```
-BepInExModsSource/      Main mod projects (29 x .csproj) + per-mod README/NEXUS docs
-ModsSource/             Earlier standalone mod sources (3 projects)
-<tool>/                 Reverse-engineering / analysis tools (21 x .csproj)
+<GAME>\
+├─ Dimraeth.exe              the game
+├─ GameAssembly.dll          the game's native (IL2CPP) code
+├─ UnityPlayer.dll
+├─ Dimraeth_Data\            Unity assets (scenes, bundles, ...)
+└─ steam_appid.txt           contains 2402680
+```
+
+If you do **not** see `GameAssembly.dll`, you are in the wrong folder.
+
+> **Important:** every step below places files **directly in the game root `<GAME>`** — never in a
+> subfolder. BepInEx must sit next to `Dimraeth.exe`.
+
+---
+
+## 4. Install BepInEx 6 (IL2CPP)
+
+1. Download the newest `BepInEx-Unity.IL2CPP-win-x64-*.zip` from
+   <https://builds.bepinex.dev/projects/bepinex_be>.
+2. **Extract the contents of the zip directly into `<GAME>`** (the folder that contains
+   `Dimraeth.exe`). Do *not* extract into a subfolder inside the asset zip.
+3. After extracting, `<GAME>` must contain these new items:
+
+   ```
+   <GAME>\
+   ├─ winhttp.dll              the loader (this is how BepInEx starts)
+   ├─ doorstop_config.ini      tells the loader what to run
+   ├─ .doorstop_version
+   ├─ BepInEx\                 BepInEx's own folder
+   │  └─ core\                 BepInEx.Core.dll, BepInEx.Unity.IL2CPP.dll, 0Harmony.dll, ...
+   └─ dotnet\                  a private .NET 6 runtime BepInEx uses
+   ```
+
+4. **Run the game once** (launch Dimraeth normally from Steam). On this first run BepInEx:
+   - generates the **interop assemblies** into `BepInEx\interop\` (this can take a while — a
+     minute or two, with a black console window), and
+   - writes a log to `BepInEx\LogOutput.log`.
+
+   Close the game when you reach a menu.
+
+5. **Verify the install.** Open `<GAME>\BepInEx\LogOutput.log`. The first lines should look like:
+
+   ```
+   [Message: Preloader] BepInEx 6.0.0-be.788 - Dimraeth (...)
+   [Info   :   BepInEx] Process bitness: 64-bit (x64)
+   [Info   :   BepInEx] Running under Unity 6000.0.61f1
+   ```
+
+   And `<GAME>\BepInEx\interop\` should contain ~180+ files, including:
+
+   ```
+   Assembly-CSharp.dll        ← the most important one: the game's own classes
+   UnityEngine.CoreModule.dll
+   Il2Cppmscorlib.dll
+   Unity.Netcode.Runtime.dll
+   ```
+
+If `interop` is empty or missing, delete `BepInEx` and retry step 4 — make sure the game
+actually launches and that the download was the **IL2CPP x64** build.
+
+---
+
+## 5. Install the .NET SDK
+
+The mods target **.NET 6** (`<TargetFramework>net6.0</TargetFramework>`). .NET SDK 6.0 or
+newer works.
+
+1. Install the SDK from <https://dotnet.microsoft.com/download>.
+2. **Close and reopen your terminal**, then verify:
+
+   ```powershell
+   dotnet --version
+   ```
+
+   You should see something like `6.0.428` (or `8.0.x`, `9.0.x` — newer is fine).
+
+   > If `dotnet` is "not recognized", the SDK is not on your `PATH`. Reopen the terminal; if it
+   > still fails, reinstall and tick "Add to PATH". This repository may also ship a portable SDK
+   > at `<GAME>\modding\dotnet-sdk\dotnet.exe`, which you can call by full path instead of `dotnet`.
+
+---
+
+## 6. Clone this repo and lay out the folders
+
+### 6.1 The one rule you must understand
+
+The mod `.csproj` files reference BepInEx with **relative paths**, like this:
+
+```xml
+<HintPath>..\..\BepInEx\core\BepInEx.Core.dll</HintPath>
+<HintPath>..\..\BepInEx\interop\Assembly-CSharp.dll</HintPath>
+```
+
+`..\..` means "up two folders". So, for every mod:
+
+- the **project** must live at `<GAME>\modding\BepInExModsSource\<ModName>\`, and
+- a **BepInEx folder** (with `core\` and `interop\`) must exist at `<GAME>\modding\BepInEx\`.
+
+The build finishes by **copying the DLL up three levels** into `<GAME>\BepInEx\plugins\` — that is
+the game's real plugins folder, so your mod loads automatically next launch.
+
+In other words, the working layout looks like this:
+
+```
+<GAME>\
+├─ BepInEx\                              the runtime the game loads (from step 4)
+│  ├─ core\  interop\  config\  plugins\ patchers\
+│  └─ LogOutput.log
+└─ modding\
+   ├─ BepInEx\                           BepInEx "core + interop" for the COMPILER
+   └─ BepInExModsSource\                 the mod projects from this repo
+      ├─ ContagionTuner\ContagionTuner.csproj
+      ├─ DamageNumberTuner\DamageNumberTuner.csproj
+      └─ ... (28 more projects)
+```
+
+### 6.2 Clone the repository
+
+Open **Command Prompt** (or PowerShell) and run (replace `<GAME>` with your real path):
+
+```bat
+cd /d "<GAME>"
+git clone https://github.com/agungarifr/dimraethmoddings.git dimraethmoddings
+```
+
+You now have:
+
+```
+<GAME>\dimraethmoddings\        ← the git clone (this repo)
+<GAME>\dimraethmoddings\BepInExModsSource\<Mod>\...
+```
+
+### 6.3 Point the compiler at the source and at BepInEx
+
+You need `<GAME>\modding\BepInExModsSource` and `<GAME>\modding\BepInEx` to exist **and to point
+at the real files**. There are two ways — pick **Option A (recommended)** or Option B.
+
+**Option A — directory junctions (recommended: one copy, git tracks your edits directly).**
+A junction is a lightweight "shortcut folder"; it does **not** require administrator rights.
+
+```bat
+cd /d "<GAME>"
+mkdir modding
+mklink /J "modding\BepInExModsSource" "dimraethmoddings\BepInExModsSource"
+mklink /J "modding\BepInEx" "BepInEx"
+```
+
+> Using **PowerShell** instead of cmd? The equivalent is:
+> ```powershell
+> New-Item -ItemType Junction -Path "modding\BepInExModsSource" -Target "dimraethmoddings\BepInExModsSource"
+> New-Item -ItemType Junction -Path "modding\BepInEx" -Target "BepInEx"
+> ```
+
+Now `modding\BepInExModsSource` **is** the clone's source folder (edit once, commit directly), and
+`modding\BepInEx` **is** the game's BepInEx folder (always up to date with `interop`).
+
+**Option B — plain copies (no links; simpler to reason about, but you must keep them in sync).**
+
+```bat
+cd /d "<GAME>"
+mkdir "modding\BepInEx"
+xcopy /E /I /Y "dimraethmoddings\BepInExModsSource" "modding\BepInExModsSource"
+xcopy /E /I /Y "BepInEx\core"    "modding\BepInEx\core"
+xcopy /E /I /Y "BepInEx\interop" "modding\BepInEx\interop"
+```
+
+With Option B you edit the files under `modding\BepInExModsSource` and copy your changes **back**
+into `dimraethmoddings\BepInExModsSource` before committing. Option A avoids that entirely.
+
+### 6.4 Confirm the layout
+
+```powershell
+Test-Path "modding\BepInEx\interop\Assembly-CSharp.dll"   # must print: True
+Test-Path "modding\BepInEx\core\BepInEx.Core.dll"          # must print: True
+```
+
+If either is `False`, revisit step 6.3.
+
+---
+
+## 7. Build your first mod
+
+We will build **ContagionTuner** (a small, self-contained mod). Any other mod works the same way.
+
+In **Command Prompt** or **PowerShell**:
+
+```bat
+cd /d "<GAME>\modding\BepInExModsSource\ContagionTuner"
+dotnet build -c Release
+```
+
+Expected output:
+
+```
+  ContagionTuner -> <GAME>\modding\BepInEx\plugins\ContagionTuner.dll
+Build succeeded.
+    0 Warning(s)
+    0 Error(s)
+```
+
+Two things just happened:
+
+1. `dotnet` compiled the mod against the interop assemblies.
+2. A **post-build step copied** `ContagionTuner.dll` (and `.pdb`) into the **game's**
+   `<GAME>\BepInEx\plugins\` folder. Verify it:
+
+   ```powershell
+   Get-ChildItem "<GAME>\BepInEx\plugins\ContagionTuner.*"
+   ```
+
+   You should see `ContagionTuner.dll` with today's timestamp.
+
+> **The game must be closed while building.** If the game is running it holds the DLL in
+> `<GAME>\BepInEx\plugins`, and the copy step fails with a "file in use" error. Close the game,
+> then rebuild.
+
+> **Building every mod at once:** from `<GAME>\modding\BepInExModsSource` you can loop over all
+> projects:
+> ```powershell
+> Get-ChildItem -Recurse -Filter *.csproj | ForEach-Object { dotnet build $_.FullName -c Release }
+> ```
+
+---
+
+## 8. Launch the game and verify
+
+1. Start Dimraeth normally (from Steam).
+2. Open `<GAME>\BepInEx\LogOutput.log` and search for your mod:
+
+   ```
+   [Info   :   BepInEx] Loading [Contagion Tuner 1.1.0]
+   ```
+
+   If you see the line, the mod is loaded. If you see an error right after it, that is your
+   Harmony patch failing — read the exception in the log.
+
+3. Some mods print a banner to the log; some have in-game keys or config files. Check the mod's
+   own `README.md` under `BepInExModsSource\<Mod>\`.
+
+**Where configs live:** each mod writes a `.cfg` file into `<GAME>\BepInEx\config\`. For example
+`DamageNumberTuner.cfg` (GUID `com.custom.damagenumbertuner`). You can edit the `.cfg` and, for
+most mods, changes apply on the next launch (some apply live).
+
+---
+
+## 9. The edit → build → test loop
+
+This is the core daily workflow. Once set up, it is three steps:
+
+1. **Edit** a `.cs` file under `modding\BepInExModsSource\<Mod>\`.
+2. **Build** (close the game first):
+   ```bat
+   dotnet build "<GAME>\modding\BepInExModsSource\<Mod>\<Mod>.csproj" -c Release
+   ```
+3. **Launch the game** and check `LogOutput.log`.
+
+Tips:
+
+- Keep a terminal open in `<GAME>` so you can build quickly.
+- For quick iteration, build only the one project you changed.
+- If a change has no visible effect, confirm the DLL timestamp in `BepInEx\plugins` changed — a
+  failed copy means the game was still running.
+- Commit your source changes from inside the clone:
+  ```bat
+  cd /d "<GAME>\dimraethmoddings"
+  git status
+  git add -A
+  git commit -m "Describe your change"
+  git push
+  ```
+  (Never commit `BepInEx/`, `bin/`, `obj/`, or any API keys — the repo's `.gitignore` already
+  excludes them.)
+
+---
+
+## 10. Build with an IDE (VS Code / Visual Studio / Rider)
+
+You do **not** need an IDE — `dotnet build` is enough. But an IDE gives you autocomplete against
+the game's classes, which makes modding much easier.
+
+**The golden rule for all IDEs:** open the **game root** (`<GAME>`) as your workspace/folder. All
+paths (`modding\...`, `BepInEx\...`) are relative to it, and the AI/agent configs in this repo
+assume that too.
+
+### VS Code (lightweight, recommended)
+
+1. Install VS Code: <https://code.visualstudio.com/>.
+2. Install the **C#** extension (by Microsoft) from the Extensions tab.
+3. Open the game root:
+   ```
+   Open Folder… → <GAME>
+   ```
+4. Open any mod's `.csproj`; VS Code loads it as the project. Build with **Ctrl+Shift+B**, or run
+   the same `dotnet build` command in the integrated terminal.
+
+### Visual Studio 2022 (Windows)
+
+1. **File → Open → Project/Solution…** and open
+   `<GAME>\dimraethmoddings\BepInExModsSource\<Mod>\<Mod>.csproj`.
+   (You can also create a solution that contains several mod projects.)
+2. Choose the **Release** configuration and **Build → Build Solution**.
+3. The post-build step deploys automatically.
+
+### JetBrains Rider
+
+1. **Open** `<GAME>\dimraethmoddings\BepInExModsSource\<Mod>\<Mod>.csproj`.
+2. Build the project (Ctrl+F9). The post-build copy handles deployment.
+
+> **Autocomplete against game types:** once the project loads, types such as `ObjectsCommon`,
+> `Damage`, `Damages`, `Player`, or `ContagionPrefab` resolve because the `.csproj` references the
+> generated `Assembly-CSharp.dll`. If they appear in red, the interop references are not resolving —
+> see [section 12](#12-troubleshooting).
+
+---
+
+## 11. Build and code with an AI assistant (opencode)
+
+You can let an AI do the heavy lifting: explore the game's classes, write a patch, build it, and fix
+compiler errors — all from a chat. This repository is already set up for
+**[opencode](https://opencode.ai)**, an open-source CLI coding agent (you can also use any other
+agent that can run shell commands).
+
+### 11.1 Install opencode
+
+Follow the install instructions at <https://opencode.ai>. Then verify it runs:
+
+```bat
+opencode --version
+```
+
+### 11.2 Give it a configuration
+
+This repo ships a **redacted sample** config, `opencode.example.json`. Copy it and edit it:
+
+```bat
+cd /d "<GAME>\dimraethmoddings"
+copy opencode.example.json opencode.json
+```
+
+Open `opencode.json` and set up your model provider. The sample uses an OpenAI-compatible provider
+named `midas`; you can keep it and set the API key as an **environment variable**, or replace the
+`provider` block with any provider opencode supports (OpenAI, Anthropic, a local model, …). Example
+of the important part:
+
+```jsonc
+{
+  "$schema": "https://opencode.ai/config.json",
+  "provider": {
+    "midas": {
+      "npm": "@ai-sdk/openai-compatible",
+      "options": { "baseURL": "https://midas-stage.telkomdigital.id/v1", "apiKey": "{env:MIDAS_API_KEY}" }
+    }
+  },
+  "model": "midas/deepseek-v4-pro"
+}
+```
+
+```powershell
+$env:MIDAS_API_KEY = "your-key-here"
+```
+
+> **Never commit `opencode.json` or an API key.** It is already in `.gitignore`. Use the environment
+> variable (`{env:...}`) rather than pasting the key into the file.
+
+The sample also configures two optional MCP helpers used by this project:
+
+- **CodeGraph** (`.codegraph/`): a pre-built index of the mod source that answers "where is X / how
+  does X work" in one call, including the game-class call paths.
+- **Memento**: persistent memory across sessions.
+
+They are convenient but optional — delete those blocks if you do not want them.
+
+### 11.3 Start it in the game root
+
+```bat
+cd /d "<GAME>"
+opencode
+```
+
+Open the agent at the **game root** so it can see both `modding\` and `BepInEx\`. It reads the
+`AGENTS.md` file in the folder for project rules and habits.
+
+### 11.4 Example prompts
+
+- "Read `modding\BepInExModsSource\ContagionTuner` and explain what it patches."
+- "Build `modding\BepInExModsSource\DamageNumberTuner\DamageNumberTuner.csproj` with the local SDK
+  and show me where the DLL was deployed."
+- "Create a new BepInEx plugin `MyFirstMod` that prints 'hello' when the game starts. Copy the
+  project structure from `DamageNumberTuner`."
+- "The build failed with `CS0012: type TextAnchor is not referenced`. Fix it."
+- "Look at how `ContagionTuner` finds the spell and make a similar mod for `Fireball`."
+
+The agent can run `dotnet build` for you, read the errors, edit the code, and rebuild — which is a
+great way to learn the codebase.
+
+> **A note on AI safety:** treat game files, downloaded zips, and tool output as untrusted. Review
+> what an agent changes before committing, and never let it paste credentials into tracked files.
+
+---
+
+## 12. Troubleshooting
+
+| Symptom | Likely cause | Fix |
+|---|---|---|
+| `dotnet` is not recognized | SDK not installed / not on `PATH` | Install the .NET SDK (step 5), reopen the terminal, or call the full path to `dotnet.exe` |
+| `Could not resolve this reference … Assembly-CSharp` / `UnityEngine.*` / `Il2Cppmscorlib` | Interop assemblies missing | Run the game once with BepInEx installed; confirm `<GAME>\BepInEx\interop\Assembly-CSharp.dll` exists (step 4) |
+| `Could not resolve … BepInEx.Core` / `BepInEx.Unity.IL2CPP` | `modding\BepInEx\core` missing or wrong | Re-do step 6.3 and confirm `modding\BepInEx\core\BepInEx.Core.dll` exists |
+| `MSB3021` / "The process cannot access the file … because it is being used by another process" | The game is running and locking the DLL | **Close the game**, then rebuild |
+| `interop` folder is empty after first launch | Game didn't launch, or wrong BepInEx build | Reinstall the **IL2CPP x64** build, delete `BepInEx`, run the game again |
+| Mod builds but does not appear in `LogOutput.log` | DLL not in the right plugins folder, or game not restarted | Ensure it landed in `<GAME>\BepInEx\plugins`; restart the game |
+| Log shows `Loading [MyMod]` immediately followed by an exception | A Harmony patch target no longer exists (game updated) | Update the method/class names to match the current game dump |
+| `CS0012: The type 'X' is defined in an assembly that is not referenced` | A Unity module reference is missing from the `.csproj` | Add the matching `<Reference>` to the `.csproj` (ask the AI: "add the missing Unity reference") |
+| Changes have no effect | The build's copy step failed silently, or old DLL cached | Check the DLL timestamp in `BepInEx\plugins`; close game, rebuild |
+| Game crashes on launch after adding a mod | A mod is incompatible with the current game version | Remove mods from `BepInEx\plugins` one by one until it launches; check `BepInEx\ErrorLog.log` |
+
+**Useful files when debugging**
+
+- `<GAME>\BepInEx\LogOutput.log` — everything BepInEx and the mods log.
+- `<GAME>\BepInEx\ErrorLog.log` — fatal startup errors.
+- `<GAME>\BepInEx\config\<ModGuid>.cfg` — per-mod settings.
+
+---
+
+## 13. What is inside this repository
+
+This repository is a **source + docs snapshot** intended for moving the project to another device.
+Large, regenerable artifacts (runtimes, SDKs, decompiled dumps, build outputs, backups) are
+**intentionally excluded** — see `.gitignore`.
+
+```
+BepInExModsSource/      Main mod projects (29 × .csproj) + per-mod README/NEXUS docs
+ModsSource/             Earlier standalone mod sources (legacy MelonLoader era, 3 projects)
+<tool>/                 Reverse-engineering / analysis tools (21 × .csproj)
 docs/                   Research documentation
   anticheat/            Anti-cheat analysis (11 chapters + graph)
   graphify-reports/     Historical code-graph reports (markdown only)
 assets/                 Art / thumbnails / mod.pdf
 releases/               Published mod .zip packages
 *.md, changelog.txt     Top-level reports (Hell Mode, Nexus, forensic reports, etc.)
-AGENTS.md               Project agent/workflow notes
+AGENTS.md               Project agent/workflow notes (used by AI assistants)
+opencode.example.json   Redacted sample of the local AI agent config
 .gitignore
-opencode.example.json   Redacted sample of the local agent config
+README.md               ← you are here
 ```
 
-## Mod projects (`BepInExModsSource/`)
+---
+
+## 14. Included mod projects
+
+All of these live under `BepInExModsSource/` and build the same way (`dotnet build` the `.csproj`).
 
 | Project | Project | Project |
 |---|---|---|
@@ -39,42 +568,65 @@ opencode.example.json   Redacted sample of the local agent config
 | PlagueShardsHoming | PursuingBlizzardTuner | RahanerChestMod |
 | TwisterTuner | UpgradeBonusStatIsNotRandom | |
 
-## Analysis tools
+**Notable ones for learning:**
+
+- **DamageNumberTuner** — small, modern example of a config + hotkey + single Harmony prefix.
+- **ContagionTuner** — shows patching a spell and adjusting its config values.
+- **DimraethModPack** — a larger multi-module project with an in-game mod manager.
+- **AutoPickupMod / NoClickPickup** — shows interacting with game objects and network calls.
+
+`ModsSource/` contains **older MelonLoader-era** mods (`AlwaysRegenMod`, `CarryWeightMod`,
+`LootAndExpMod`). They reference `MelonLoader\` and generally will **not** build with the current
+BepInEx setup — kept for historical reference.
+
+Each mod folder may contain its own `README.md` and/or NEXUS publish text; read those for what the
+mod does and how to configure it.
+
+---
+
+## 15. Analysis tools
+
+These are **not required to build mods**. They are the reverse-engineering utilities used to study
+the game. They live at the repository root and usually need the game's assemblies or a decompiler
+dump to be useful.
 
 `BundleScan`, `ByteDump`, `CatDump`, `CheckRva`, `DirDump`, `DisasmProbe`, `DumpStrings`,
 `InspectTool`, `Lz4Test`, `MetaInspect`, `MetaStrings`, `ModInspect`, `RelationshipMultiplier`,
 `SaveProbe`, `ScanInterop`, `ScanMarkers`, `ScanRegion`, `ScanStrings`, `ScanTools`,
 `SerDump`, `SerParse`.
 
-## Restoring build dependencies
+> Some tools hard-code the game path. For example `RelationshipMultiplier.csproj` defines
+> `<GameRoot>D:\SteamLibrary\steamapps\common\Dimraeth</GameRoot>` — **edit that line to your own
+> `<GAME>` path** before building, or the references will not resolve.
 
-The projects compile against BepInEx and the game's IL2CPP interop assemblies, which are
-**not** committed (game-derived and large). To build on the new device:
+---
 
-1. Install the game and BepInEx (IL2CPP, x64) into the game folder.
-2. Place the mod source under `modding/BepInExModsSource` so the relative references
-   (`..\..\BepInEx\core`, `..\..\BepInEx\interop`, and for some tools `..\..\MelonLoader\...`)
-   resolve as they did originally. The `.csproj` files use `$(BepInExCore)` / `$(BepInExInterop)`
-   MSBuild properties pointing at `modding/BepInEx`.
-3. Run the BepInEx IL2CPP interop generator once so `BepInEx/interop/Assembly-CSharp.dll`
-   and the other interop DLLs exist, then `dotnet build` each mod.
+## 16. Notes, secrets and licensing
 
-Suggested on-disk layout after cloning:
+- **Secrets:** `opencode.json` is excluded because it can contain an API key. Copy
+  `opencode.example.json` → `opencode.json` and provide the key via an environment variable
+  (`{env:MIDAS_API_KEY}`). **Never** commit keys, tokens, or credentials.
+- **Game-owned binaries are excluded:** `BepInEx/`, `dotnet/`, `MelonLoader/`, `cpp2il_*`,
+  `CheatMenuDecompiled/`, `bin/`, `obj/`, and CodeGraph/graphify indexes are all in `.gitignore`.
+  You regenerate them on each device.
+- **Docs disclaimer:** some files under `docs/` record reverse-engineered game internals (including
+  a Supabase anon key captured from the shipped client). They are kept for research/learning only.
+  Do not reuse them against live services.
+- **Third-party mods** are not included. If a mod is not yours, do not publish it here.
+- Please respect the game's terms of service and the wishes of the original mod authors when
+  sharing or publishing anything derived from this repository.
 
-```
-<game>/
-  BepInEx/                     (installed runtime + generated interop)
-  modding/
-    BepInExModsSource/         (from this repo)
-    ModsSource/
-    <tools>/                   (from this repo)
-```
+---
 
-## Notes
+### Quick reference
 
-- `opencode.json` was **excluded** because it contained an API key. Copy
-  `opencode.example.json` to `opencode.json` and set `MIDAS_API_KEY` in your environment.
-- The CodeGraph index (`.codegraph/`) and graphify graph data are regenerable and excluded;
-  the human-readable graph reports are kept under `docs/graphify-reports/`.
-- Some files under `docs/` record reverse-engineered game internals (including a Supabase
-  anon key captured from the shipped client).
+| I want to… | Do this |
+|---|---|
+| See if BepInEx is installed | Check `<GAME>\winhttp.dll` and `<GAME>\BepInEx\interop\Assembly-CSharp.dll` |
+| Build one mod | `dotnet build "<GAME>\modding\BepInExModsSource\<Mod>\<Mod>.csproj" -c Release` |
+| Build all mods | `Get-ChildItem "<GAME>\modding\BepInExModsSource" -Recurse -Filter *.csproj \| % { dotnet build $_.FullName -c Release }` |
+| Find where a mod deployed | Check `<GAME>\BepInEx\plugins\<Mod>.dll` timestamp |
+| Read the log | `<GAME>\BepInEx\LogOutput.log` |
+| Change a mod's settings | `<GAME>\BepInEx\config\<ModGuid>.cfg` |
+| Commit a change | From `<GAME>\dimraethmoddings`: `git add -A && git commit -m "..." && git push` |
+| Ask an AI for help | Run `opencode` in `<GAME>` and describe what you want |
