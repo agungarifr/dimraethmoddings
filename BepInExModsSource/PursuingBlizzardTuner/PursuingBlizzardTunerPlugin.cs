@@ -11,9 +11,15 @@ namespace PursuingBlizzardTuner
 {
     /// <summary>
     /// BepInEx 6 (IL2CPP) plugin that tunes the Pursuing Blizzard upgrade for the Blizzard spell:
-    ///   * Area of Effect: Increased by +35% (scale 1.35x) instead of vanilla -20% penalty (scale 0.80x).
+    /// [2026-10-06] Retuned: area 1.75x, 12 ticks @ 0.5s over a 6.0s lifetime, per-tick damage x0.90.
+    // [2026-10-06] Previous tuning kept for reference (obsolete): +35% area (1.35x), 8 ticks, 3.85s, vanilla damage.
+    //   * Area of Effect: Increased by +35% (scale 1.35x) instead of vanilla -20% penalty (scale 0.80x).
+    //   * Tick Interval: Damage ticks every 0.5 seconds (half-second) instead of vanilla 1.0 second.
+    //   * Total Ticks: Fixed to exactly 8 damage ticks.
+    ///   * Area of Effect: Increased by +75% (scale 1.75x) instead of vanilla -20% penalty (scale 0.80x).
     ///   * Tick Interval: Damage ticks every 0.5 seconds (half-second) instead of vanilla 1.0 second.
-    ///   * Total Ticks: Fixed to exactly 8 damage ticks.
+    ///   * Total Ticks: Fixed to exactly 12 damage ticks over a 6.0 second lifetime.
+    ///   * Damage Per Tick: Reduced by 10% (x0.90) versus vanilla per-tick damage.
     ///   * Black Hole Suction: Drags all enemies inside the blizzard toward its center using the game's own
     ///     <c>BaseSpellLibrary.DashTargetToPosition</c> (the exact primitive Black Hole uses) on cast and on every
     ///     tick - a 2-per-second yank. Mirrors the Contagion Tuner suction (docs/BlackHole_Dragging_Mechanism.md).
@@ -25,7 +31,7 @@ namespace PursuingBlizzardTuner
     {
         public const string GUID = "com.custom.pursuingblizzardtuner";
         public const string NAME = "Pursuing Blizzard Tuner";
-        public const string VERSION = "1.1.0";
+        public const string VERSION = "1.2.0";
 
         internal static new ManualLogSource Log;
         internal static PursuingBlizzardTunerPlugin Instance;
@@ -34,6 +40,14 @@ namespace PursuingBlizzardTuner
         public static ConfigEntry<float> AreaMultiplier;
         public static ConfigEntry<float> TickInterval;
         public static ConfigEntry<int> TotalTicks;
+        public static ConfigEntry<float> DamageMultiplier;
+
+        // [2026-10-06] VFX tuning: scale World-space particle sizes to match the larger area, and extend the
+        // persistent storm/spike systems so the visuals cover the full spell lifetime.
+        public static ConfigEntry<bool> ScaleVfxParticles;
+        public static ConfigEntry<bool> MatchVfxLifetime;
+        public static ConfigEntry<bool> LogVfxTuning;
+
         public static ConfigEntry<bool> DiagnosticLogging;
 
         // Black Hole style suction configuration (mirrors ContagionTuner).
@@ -50,6 +64,12 @@ namespace PursuingBlizzardTuner
         internal static int MaxTimeAliveOffset = 0x1C8;
         internal static int TimeAliveOffset = 0x1CC;
         internal static int OneSecondCounterOffset = 0x1D0;
+        internal static int DamageMultiplierOffset = 0x344; // BlizzardPrefab._damageMultiplier
+        // [2026-10-06] Persistent VFX roots on BlizzardPrefab (children of the spell transform).
+        internal static int StormVfxOffset = 0x2E8;        // _stormVFX
+        internal static int SpikesVfxOffset = 0x2F0;       // _spikesVFX
+        internal static int OBlizzardOffset = 0x300;       // _o_blizzard
+        internal static int OSoftBlizzardOffset = 0x308;   // _o_softBlizzard
 
         public override void Load()
         {
@@ -59,14 +79,30 @@ namespace PursuingBlizzardTuner
             Enabled = Config.Bind("General", "Enabled", true,
                 "Master switch. When false, Pursuing Blizzard uses vanilla values. (Default: true)");
 
-            AreaMultiplier = Config.Bind("PursuingBlizzard", "AreaMultiplier", 1.35f,
-                "Target area/scale multiplier for Pursuing Blizzard relative to base Blizzard (1.35 = +35% area instead of vanilla 0.80 = -20% area). (Default: 1.35)");
+            AreaMultiplier = Config.Bind("PursuingBlizzard", "AreaMultiplier", 1.75f,
+                "Target area/scale multiplier for Pursuing Blizzard relative to base Blizzard (1.75 = +75% area instead of vanilla 0.80 = -20% area). (Default: 1.75)");
 
             TickInterval = Config.Bind("PursuingBlizzard", "TickInterval", 0.5f,
                 "Seconds between damage pulses/ticks for Pursuing Blizzard. (Default: 0.5)");
 
-            TotalTicks = Config.Bind("PursuingBlizzard", "TotalTicks", 8,
-                "Total number of damage pulses/ticks for Pursuing Blizzard. (Default: 8)");
+            TotalTicks = Config.Bind("PursuingBlizzard", "TotalTicks", 12,
+                "Total number of damage pulses/ticks for Pursuing Blizzard. (Default: 12)");
+
+            DamageMultiplier = Config.Bind("PursuingBlizzard", "DamageMultiplier", 0.90f,
+                "Multiplier applied to Pursuing Blizzard's per-tick damage. 1.0 = vanilla per-tick damage; " +
+                "0.9 = 10% less damage per tick. (Default: 0.90)");
+
+            // [2026-10-06] VFX tuning binds.
+            ScaleVfxParticles = Config.Bind("Vfx", "ScaleVfxParticles", true,
+                "If true, set the storm/spike particle systems to Hierarchy scaling so particle sizes follow the " +
+                "enlarged spell transform (Local scaling ignores parent scale). (Default: true)");
+
+            MatchVfxLifetime = Config.Bind("Vfx", "MatchVfxLifetime", true,
+                "If true, enable looping on the persistent storm/spike VFX so they keep emitting for the full spell " +
+                "lifetime (12 ticks @ 0.5s = 6.0s). (Default: true)");
+
+            LogVfxTuning = Config.Bind("Vfx", "LogVfxTuning", true,
+                "Log how many particle systems were resized/lifetime-extended. Temporary recon. (Default: true)");
 
             DiagnosticLogging = Config.Bind("Diagnostics", "DiagnosticLogging", false,
                 "Log Pursuing Blizzard scale, tick pulses, and lifetime events to the BepInEx console. (Default: false)");
@@ -105,9 +141,11 @@ namespace PursuingBlizzardTuner
             Log.LogInfo("=================================================");
             Log.LogInfo($"{NAME} v{VERSION} loaded.");
             Log.LogInfo($"Enabled: {Enabled.Value}");
-            Log.LogInfo($"AreaMultiplier: {AreaMultiplier.Value} (+35% AoE)");
+            Log.LogInfo($"AreaMultiplier: {AreaMultiplier.Value} (x{AreaMultiplier.Value / 0.80f:F3} vs vanilla pursuing 0.80)");
             Log.LogInfo($"TickInterval: {TickInterval.Value}s (half-second ticks)");
-            Log.LogInfo($"TotalTicks: {TotalTicks.Value}");
+            Log.LogInfo($"TotalTicks: {TotalTicks.Value} (lifetime {TotalTicks.Value * TickInterval.Value:F2}s)");
+            Log.LogInfo($"DamageMultiplier: x{DamageMultiplier.Value} per tick");
+            Log.LogInfo($"Vfx: scaleParticles={ScaleVfxParticles.Value}, matchLifetime={MatchVfxLifetime.Value}, log={LogVfxTuning.Value}");
             Log.LogInfo($"BlackHoleSuction: {SuctionEnabled.Value} (activate={SuctionOnActivate.Value}, tick={SuctionOnTick.Value}, radiusX{SuctionRadiusMultiplier.Value}, distX{SuctionDistanceMultiplier.Value}, dashTime={SuctionDashTime.Value}s)");
             Log.LogInfo("=================================================");
         }
@@ -121,6 +159,11 @@ namespace PursuingBlizzardTuner
                 {
                     PursuingBlizzardOffset = GetFieldOffset(bpClass, "_pursuingBlizzard", 0x338);
                     PulseCountOffset = GetFieldOffset(bpClass, "_pulseCount", 0x368);
+                    DamageMultiplierOffset = GetFieldOffset(bpClass, "_damageMultiplier", 0x344);
+                    StormVfxOffset = GetFieldOffset(bpClass, "_stormVFX", 0x2E8);
+                    SpikesVfxOffset = GetFieldOffset(bpClass, "_spikesVFX", 0x2F0);
+                    OBlizzardOffset = GetFieldOffset(bpClass, "_o_blizzard", 0x300);
+                    OSoftBlizzardOffset = GetFieldOffset(bpClass, "_o_softBlizzard", 0x308);
                 }
 
                 var bslClass = Il2CppClassPointerStore<BaseSpellLibrary>.NativeClassPtr;
@@ -133,7 +176,7 @@ namespace PursuingBlizzardTuner
 
                 if (DiagnosticLogging.Value)
                 {
-                    Log.LogInfo($"[Offsets] _pursuingBlizzard=0x{PursuingBlizzardOffset:X}, _pulseCount=0x{PulseCountOffset:X}, _maxTimeAlive=0x{MaxTimeAliveOffset:X}, _timealive=0x{TimeAliveOffset:X}, _oneSecondCounter=0x{OneSecondCounterOffset:X}");
+                    Log.LogInfo($"[Offsets] _pursuingBlizzard=0x{PursuingBlizzardOffset:X}, _pulseCount=0x{PulseCountOffset:X}, _damageMultiplier=0x{DamageMultiplierOffset:X}, _maxTimeAlive=0x{MaxTimeAliveOffset:X}, _timealive=0x{TimeAliveOffset:X}, _oneSecondCounter=0x{OneSecondCounterOffset:X}, _stormVFX=0x{StormVfxOffset:X}, _spikesVFX=0x{SpikesVfxOffset:X}, _o_blizzard=0x{OBlizzardOffset:X}, _o_softBlizzard=0x{OSoftBlizzardOffset:X}");
                 }
             }
             catch (Exception ex)
@@ -221,6 +264,87 @@ namespace PursuingBlizzardTuner
             }
         }
 
+        /// <summary>
+        /// [2026-10-06] VFX tuning for the retuned Pursuing Blizzard. The IL2CPP interop exposes
+        /// MainModule.duration as read-only and startSize as write-only, so we use the two settable levers:
+        ///   * Scale: set the particle systems to ParticleSystemScalingMode.Hierarchy so particle sizes follow the
+        ///     enlarged spell transform (Local scaling ignores parent scale, which is why the storm looked small).
+        ///   * Lifetime: enable looping on the persistent storm/spike VFX roots so they keep emitting for the whole
+        ///     spell lifetime. The per-tick blast bursts (_blastShards / _blastMist) are intentionally untouched.
+        /// </summary>
+        public static unsafe void ApplyVfxTuning(BlizzardPrefab bp, float areaRatio, float lifetime)
+        {
+            if (!Enabled.Value) return;
+            if (bp == null || bp.Pointer == IntPtr.Zero) return;
+
+            int scaled = 0;
+            int looped = 0;
+
+            try
+            {
+                // --- Scale: Hierarchy scaling makes particle size follow the (enlarged) spell transform. ---
+                if (ScaleVfxParticles.Value)
+                {
+                    var all = bp.GetComponentsInChildren<ParticleSystem>(true);
+                    if (all != null)
+                    {
+                        foreach (var ps in all)
+                        {
+                            if (ps == null) continue;
+                            try
+                            {
+                                var main = ps.main;
+                                main.scalingMode = ParticleSystemScalingMode.Hierarchy;
+                                scaled++;
+                            }
+                            catch { /* one bad system should not abort the rest */ }
+                        }
+                    }
+                }
+
+                // --- Lifetime: persistent storm/spike VFX roots only. ---
+                if (MatchVfxLifetime.Value)
+                {
+                    byte* ptr = (byte*)bp.Pointer;
+                    int[] rootOffsets = { StormVfxOffset, SpikesVfxOffset, OBlizzardOffset, OSoftBlizzardOffset };
+                    foreach (int off in rootOffsets)
+                    {
+                        IntPtr goPtr = *(IntPtr*)(ptr + off);
+                        if (goPtr == IntPtr.Zero) continue;
+
+                        var go = new GameObject(goPtr);
+                        if (go == null) continue;
+
+                        var systems = go.GetComponentsInChildren<ParticleSystem>(true);
+                        if (systems == null) continue;
+                        foreach (var ps in systems)
+                        {
+                            if (ps == null) continue;
+                            try
+                            {
+                                var main = ps.main;
+                                if (!main.loop)
+                                {
+                                    main.loop = true;
+                                    looped++;
+                                }
+                            }
+                            catch { /* one bad system should not abort the rest */ }
+                        }
+                    }
+                }
+
+                if (LogVfxTuning.Value && (scaled > 0 || looped > 0))
+                {
+                    Log.LogInfo($"[BlizzardVfx] set {scaled} system(s) to Hierarchy scaling (area x{areaRatio:F2}); set {looped} persistent system(s) to loop for the {lifetime:F2}s lifetime");
+                }
+            }
+            catch (Exception ex)
+            {
+                Log?.LogError($"[ApplyVfxTuning] {ex}");
+            }
+        }
+
         private static void PatchOrLog(Harmony harmony, Type patchType)
         {
             try
@@ -238,7 +362,10 @@ namespace PursuingBlizzardTuner
     /// <summary>
     /// Postfix on BlizzardPrefab.ApplyScaleAndDamageModifiers.
     /// Vanilla applies a -20% scale reduction (0.80x) when _pursuingBlizzard > 0.
-    /// We rescale the transform to +35% (1.35x) and calculate the appropriate spell lifetime for 8 ticks @ 0.5s.
+    /// [2026-10-06] Retuned: rescale the transform to AreaMultiplier (default 1.75x = +75%), set lifetime for
+    /// TotalTicks @ TickInterval (default 12 @ 0.5s = 6.0s), scale per-tick damage by DamageMultiplier (default 0.90),
+    /// and scale/extend the storm VFX to match.
+    // [2026-10-06] Previous behaviour kept for reference (obsolete): transform 1.35x (+35%) and 8 ticks @ 0.5s (3.85s), vanilla damage.
     /// </summary>
     [HarmonyPatch(typeof(BlizzardPrefab), "ApplyScaleAndDamageModifiers")]
     public static class Patch_BlizzardPrefab_ApplyScaleAndDamageModifiers
@@ -255,19 +382,32 @@ namespace PursuingBlizzardTuner
                 if (pursuing <= 0) return; // Vanilla Blizzard without Pursuing upgrade is untouched
 
                 // Vanilla applied scale factor 0.80f (-20%).
-                // We want target scale 1.35f (+35%).
-                // Ratio to convert from 0.80x to 1.35x: 1.35 / 0.80 = 1.6875.
+                // We want target scale = AreaMultiplier (default 1.75 => +75%).
+                // Ratio to convert from the vanilla 0.80x to the target: AreaMultiplier / 0.80.
                 float scaleAdjustment = PursuingBlizzardTunerPlugin.AreaMultiplier.Value / 0.80f;
                 Vector3 currentScale = __instance.transform.localScale;
                 Vector3 newScale = currentScale * scaleAdjustment;
                 __instance.transform.localScale = newScale;
 
                 // Adjust _maxTimeAlive so the spell lifecycle supports exactly TotalTicks @ TickInterval.
-                // 8 ticks at 0.5s: Tick 1 at t=0.0s, Tick 8 at t=3.5s.
-                // Allow a small buffer (0.35s) after Tick 8 for smooth audio/VFX dissipation before despawn (3.85s total).
-                float targetDuration = (PursuingBlizzardTunerPlugin.TotalTicks.Value - 1) * PursuingBlizzardTunerPlugin.TickInterval.Value + 0.35f;
+                // OnStart seeds _oneSecondCounter = 1.0f, so Tick 1 fires on the first Update; then every
+                // TickInterval. Last tick is at (TotalTicks - 1) * TickInterval, and TotalTicks * TickInterval
+                // gives that span plus one interval of tail before despawn.
+                // [2026-10-06] Replaced the old formula (kept for reference):
+                //   float targetDuration = (TotalTicks - 1) * TickInterval + 0.35f;   // 8 ticks @ 0.5s => 3.85s
+                float targetDuration = PursuingBlizzardTunerPlugin.TotalTicks.Value * PursuingBlizzardTunerPlugin.TickInterval.Value;
                 float* pMaxTime = (float*)(ptr + PursuingBlizzardTunerPlugin.MaxTimeAliveOffset);
                 *pMaxTime = targetDuration;
+
+                // [2026-10-06] Per-tick damage tuning: multiply the vanilla _damageMultiplier by DamageMultiplier.
+                if (PursuingBlizzardTunerPlugin.DamageMultiplier.Value != 1.0f)
+                {
+                    float* pDamage = (float*)(ptr + PursuingBlizzardTunerPlugin.DamageMultiplierOffset);
+                    *pDamage *= PursuingBlizzardTunerPlugin.DamageMultiplier.Value;
+                }
+
+                // [2026-10-06] Scale + lifetime tuning for the storm/spike VFX.
+                PursuingBlizzardTunerPlugin.ApplyVfxTuning(__instance, PursuingBlizzardTunerPlugin.AreaMultiplier.Value, targetDuration);
 
                 // [2026-10-06] Black Hole style suction on cast, via the game's own DashTargetToPosition.
                 if (PursuingBlizzardTunerPlugin.SuctionOnActivate.Value)
@@ -279,7 +419,8 @@ namespace PursuingBlizzardTuner
                 {
                     PursuingBlizzardTunerPlugin.Log.LogInfo(
                         $"[PursuingBlizzard] Scale adjusted from {currentScale.x:F3} to {newScale.x:F3} (x{scaleAdjustment:F3}). " +
-                        $"MaxTimeAlive set to {targetDuration:F2}s for {PursuingBlizzardTunerPlugin.TotalTicks.Value} ticks @ {PursuingBlizzardTunerPlugin.TickInterval.Value:F2}s.");
+                        $"MaxTimeAlive set to {targetDuration:F2}s for {PursuingBlizzardTunerPlugin.TotalTicks.Value} ticks @ {PursuingBlizzardTunerPlugin.TickInterval.Value:F2}s. " +
+                        $"DamageMultiplier x{PursuingBlizzardTunerPlugin.DamageMultiplier.Value}.");
                 }
             }
             catch (Exception ex)
@@ -293,7 +434,7 @@ namespace PursuingBlizzardTuner
     /// Prefix on BlizzardPrefab.Update.
     /// Controls tick pacing and enforces the exact tick cap:
     ///   * When _oneSecondCounter reaches 0.5s, it sets it to 1.0s so BaseSpell.OneSecondUpdate triggers On1SecondUpdate().
-    ///   * When _pulseCount reaches TotalTicks (8), clamps timer to 0 so no further pulses fire before despawn.
+    ///   * When _pulseCount reaches TotalTicks, clamps timer to 0 so no further pulses fire before despawn.
     /// </summary>
     [HarmonyPatch(typeof(BlizzardPrefab), "Update")]
     public static class Patch_BlizzardPrefab_Update
@@ -316,7 +457,7 @@ namespace PursuingBlizzardTuner
 
                 if (pulses >= maxTicks)
                 {
-                    // Exactly 8 ticks have fired. Clamp counter to 0 so no 9th pulse can trigger while waiting to despawn.
+                    // Exactly TotalTicks have fired. Clamp counter to 0 so no extra pulse can trigger while waiting to despawn.
                     if (*pCounter >= PursuingBlizzardTunerPlugin.TickInterval.Value)
                     {
                         *pCounter = 0f;
