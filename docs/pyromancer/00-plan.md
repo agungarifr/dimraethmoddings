@@ -141,3 +141,15 @@ New standalone plugin with four independent, config-gated patch groups.
 - `modding/cpp2il_new_isil/IsilDump/Assembly-CSharp/`: `BaseSpellLibrary.txt`, `BlizzardPrefab.txt`, `FrostJavelinPrefab.txt`, `InfernoPrefab.txt`, `FireballPrefab.txt`.
 - `BepInExModsSource/FireballTuner/FireballTunerPlugin.cs` — single-file skeleton.
 - Decompiled `NecroSkelly`: `Patch_OurSpellDamageType.cs`, `TreeAuthor.cs` (`RetypeStats`), `TreeContent.cs` (`Arch*Stats` remap tables), `SpellTypes.cs`.
+
+## 9. Implementation status (2026-10-06)
+
+- **Phase 1 (MVP)** — done: Blizzard deals Fire, applies Burning; Magician tree Chill/Ice stats remapped.
+- **Phase 2** — done: full Magician cold set converted via the owner gate (any player-cast cold becomes fire/burn);
+  Blizzard's spawned Ice Pool included; the Frostbound ally aura path handled. Monster/pet cold deliberately left cold
+  (runtime log proved the only remaining Chill was the player's pet, `SavageFrostbite`/`ChillwingDescent`).
+- **Phase 3 (VFX)** — first pass implemented in `PyromancerConverter`: runtime cold→fire hue-shift of each converted
+  spell's VFX (`ParticleSystem.main.startColor`, Sprite/Trail/Line renderer colors, Lights), config `ConvertVfx`.
+  The game uses the All In 1 VFX Toolkit whose `AllIn1VfxComponent` is editor-only, so there is no runtime color
+  component; shifting the particle color modules is the lever. `LogVfx` dumps the per-spell VFX inventory
+  (type, object, color) so any effect still rendering blue can be identified and handled next.
