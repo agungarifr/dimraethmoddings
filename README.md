@@ -29,16 +29,15 @@ modded a Unity game before, follow it top to bottom. When you finish you will ha
 - [4. Install BepInEx 6 (IL2CPP)](#4-install-bepinex-6-il2cpp)
 - [5. Install the .NET SDK](#5-install-the-net-sdk)
 - [6. Clone this repo and lay out the folders](#6-clone-this-repo-and-lay-out-the-folders)
-- [7. Build your first mod](#7-build-your-first-mod)
+- [7. Build your first mod (with an AI agent)](#7-build-your-first-mod-with-an-ai-agent)
 - [8. Launch the game and verify](#8-launch-the-game-and-verify)
 - [9. The edit → build → test loop](#9-the-edit--build--test-loop)
-- [10. Build with an IDE (VS Code / Visual Studio / Rider)](#10-build-with-an-ide-vs-code--visual-studio--rider)
-- [11. Build and code with an AI assistant (opencode)](#11-build-and-code-with-an-ai-assistant-opencode)
-- [12. Troubleshooting](#12-troubleshooting)
-- [13. What is inside this repository](#13-what-is-inside-this-repository)
-- [14. Included mod projects](#14-included-mod-projects)
-- [15. Analysis tools](#15-analysis-tools)
-- [16. Notes, secrets and licensing](#16-notes-secrets-and-licensing)
+- [10. Build and code with an AI assistant (opencode)](#10-build-and-code-with-an-ai-assistant-opencode)
+- [11. Troubleshooting](#11-troubleshooting)
+- [12. What is inside this repository](#12-what-is-inside-this-repository)
+- [13. Included mod projects](#13-included-mod-projects)
+- [14. Analysis tools](#14-analysis-tools)
+- [15. Notes, secrets and licensing](#15-notes-secrets-and-licensing)
 
 ---
 
@@ -92,7 +91,7 @@ are capable **free editors and AI agents**. Paid tools are optional conveniences
 | **Visual Studio Community** | IDE | Free for individuals / small teams (non-enterprise). Excellent .NET support. |
 | **JetBrains Rider** | IDE | **Free for non-commercial use** (paid only if you sell your work). Best-in-class C#/Unity tooling. <https://www.jetbrains.com/rider/> |
 | **Zed** | Editor | Free and fast, open source. |
-| **opencode** | CLI AI agent | Open source (MIT). The software is free — use its **free included models** or plug in any provider key. Optional paid plan (OpenCode Go, $10/mo) for more. Already configured for this repo — see [section 11](#11-build-and-code-with-an-ai-assistant-opencode). <https://opencode.ai> |
+| **opencode** | CLI AI agent | Open source (MIT). The software is free — use its **free included models** or plug in any provider key. Optional paid plan (OpenCode Go, $10/mo) for more. Already configured for this repo — see [section 10](#10-build-and-code-with-an-ai-assistant-opencode). <https://opencode.ai> |
 | **Freebuff** | CLI + web AI agent | **Completely free**, ad-supported — no subscription, credits or API key. Uses GLM / DeepSeek / GPT backends. <https://freebuff.com/> |
 | **Cline** / **Roo Code** | VS Code AI extension | Free, open source. Bring your own model key (or a local model). |
 | **Aider** | CLI AI agent | Free, open source. Bring your own model key. |
@@ -318,14 +317,14 @@ prompt:
 > `dotnet build`. Then confirm `ContagionTuner.dll` was copied into `BepInEx\plugins` and show me the
 > build output.
 
-If you have not set up an agent yet, do [section 11](#11-build-and-code-with-an-ai-assistant-opencode)
+If you have not set up an agent yet, do [section 10](#10-build-and-code-with-an-ai-assistant-opencode)
 (opencode) first, or use any tool below.
 
 ### 7.1 Example prompt by tool
 
 | Tool | What to do |
 |---|---|
-| **opencode** (free, open source) | `cd /d "D:\SteamLibrary\steamapps\common\Dimraeth"` then `opencode`, paste the prompt. Setup: section 11 |
+| **opencode** (free, open source) | `cd /d "D:\SteamLibrary\steamapps\common\Dimraeth"` then `opencode`, paste the prompt. Setup: section 10 |
 | **Claude Code** (paid, Anthropic) | install it, run `claude` from the game root, paste the prompt |
 | **Antigravity** (Google, free preview) | open the game root as the workspace, open the **Agent** panel, paste the prompt |
 | **Cursor / Windsurf / Copilot Chat / Cline / Aider** | open the game root, paste the prompt. Free vs paid: section 2.1 |
@@ -424,54 +423,14 @@ Tips:
 
 ---
 
-## 10. Build with an IDE (VS Code / Visual Studio / Rider)
-
-You do **not** need an IDE — `dotnet build` is enough. But an IDE gives you autocomplete against
-the game's classes, which makes modding much easier.
-
-**The golden rule for all IDEs:** open the **game root** (`D:\SteamLibrary\steamapps\common\Dimraeth`) as your workspace/folder. All
-paths (`modding\...`, `BepInEx\...`) are relative to it, and the AI/agent configs in this repo
-assume that too.
-
-### VS Code (lightweight, recommended)
-
-1. Install VS Code: <https://code.visualstudio.com/>.
-2. Install the **C#** extension (by Microsoft) from the Extensions tab.
-3. Open the game root:
-   ```
-   Open Folder… → D:\SteamLibrary\steamapps\common\Dimraeth
-   ```
-4. Open any mod's `.csproj`; VS Code loads it as the project. Build with **Ctrl+Shift+B**, or run
-   the same `dotnet build` command in the integrated terminal.
-
-### Visual Studio 2022 (Windows)
-
-1. **File → Open → Project/Solution…** and open
-   `D:\SteamLibrary\steamapps\common\Dimraeth\dimraethmoddings\BepInExModsSource\<Mod>\<Mod>.csproj`.
-   (You can also create a solution that contains several mod projects.)
-2. Choose the **Release** configuration and **Build → Build Solution**.
-3. The post-build step deploys automatically.
-
-### JetBrains Rider
-
-1. **Open** `D:\SteamLibrary\steamapps\common\Dimraeth\dimraethmoddings\BepInExModsSource\<Mod>\<Mod>.csproj`.
-2. Build the project (Ctrl+F9). The post-build copy handles deployment.
-
-> **Autocomplete against game types:** once the project loads, types such as `ObjectsCommon`,
-> `Damage`, `Damages`, `Player`, or `ContagionPrefab` resolve because the `.csproj` references the
-> generated `Assembly-CSharp.dll`. If they appear in red, the interop references are not resolving —
-> see [section 12](#12-troubleshooting).
-
----
-
-## 11. Build and code with an AI assistant (opencode)
+## 10. Build and code with an AI assistant (opencode)
 
 You can let an AI do the heavy lifting: explore the game's classes, write a patch, build it, and fix
 compiler errors — all from a chat. This repository is already set up for
 **[opencode](https://opencode.ai)**, an open-source CLI coding agent (you can also use any other
 agent that can run shell commands).
 
-### 11.1 Install opencode
+### 10.1 Install opencode
 
 Follow the install instructions at <https://opencode.ai>. Then verify it runs:
 
@@ -479,7 +438,7 @@ Follow the install instructions at <https://opencode.ai>. Then verify it runs:
 opencode --version
 ```
 
-### 11.2 Give it a configuration
+### 10.2 Give it a configuration
 
 This repo ships a **redacted sample** config, `opencode.example.json`. Copy it and edit it:
 
@@ -521,7 +480,7 @@ The sample also configures two optional MCP helpers used by this project:
 
 They are convenient but optional — delete those blocks if you do not want them.
 
-### 11.3 Start it in the game root
+### 10.3 Start it in the game root
 
 ```bat
 cd /d "D:\SteamLibrary\steamapps\common\Dimraeth"
@@ -531,7 +490,7 @@ opencode
 Open the agent at the **game root** so it can see both `modding\` and `BepInEx\`. It reads the
 `AGENTS.md` file in the folder for project rules and habits.
 
-### 11.4 Example prompts
+### 10.4 Example prompts
 
 - "Read `modding\BepInExModsSource\ContagionTuner` and explain what it patches."
 - "Build `modding\BepInExModsSource\DamageNumberTuner\DamageNumberTuner.csproj` with the local SDK
@@ -549,7 +508,7 @@ great way to learn the codebase.
 
 ---
 
-## 12. Troubleshooting
+## 11. Troubleshooting
 
 | Symptom | Likely cause | Fix |
 |---|---|---|
@@ -572,7 +531,7 @@ great way to learn the codebase.
 
 ---
 
-## 13. What is inside this repository
+## 12. What is inside this repository
 
 This repository is a **source + docs snapshot** intended for moving the project to another device.
 Large, regenerable artifacts (runtimes, SDKs, decompiled dumps, build outputs, backups) are
@@ -596,7 +555,7 @@ README.md               ← you are here
 
 ---
 
-## 14. Included mod projects
+## 13. Included mod projects
 
 All of these live under `BepInExModsSource/` and build the same way (`dotnet build` the `.csproj`).
 
@@ -629,7 +588,7 @@ mod does and how to configure it.
 
 ---
 
-## 15. Analysis tools
+## 14. Analysis tools
 
 These are **not required to build mods**. They are the reverse-engineering utilities used to study
 the game. They live at the repository root and usually need the game's assemblies or a decompiler
@@ -646,7 +605,7 @@ dump to be useful.
 
 ---
 
-## 16. Notes, secrets and licensing
+## 15. Notes, secrets and licensing
 
 - **Secrets:** `opencode.json` is excluded because it can contain an API key. Copy
   `opencode.example.json` → `opencode.json` and provide the key via an environment variable
