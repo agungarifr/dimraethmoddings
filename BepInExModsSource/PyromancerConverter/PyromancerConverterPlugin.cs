@@ -44,7 +44,26 @@ namespace PyromancerConverter
         internal static readonly HashSet<Spell> Converted = new HashSet<Spell>();
 
         internal static readonly HashSet<Spell> LoggedDamage = new HashSet<Spell>();
-        internal static readonly HashSet<Spell> LoggedStacks = new HashSet<Spell>();
+        // [2026-10-05] Was HashSet<Spell>: one line per spell hid the fact that a single spell applies
+        // several distinct StackingEffects (Blizzard applies Chill AND Frostbound). Now keyed by
+        // (spell, effect) so every pair is reported once.
+        // internal static readonly HashSet<Spell> LoggedStacks = new HashSet<Spell>();
+        internal static readonly HashSet<long> LoggedStacks = new HashSet<long>();
+
+        internal static long StackKey(Spell spell, StackingEffect effect)
+        {
+            return ((long)(int)spell << 8) | (byte)effect;
+        }
+
+        /// <summary>Log a converted stack swap once per (spell, source effect).</summary>
+        internal static void LogSwap(Spell spell, StackingEffect from, StackingEffect to)
+        {
+            if (!LogSwaps.Value) return;
+            if (LoggedStacks.Add(StackKey(spell, from)))
+            {
+                Log.LogInfo($"[status] {spell}: {from} -> {to}");
+            }
+        }
 
         // Insurance: spells that must convert even if their definition does not report Element/DamageType Ice
         // (e.g. the prefab hard-codes Ice). Blizzard + Frost Javelin are the core Magician ice spells.
@@ -225,17 +244,35 @@ namespace PyromancerConverter
             {
                 if (!PyromancerConverterPlugin.Enabled.Value) return true;
                 if (!PyromancerConverterPlugin.ConvertStatus.Value) return true;
-                if (effect != StackingEffect.Chill) return true;
-                if (!PyromancerConverterPlugin.IsConverted(__instance)) return true;
 
-                __instance.AddStacksToTarget(target, StackingEffect.Burning, amount, time);
+                // Only the cold effects are interesting here; anything else passes straight through.
+                if (effect != StackingEffect.Chill && effect != StackingEffect.Frostbound) return true;
 
-                if (PyromancerConverterPlugin.LogSwaps.Value &&
-                    PyromancerConverterPlugin.LoggedStacks.Add(__instance._spell))
+                if (!PyromancerConverterPlugin.IsConverted(__instance))
                 {
-                    PyromancerConverterPlugin.Log.LogInfo($"[status] {__instance._spell}: Chill -> Burning");
+                    // [2026-10-05] A cold stack from a spell that is NOT in the converted set means the
+                    // discovery step (or the seed list) missed an ice spell. Name it once so the set can be
+                    // widened instead of silently leaving Chill on the target.
+                    if (PyromancerConverterPlugin.LogSwaps.Value &&
+                        PyromancerConverterPlugin.LoggedStacks.Add(PyromancerConverterPlugin.StackKey(__instance._spell, effect)))
+                    {
+                        PyromancerConverterPlugin.Log.LogInfo(
+                            $"[unconverted] {__instance._spell}: {effect} via AddStacksToTarget (not in converted set)");
+                    }
+                    return true;
                 }
 
+                if (effect == StackingEffect.Chill)
+                {
+                    __instance.AddStacksToTarget(target, StackingEffect.Burning, amount, time);
+                    PyromancerConverterPlugin.LogSwap(__instance._spell, effect, StackingEffect.Burning);
+                    return false;
+                }
+
+                // [2026-10-05] Blizzard's ally aura applies Frostbound(16) through AddStacksToTarget, not
+                // AddStacksToCaster, so the Frostbound->Kindled swap must also happen on this path.
+                __instance.AddStacksToTarget(target, StackingEffect.Kindled, amount, time);
+                PyromancerConverterPlugin.LogSwap(__instance._spell, effect, StackingEffect.Kindled);
                 return false;
             }
             catch (Exception ex)
@@ -260,9 +297,20 @@ namespace PyromancerConverter
                 if (!PyromancerConverterPlugin.Enabled.Value) return true;
                 if (!PyromancerConverterPlugin.ConvertStatus.Value) return true;
                 if (effect != StackingEffect.Frostbound) return true;
-                if (!PyromancerConverterPlugin.IsConverted(__instance)) return true;
+
+                if (!PyromancerConverterPlugin.IsConverted(__instance))
+                {
+                    if (PyromancerConverterPlugin.LogSwaps.Value &&
+                        PyromancerConverterPlugin.LoggedStacks.Add(PyromancerConverterPlugin.StackKey(__instance._spell, effect)))
+                    {
+                        PyromancerConverterPlugin.Log.LogInfo(
+                            $"[unconverted] {__instance._spell}: Frostbound via AddStacksToCaster (not in converted set)");
+                    }
+                    return true;
+                }
 
                 __instance.AddStacksToCaster(StackingEffect.Kindled, amount, time);
+                PyromancerConverterPlugin.LogSwap(__instance._spell, effect, StackingEffect.Kindled);
                 return false;
             }
             catch (Exception ex)
