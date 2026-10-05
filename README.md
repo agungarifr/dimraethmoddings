@@ -62,17 +62,25 @@ Steps:
 
 ---
 
-## 4. Build a mod
+## 4. Build a mod (just an example)
 
-Paste this into opencode (close the game first):
+Close the game first. Then talk to the agent like normal — no special syntax:
+
+```text
+hey build me the mod that opens the sanctum chest from anywhere
+```
+
+The agent works out that's `DimraethSanctumChests`, builds it in Release, and copies the DLL into
+`BepInEx\plugins`. The DLL loads the next time you start the game.
+
+<details><summary>More explicit version (if the agent is unsure which project)</summary>
 
 ```text
 Build modding\BepInExModsSource\DimraethSanctumChests\DimraethSanctumChests.csproj in Release with
 dotnet build. Confirm DimraethSanctumChests.dll was copied into BepInEx\plugins, and show me the
 build output.
 ```
-
-The DLL loads the next time you start the game.
+</details>
 
 ---
 
