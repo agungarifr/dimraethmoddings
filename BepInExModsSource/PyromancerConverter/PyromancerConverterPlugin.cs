@@ -43,6 +43,11 @@ namespace PyromancerConverter
         // auto-applying a spell definition's StackDatas, or a passive) would sneak Chill past the
         // BaseSpellLibrary patch, so it is the authoritative way to find the source of a cold icon.
         public static ConfigEntry<bool> DiagnosticLogging;
+        // [2026-10-06] Phase 3 — VFX. Recolor the converted spells' ice effects (blue) to fire (orange) at
+        // runtime by shifting the ParticleSystem color modules and sprite/trail/line renderer colors. Only
+        // converted spells are touched, so monster/pet ice VFX are left alone.
+        public static ConfigEntry<bool> ConvertVfx;
+        public static ConfigEntry<bool> LogVfx;
 
         /// <summary>Spells whose Ice/Chill output this mod rewrites. Seeded with the known Magician ice
         /// spells and extended at runtime by <see cref="Patch_SpellLibrary_ApplyDefinition"/>.</summary>
@@ -154,6 +159,12 @@ namespace PyromancerConverter
             DiagnosticLogging = Config.Bind("Diagnostics", "DiagnosticLogging", false,
                 "Deep audit: log every stack applied at the target (Stacking.AddStacksToTarget) and every BaseSpellLibrary stack call, once per (spell/effect/source). Re-enable only when hunting an unexplained cold source. (Default: false)");
 
+            ConvertVfx = Config.Bind("General", "ConvertVfx", true,
+                "Recolor the converted spells' ice VFX (blue) to fire (orange) at runtime, by shifting the particle color modules and sprite/trail/line renderer colors. (Default: true)");
+
+            LogVfx = Config.Bind("Diagnostics", "LogVfx", true,
+                "Log every VFX element recolored (type, object, before -> after), once per (spell, type, object). Turn off once the VFX pass is verified. (Default: true)");
+
             foreach (Spell s in KnownMagicianIce)
             {
                 Converted.Add(s);
@@ -164,6 +175,11 @@ namespace PyromancerConverter
             PatchOrLog(harmony, typeof(Patch_BaseSpellLibrary_SendDamageToTarget));
             PatchOrLog(harmony, typeof(Patch_BaseSpellLibrary_AddStacksToTarget));
             PatchOrLog(harmony, typeof(Patch_BaseSpellLibrary_AddStacksToCaster));
+            // [2026-10-06] Phase 3 — VFX recoloring hooks.
+            PatchOrLog(harmony, typeof(Patch_BaseSpellLibrary_Start_Vfx));
+            PatchOrLog(harmony, typeof(Patch_AreaOfEffect_Start_Vfx));
+            PatchOrLog(harmony, typeof(Patch_SkillShot_Start_Vfx));
+            PatchOrLog(harmony, typeof(Patch_BaseSpellLibrary_SpawnVFXAtOffset));
             PatchOrLog(harmony, typeof(Patch_Stacking_AddStacksToTarget_StackData));
             PatchOrLog(harmony, typeof(Patch_Stacking_AddStacksToTarget_List));
             PatchOrLog(harmony, typeof(Patch_SkillTree_LoadSkillTreeInitial));
@@ -177,8 +193,8 @@ namespace PyromancerConverter
             Log.LogInfo("=================================================");
             Log.LogInfo($"{NAME} v{VERSION} loaded.");
             Log.LogInfo($"Enabled: {Enabled.Value}, ConvertDamage: {ConvertDamage.Value}, ConvertStatus: {ConvertStatus.Value}, " +
-                        $"ConvertTree: {ConvertTree.Value}, ConvertTooltips: {ConvertTooltips.Value}, LogSwaps: {LogSwaps.Value}, " +
-                        $"DiagnosticLogging: {DiagnosticLogging.Value}");
+                        $"ConvertTree: {ConvertTree.Value}, ConvertTooltips: {ConvertTooltips.Value}, ConvertVfx: {ConvertVfx.Value}, " +
+                        $"LogSwaps: {LogSwaps.Value}, LogVfx: {LogVfx.Value}, DiagnosticLogging: {DiagnosticLogging.Value}");
             Log.LogInfo($"Seeded Magician ice spells: {string.Join(", ", KnownMagicianIce)}");
             Log.LogInfo("=================================================");
         }
@@ -536,6 +552,301 @@ namespace PyromancerConverter
             {
                 __result[i] = TooltipText.Convert(__result[i]);
             }
+        }
+    }
+
+    /// <summary>
+    /// [2026-10-06] Phase 3 — VFX pass 1 (base spell spawn). A postfix on <c>BaseSpellLibrary.Start</c> runs after
+    /// the prefab's virtual <c>OnStart</c> has configured its visuals, so the whole spell hierarchy can be
+    /// recolored in one shot. Gated by <see cref="PyromancerConverterPlugin.ShouldConvert"/>, so monster/pet ice
+    /// VFX are left alone.
+    /// </summary>
+    [HarmonyPatch(typeof(BaseSpellLibrary), "Start")]
+    public static class Patch_BaseSpellLibrary_Start_Vfx
+    {
+        public static void Postfix(BaseSpellLibrary __instance)
+        {
+            try
+            {
+                if (__instance == null) return;
+                if (!PyromancerConverterPlugin.ShouldConvert(__instance)) return;
+                VfxRecolor.Convert(__instance.gameObject, $"spell:{__instance._spell}");
+            }
+            catch (Exception ex) { PyromancerConverterPlugin.Log?.LogError($"[Patch_BaseSpellLibrary_Start_Vfx] {ex}"); }
+        }
+    }
+
+    /// <summary>[2026-10-06] VFX pass 1b — AreaOfEffect overrides Start; its postfix runs once the AoE is set up.</summary>
+    [HarmonyPatch(typeof(AreaOfEffect), "Start")]
+    public static class Patch_AreaOfEffect_Start_Vfx
+    {
+        public static void Postfix(AreaOfEffect __instance)
+        {
+            try
+            {
+                if (__instance == null) return;
+                if (!PyromancerConverterPlugin.ShouldConvert(__instance)) return;
+                VfxRecolor.Convert(__instance.gameObject, $"aoe:{__instance._spell}");
+            }
+            catch (Exception ex) { PyromancerConverterPlugin.Log?.LogError($"[Patch_AreaOfEffect_Start_Vfx] {ex}"); }
+        }
+    }
+
+    /// <summary>[2026-10-06] VFX pass 1c — SkillShot projectiles (e.g. Frost Javelin) that override Start.</summary>
+    [HarmonyPatch(typeof(SkillShot), "Start")]
+    public static class Patch_SkillShot_Start_Vfx
+    {
+        public static void Postfix(SkillShot __instance)
+        {
+            try
+            {
+                if (__instance == null) return;
+                if (!PyromancerConverterPlugin.ShouldConvert(__instance)) return;
+                VfxRecolor.Convert(__instance.gameObject, $"skillshot:{__instance._spell}");
+            }
+            catch (Exception ex) { PyromancerConverterPlugin.Log?.LogError($"[Patch_SkillShot_Start_Vfx] {ex}"); }
+        }
+    }
+
+    /// <summary>
+    /// [2026-10-06] VFX pass 2 — VFX that the prefab instantiates as a separate object (cast FX, blast FX) rather
+    /// than authoring as a child. Recolor the returned instance right after it spawns.
+    /// </summary>
+    [HarmonyPatch(typeof(BaseSpellLibrary), "SpawnVFXAtOffset")]
+    public static class Patch_BaseSpellLibrary_SpawnVFXAtOffset
+    {
+        public static void Postfix(BaseSpellLibrary __instance, GameObject __result)
+        {
+            try
+            {
+                if (__result == null) return;
+                if (!PyromancerConverterPlugin.ShouldConvert(__instance)) return;
+                VfxRecolor.Convert(__result, $"spawned:{__instance._spell}");
+            }
+            catch (Exception ex) { PyromancerConverterPlugin.Log?.LogError($"[Patch_BaseSpellLibrary_SpawnVFXAtOffset] {ex}"); }
+        }
+    }
+
+    /// <summary>
+    /// [2026-10-06] Phase 3 — runtime VFX recolor. The game's effects use the All In 1 VFX Toolkit, whose shader
+    /// tints a (grayscale) texture by the ParticleSystem vertex color; there is no runtime color component
+    /// (AllIn1VfxComponent is editor-only). So the reliable levers are the ParticleSystem color modules
+    /// (<c>main.startColor</c>, <c>colorOverLifetime.color</c>) plus SpriteRenderer / TrailRenderer /
+    /// LineRenderer / Light colors. Cold hues (cyan..violet) are remapped onto a fire range (red-orange..amber)
+    /// while preserving saturation, brightness and alpha, so gradients and fades survive. The shift is guarded by
+    /// a cold test, so it is idempotent and never touches already-warm colors.
+    /// </summary>
+    internal static class VfxRecolor
+    {
+        private const float ColdHueMin = 0.45f;   // cyan
+        private const float ColdHueMax = 0.78f;   // violet-blue
+        private const float FireHueMin = 0.02f;   // red-orange
+        private const float FireHueMax = 0.12f;   // amber
+        private const float FireMinValue = 0.80f; // brighten fire a touch
+        private const float FireMinSaturation = 0.60f;
+
+        private static readonly HashSet<string> LoggedVfx = new HashSet<string>();
+
+        internal static bool IsCold(Color c)
+        {
+            if (c.a <= 0.01f) return false;
+            // Blue dominant over red, with enough blue to be a real tint (skips grays/whites/blacks).
+            return c.b > c.r + 0.03f && c.b > 0.15f;
+        }
+
+        internal static Color ToFire(Color c)
+        {
+            if (!IsCold(c)) return c;
+            Color.RGBToHSV(c, out float h, out float s, out float v);
+            float t = Mathf.InverseLerp(ColdHueMin, ColdHueMax, h);
+            float nh = Mathf.Lerp(FireHueMin, FireHueMax, t);
+            float ns = Mathf.Clamp(s, FireMinSaturation, 1f);
+            float nv = Mathf.Max(v, FireMinValue);
+            Color fire = Color.HSVToRGB(nh, ns, nv);
+            fire.a = c.a;
+            return fire;
+        }
+
+        internal static void Convert(GameObject root, string tag)
+        {
+            if (root == null) return;
+            if (!PyromancerConverterPlugin.Enabled.Value || !PyromancerConverterPlugin.ConvertVfx.Value) return;
+
+            int changed = 0;
+            try
+            {
+                foreach (ParticleSystem ps in root.GetComponentsInChildren<ParticleSystem>(true))
+                {
+                    if (RecolorParticleSystem(ps, tag)) changed++;
+                }
+
+                foreach (Renderer r in root.GetComponentsInChildren<Renderer>(true))
+                {
+                    if (r == null) continue;
+
+                    SpriteRenderer sr = r.TryCast<SpriteRenderer>();
+                    if (sr != null)
+                    {
+                        if (RecolorColor(sr, sr.color, c => sr.color = c, tag, "Sprite")) changed++;
+                        continue;
+                    }
+
+                    TrailRenderer tr = r.TryCast<TrailRenderer>();
+                    if (tr != null)
+                    {
+                        bool a = RecolorColor(tr, tr.startColor, c => tr.startColor = c, tag, "Trail.start");
+                        bool b = RecolorColor(tr, tr.endColor, c => tr.endColor = c, tag, "Trail.end");
+                        if (a || b) changed++;
+                        continue;
+                    }
+
+                    LineRenderer lr = r.TryCast<LineRenderer>();
+                    if (lr != null)
+                    {
+                        bool a = RecolorColor(lr, lr.startColor, c => lr.startColor = c, tag, "Line.start");
+                        bool b = RecolorColor(lr, lr.endColor, c => lr.endColor = c, tag, "Line.end");
+                        if (a || b) changed++;
+                        continue;
+                    }
+                }
+
+                foreach (Light l in root.GetComponentsInChildren<Light>(true))
+                {
+                    if (l == null) continue;
+                    if (RecolorColor(l, l.color, c => l.color = c, tag, "Light")) changed++;
+                }
+            }
+            catch (Exception ex)
+            {
+                PyromancerConverterPlugin.Log?.LogError($"[vfx] {tag} {ex}");
+            }
+
+            if (changed > 0 && PyromancerConverterPlugin.LogVfx.Value)
+            {
+                PyromancerConverterPlugin.Log.LogInfo($"[vfx] {tag}: recolored {changed} element(s) on '{root.name}'");
+            }
+        }
+
+        private static bool RecolorColor(UnityEngine.Object owner, Color before, Action<Color> set, string tag, string kind)
+        {
+            Color after = ToFire(before);
+            if (after == before) return false;
+            set(after);
+            LogVfx(tag, kind, owner != null ? owner.name : "?", before, after);
+            return true;
+        }
+
+        private static bool RecolorParticleSystem(ParticleSystem ps, string tag)
+        {
+            bool changed = false;
+
+            var main = ps.main;
+            ParticleSystem.MinMaxGradient sc = main.startColor;
+            // [2026-10-06] The interop exposes MinMaxGradient.color/gradient as read-only and
+            // ColorOverLifetimeModule.color as write-only, so the only safe lever is main.startColor:
+            // read it, build a shifted copy through a constructor, and assign that back. colorOverLifetime
+            // is usually just an alpha fade (white RGB), so shifting startColor recolors the effect while
+            // preserving the fade.
+            ParticleSystem.MinMaxGradient shifted;
+            if (TryShiftGradient(sc, out shifted))
+            {
+                main.startColor = shifted;
+                changed = true;
+            }
+
+            if (changed) LogVfx(tag, "ParticleSystem", ps != null ? ps.name : "?", new Color(-1f, -1f, -1f, -1f), Color.white);
+            return changed;
+        }
+
+        private static bool TryShiftGradient(ParticleSystem.MinMaxGradient g, out ParticleSystem.MinMaxGradient result)
+        {
+            result = g;
+            switch (g.mode)
+            {
+                case ParticleSystemGradientMode.Color:
+                    {
+                        Color c = g.color, n = ToFire(c);
+                        if (n == c) return false;
+                        result = new ParticleSystem.MinMaxGradient(n);
+                        return true;
+                    }
+                case ParticleSystemGradientMode.TwoColors:
+                    {
+                        Color a = g.colorMin, b = g.colorMax;
+                        Color na = ToFire(a), nb = ToFire(b);
+                        if (na == a && nb == b) return false;
+                        result = new ParticleSystem.MinMaxGradient(na, nb);
+                        return true;
+                    }
+                case ParticleSystemGradientMode.Gradient:
+                case ParticleSystemGradientMode.RandomColor:
+                    {
+                        Gradient shiftedG;
+                        if (!TryShiftGradientCopy(g.gradient, out shiftedG)) return false;
+                        result = new ParticleSystem.MinMaxGradient(shiftedG);
+                        return true;
+                    }
+                case ParticleSystemGradientMode.TwoGradients:
+                    {
+                        Gradient a, b;
+                        bool ca = TryShiftGradientCopy(g.gradientMin, out a);
+                        bool cb = TryShiftGradientCopy(g.gradientMax, out b);
+                        if (!ca && !cb) return false;
+                        result = new ParticleSystem.MinMaxGradient(ca ? a : g.gradientMin, cb ? b : g.gradientMax);
+                        return true;
+                    }
+            }
+            return false;
+        }
+
+        /// <summary>
+        /// Copies a gradient (so the authored asset is never mutated) and shifts every color key cold -> fire.
+        /// Returns false when nothing was cold.
+        /// </summary>
+        private static bool TryShiftGradientCopy(Gradient g, out Gradient result)
+        {
+            result = g;
+            if (g == null) return false;
+
+            var keys = g.colorKeys;
+            if (keys == null || keys.Length == 0) return false;
+
+            var alpha = g.alphaKeys;
+            bool changed = false;
+            for (int i = 0; i < keys.Length; i++)
+            {
+                Color c = keys[i].color;
+                Color n = ToFire(c);
+                if (n != c)
+                {
+                    keys[i] = new GradientColorKey(n, keys[i].time);
+                    changed = true;
+                }
+            }
+            if (!changed) return false;
+
+            Gradient copy = new Gradient();
+            copy.SetKeys(keys, alpha);
+            copy.mode = g.mode;
+            result = copy;
+            return true;
+        }
+
+        private static void LogVfx(string tag, string kind, string name, Color before, Color after)
+        {
+            if (!PyromancerConverterPlugin.LogVfx.Value) return;
+            string key = tag + "|" + kind + "|" + name;
+            if (!LoggedVfx.Add(key)) return;
+            PyromancerConverterPlugin.Log.LogInfo($"[vfx] {tag}: {kind} '{name}' {Hex(before)} -> {Hex(after)}");
+        }
+
+        private static string Hex(Color c)
+        {
+            if (c.r < 0f) return "(particles)";
+            return "#" + Mathf.RoundToInt(c.r * 255f).ToString("X2")
+                       + Mathf.RoundToInt(c.g * 255f).ToString("X2")
+                       + Mathf.RoundToInt(c.b * 255f).ToString("X2")
+                       + Mathf.RoundToInt(c.a * 255f).ToString("X2");
         }
     }
 

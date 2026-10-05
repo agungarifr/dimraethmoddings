@@ -38,6 +38,11 @@
       <HintPath>..\..\BepInEx\interop\UnityEngine.CoreModule.dll</HintPath>
       <Private>false</Private>
     </Reference>
+    <!-- [2026-10-06] Phase 3 VFX: ParticleSystem / MinMaxGradient live in the particle module. -->
+    <Reference Include="UnityEngine.ParticleSystemModule">
+      <HintPath>..\..\BepInEx\interop\UnityEngine.ParticleSystemModule.dll</HintPath>
+      <Private>false</Private>
+    </Reference>
     <Reference Include="Il2Cppmscorlib">
       <HintPath>..\..\BepInEx\interop\Il2Cppmscorlib.dll</HintPath>
       <Private>false</Private>
