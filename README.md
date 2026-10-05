@@ -216,61 +216,60 @@ newer works.
 
 ## 6. Clone this repo and lay out the folders
 
-### 6.1 The one rule you must understand
+### 6.1 The layout you're aiming for
 
-The mod `.csproj` files reference BepInEx with **relative paths**, like this:
+```
+D:\SteamLibrary\steamapps\common\Dimraeth\
+├─ BepInEx\                        the runtime the GAME loads (from step 4)
+│  ├─ core\
+│  ├─ interop\                     game wrappers, generated on first launch
+│  └─ plugins\                     built mods are copied here
+├─ dimraethmoddings\               the git clone of this repo
+│  └─ BepInExModsSource\           the 29 mod projects (+ docs, tools)
+└─ modding\                        created in step 6.3
+   ├─ BepInEx\                     → link to ..\BepInEx
+   └─ BepInExModsSource\           → link to ..\dimraethmoddings\BepInExModsSource
+```
+
+There are **two** folders named BepInEx on purpose:
+
+| Path | Used by | What it is for |
+|---|---|---|
+| `Dimraeth\BepInEx\` | the **game** | BepInEx actually runs from here; the game loads mods from `plugins\` |
+| `Dimraeth\modding\BepInEx\` | the **compiler** | `dotnet build` reads `core\` and `interop\` from here |
+
+Why the second one? Every mod `.csproj` points at BepInEx with a path that goes **up two folders**:
 
 ```xml
 <HintPath>..\..\BepInEx\core\BepInEx.Core.dll</HintPath>
 <HintPath>..\..\BepInEx\interop\Assembly-CSharp.dll</HintPath>
 ```
 
-`..\..` means "up two folders". So, for every mod:
+From `modding\BepInExModsSource\ContagionTuner\`, "up two folders" is `modding\`, so the compiler
+always looks for `modding\BepInEx\`. That copy is **never used at runtime** — the game ignores the
+`modding\` folder completely. Step 6.3 just points it at the real `BepInEx` so there is only one
+copy of the files on disk. (Only `core\` and `interop\` matter; `config\`, `plugins\` and logs do not.)
 
-- the **project** must live at `D:\SteamLibrary\steamapps\common\Dimraeth\modding\BepInExModsSource\<ModName>\`, and
-- a **BepInEx folder** (with `core\` and `interop\`) must exist at `D:\SteamLibrary\steamapps\common\Dimraeth\modding\BepInEx\`.
-
-The build finishes by **copying the DLL up three levels** into `D:\SteamLibrary\steamapps\common\Dimraeth\BepInEx\plugins\` — that is
-the game's real plugins folder, so your mod loads automatically next launch.
-
-In other words, the working layout looks like this:
-
-```
-D:\SteamLibrary\steamapps\common\Dimraeth\
-├─ BepInEx\                              the runtime the game loads (from step 4)
-│  ├─ core\  interop\  config\  plugins\ patchers\
-│  └─ LogOutput.log
-└─ modding\
-   ├─ BepInEx\                           BepInEx "core + interop" for the COMPILER
-   └─ BepInExModsSource\                 the mod projects from this repo
-      ├─ ContagionTuner\ContagionTuner.csproj
-      ├─ DamageNumberTuner\DamageNumberTuner.csproj
-      └─ ... (28 more projects)
-```
+When a mod builds, it copies its DLL **up three folders** into `Dimraeth\BepInEx\plugins\` — the
+game's real plugins folder — so the mod loads the next time you launch.
 
 ### 6.2 Clone the repository
-
-Open **Command Prompt** (or PowerShell) and run:
 
 ```bat
 cd /d "D:\SteamLibrary\steamapps\common\Dimraeth"
 git clone https://github.com/agungarifr/dimraethmoddings.git dimraethmoddings
 ```
 
-You now have:
+You now have `Dimraeth\dimraethmoddings\BepInExModsSource\` holding the 29 projects (plus the docs
+and tools). Do not build here yet — the compiler still needs the `modding\BepInEx\` folder that the
+next step creates.
 
-```
-D:\SteamLibrary\steamapps\common\Dimraeth\dimraethmoddings\        ← the git clone (this repo)
-D:\SteamLibrary\steamapps\common\Dimraeth\dimraethmoddings\BepInExModsSource\<Mod>\...
-```
+### 6.3 Link the clone into `modding\`
 
-### 6.3 Point the compiler at the source and at BepInEx
+This creates the two links shown in 6.1. A **junction** is a "shortcut folder": no administrator
+rights needed, and no files are duplicated.
 
-You need `D:\SteamLibrary\steamapps\common\Dimraeth\modding\BepInExModsSource` and `D:\SteamLibrary\steamapps\common\Dimraeth\modding\BepInEx` to exist **and to point
-at the real files**. There are two ways — pick **Option A (recommended)** or Option B.
-
-**Option A — directory junctions (recommended: one copy, git tracks your edits directly).**
-A junction is a lightweight "shortcut folder"; it does **not** require administrator rights.
+**Option A — junctions (recommended: you edit one copy, and git tracks it directly).**
 
 ```bat
 cd /d "D:\SteamLibrary\steamapps\common\Dimraeth"
@@ -279,16 +278,18 @@ mklink /J "modding\BepInExModsSource" "dimraethmoddings\BepInExModsSource"
 mklink /J "modding\BepInEx" "BepInEx"
 ```
 
-> Using **PowerShell** instead of cmd? The equivalent is:
-> ```powershell
-> New-Item -ItemType Junction -Path "modding\BepInExModsSource" -Target "dimraethmoddings\BepInExModsSource"
-> New-Item -ItemType Junction -Path "modding\BepInEx" -Target "BepInEx"
-> ```
+PowerShell equivalent:
 
-Now `modding\BepInExModsSource` **is** the clone's source folder (edit once, commit directly), and
-`modding\BepInEx` **is** the game's BepInEx folder (always up to date with `interop`).
+```powershell
+New-Item -ItemType Junction -Path "modding\BepInExModsSource" -Target "dimraethmoddings\BepInExModsSource"
+New-Item -ItemType Junction -Path "modding\BepInEx" -Target "BepInEx"
+```
 
-**Option B — plain copies (no links; simpler to reason about, but you must keep them in sync).**
+Result: `modding\BepInExModsSource` **is** the clone's source (edit it and git sees the change), and
+`modding\BepInEx` **is** the game's BepInEx (so `interop` is always current).
+
+**Option B — plain copies (if you would rather not use links).** With this option you must copy your
+edits back into `dimraethmoddings\BepInExModsSource` before committing them.
 
 ```bat
 cd /d "D:\SteamLibrary\steamapps\common\Dimraeth"
@@ -298,17 +299,15 @@ xcopy /E /I /Y "BepInEx\core"    "modding\BepInEx\core"
 xcopy /E /I /Y "BepInEx\interop" "modding\BepInEx\interop"
 ```
 
-With Option B you edit the files under `modding\BepInExModsSource` and copy your changes **back**
-into `dimraethmoddings\BepInExModsSource` before committing. Option A avoids that entirely.
-
-### 6.4 Confirm the layout
+### 6.4 Confirm it worked
 
 ```powershell
-Test-Path "modding\BepInEx\interop\Assembly-CSharp.dll"   # must print: True
-Test-Path "modding\BepInEx\core\BepInEx.Core.dll"          # must print: True
+Test-Path "modding\BepInEx\core\BepInEx.Core.dll"                          # True
+Test-Path "modding\BepInEx\interop\Assembly-CSharp.dll"                    # True
+Test-Path "modding\BepInExModsSource\ContagionTuner\ContagionTuner.csproj" # True
 ```
 
-If either is `False`, revisit step 6.3.
+If any line is `False`, redo step 6.3.
 
 ---
 
