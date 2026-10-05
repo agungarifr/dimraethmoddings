@@ -25,16 +25,34 @@ namespace AntiCheatBypassMod
             return false;
         }
 
-        // [2026-10-05] New: the 2026-10-05 hotfix added a second, Inspect-independent
-        // correction path ("Gear with impossible stats is destroyed; inflated numbers are
-        // corrected"). ContrabandPreflight is its cheap gate and Corrupt is the mutator that
-        // rewrites/repairs an offending rune - neither routes through Inspect, so the old
-        // Inspect-only bypass left edited gear to be silently reverted to vanilla in game.
-        // CorruptPrefix returns the caller's rune untouched (leaves it:false = do not run
-        // the original Corrupt body).
-        public static bool CorruptPrefix(Rune __0, ref Rune __result)
+        // [2026-10-05] OBSOLETE (v1.3.0): QARune.ContrabandPreflight / QARune.Corrupt are the QA
+        // developer spawner that CREATES contraband runes for testing the corrector - they are
+        // not the correction engine. Targeting them was a wrong guess (both logged "not found"
+        // on GearLegality). Kept as a comment to preserve the trail; the real mutator is
+        // GearLegality.CorrectIfOverstated / CorrectOverstated (below).
+        // public static bool CorruptPrefix(Rune __0, ref Rune __result)
+        // {
+        //     __result = __0;
+        //     return false;
+        // }
+
+        // [2026-10-05] New (v1.3.0): the 2026-10-05 hotfix's real "inflated numbers are corrected"
+        // path is GearLegality.InspectStats (the private core check that both Inspect and the
+        // corrector call) plus GearLegality.CorrectIfOverstated(ref Rune,...) and
+        // CorrectOverstated(List<Rune>,...). The old Inspect-only bypass never reached them, which
+        // is why a successful EquipmentStatEditor write showed vanilla stats again.
+        // CorrectOverstated returns the number of runes it rewrote -> force 0.
+        public static bool IntZeroResultPrefix(ref int __result)
         {
-            __result = __0;
+            __result = 0;
+            return false;
+        }
+
+        // CollectContraband gathers offenders for the correction/destruction pass; return an empty
+        // list so the pass has nothing to act on even if it runs off a path we do not patch.
+        public static bool EmptyRuneListPrefix(ref Il2CppSystem.Collections.Generic.List<Rune> __result)
+        {
+            __result = new Il2CppSystem.Collections.Generic.List<Rune>();
             return false;
         }
 

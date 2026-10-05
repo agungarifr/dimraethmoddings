@@ -19,6 +19,7 @@ namespace AntiCheatBypassMod
     ///
     /// Covered mechanisms (one line each, see the patch table in ApplyPatches):
     ///   02 GearLegality item destruction        -> Inspect returns Violation.None
+    ///   02 GearLegality inflated-value correction-> InspectStats/CorrectIfOverstated/CorrectOverstated no-op
     ///   04 Character identity (current build)    -> CharacterIdentityFromSkillTree.Reconcile skipped
     ///   05 CharacterPlausibility (hide + join)   -> FilterImplausible/IsImplausible/RejectsJoiningCharacter
     ///   03 Player XP/rune/attribute validators   -> always "clean"; kick/save-block/report disabled
@@ -48,7 +49,11 @@ namespace AntiCheatBypassMod
         // [2026-10-05] 1.1.0 -> 1.2.0: also neutralize the anti-cheat bootstrap (Player.InitializeAntiCheat,
         // SubscribeAntiCheatValueChangedHooks, InitializeOwnerAntiCheatClientRpc) so the new engine
         // never arms its coroutines/value tripwires in the first place.
-        public const string PluginVersion = "1.2.0";
+        // [2026-10-05] 1.2.0 -> 1.3.0: retarget the hotfix bypass to the REAL corrector
+        // (GearLegality.InspectStats / CorrectIfOverstated / CorrectOverstated / CollectContraband),
+        // drop the wrong QARune targets, and let InitializeAntiCheat run again so the rune signature
+        // store is initialized (the editor needs it to re-sign edits).
+        public const string PluginVersion = "1.3.0";
 
         internal static new ManualLogSource Log;
 
@@ -76,17 +81,30 @@ namespace AntiCheatBypassMod
             PatchByName(harmony, "GearLegality", "Inspect",
                 nameof(AntiCheatBypassPatches.InspectPrefix));
 
-            // ----- 02) 2026-10-05 hotfix: second correction path ("inflated numbers are corrected").
-            // The new periodic integrity engine does NOT call Inspect; it gates on ContrabandPreflight
-            // and mutates via Corrupt / RepairRuneCounts. Neutralize each so edited gear is neither
-            // destroyed nor silently rewritten back to vanilla.
-            PatchByName(harmony, "GearLegality", "ContrabandPreflight",
+            // ----- 02) 2026-10-05 hotfix: the "inflated numbers are corrected" engine ------------
+            // New in the hotfix: GearLegality.InspectStats is the private core check, and
+            // CorrectIfOverstated(ref Rune,...) / CorrectOverstated(List<Rune>,...) are the mutators
+            // that rewrite an over-cap rune back to its exact legal value. They do NOT route through
+            // the public Inspect (patched above), so the old bypass left edited gear to be silently
+            // corrected to vanilla in game - the exact EquipmentStatEditor symptom.
+            // [2026-10-05 v1.3.0] Retargeted: ContrabandPreflight/Corrupt live on QARune (the QA
+            // spawner), not GearLegality; RepairRuneCounts lives on SaveSystem and only repairs
+            // count fields (harmless - the editor already sets counts), so neither is patched here.
+            PatchByName(harmony, "GearLegality", "InspectStats",
+                nameof(AntiCheatBypassPatches.InspectPrefix));
+            PatchByName(harmony, "GearLegality", "CorrectIfOverstated",
                 nameof(AntiCheatBypassPatches.FalseResultPrefix));
-            PatchByName(harmony, "GearLegality", "Corrupt",
-                nameof(AntiCheatBypassPatches.CorruptPrefix));
-            PatchByName(harmony, "GearLegality", "RepairRuneCounts",
-                nameof(AntiCheatBypassPatches.SkipPrefix));
+            PatchByName(harmony, "GearLegality", "CorrectOverstated",
+                nameof(AntiCheatBypassPatches.IntZeroResultPrefix));
+            PatchByName(harmony, "GearLegality", "CollectContraband",
+                nameof(AntiCheatBypassPatches.EmptyRuneListPrefix));
+            PatchByName(harmony, "GearLegality", "IsContraband",
+                nameof(AntiCheatBypassPatches.FalseResultPrefix));
+            PatchByName(harmony, "GearLegality", "DestroyIfUnobtainable",
+                nameof(AntiCheatBypassPatches.FalseResultPrefix));
             PatchByName(harmony, "GearLegality", "IsChargeContraband",
+                nameof(AntiCheatBypassPatches.FalseResultPrefix));
+            PatchByName(harmony, "GearLegality", "DestroyIfChargesUnobtainable",
                 nameof(AntiCheatBypassPatches.FalseResultPrefix));
 
             // ----- 05) Character plausibility: stop hiding saves and stop the multiplayer join gate
@@ -173,13 +191,13 @@ namespace AntiCheatBypassMod
                 nameof(AntiCheatBypassPatches.FalseResultPrefix));
 
             // ----- 03) 2026-10-05 hotfix: anti-cheat bootstrap --------------------------------
-            // Stop the new engine from arming at all: InitializeAntiCheat starts the periodic
-            // coroutines and SubscribeAntiCheatValueChangedHooks wires the obfuscated-value
-            // tripwires. Skipping both means the loops/tripwires never register, so there is
-            // nothing left to correct edited runes or flag the session. The owner-side client RPC
-            // is neutralized too (it is the "you may run the checks" handshake).
-            PatchByName(harmony, "Player", "InitializeAntiCheat",
-                nameof(AntiCheatBypassPatches.SkipPrefix));
+            // [2026-10-05 v1.3.0] Reverted the InitializeAntiCheat skip from v1.2.0: that method
+            // initializes Player._runeSignatureStore (the log showed "signature store count=-1",
+            // i.e. null, while it was skipped) and a null store breaks the editor's re-signing.
+            // The engine is already disarmed at the coroutine (MoveNext) and hook-subscription
+            // level, so letting initialization run has no enforcement downside.
+            // PatchByName(harmony, "Player", "InitializeAntiCheat",
+            //     nameof(AntiCheatBypassPatches.SkipPrefix));
             PatchByName(harmony, "Player", "SubscribeAntiCheatValueChangedHooks",
                 nameof(AntiCheatBypassPatches.SkipPrefix));
             PatchByName(harmony, "Player", "InitializeOwnerAntiCheatClientRpc",
