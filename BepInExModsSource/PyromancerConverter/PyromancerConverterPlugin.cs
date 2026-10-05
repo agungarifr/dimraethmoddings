@@ -640,20 +640,31 @@ namespace PyromancerConverter
     {
         private const float ColdHueMin = 0.45f;   // cyan
         private const float ColdHueMax = 0.78f;   // violet-blue
-        private const float FireHueMin = 0.02f;   // red-orange
-        private const float FireHueMax = 0.12f;   // amber
+        private const float FireHueMin = 0.00f;   // pure red (user wanted more red)
+        private const float FireHueMax = 0.045f;  // orange-red
         private const float FireMinValue = 0.80f; // brighten fire a touch
-        private const float FireMinSaturation = 0.60f;
+        private const float FireMinSaturation = 0.75f;
 
         private static readonly HashSet<string> LoggedVfx = new HashSet<string>();
         private static readonly HashSet<string> LoggedMats = new HashSet<string>();
+        // [2026-10-06] Cache of hue-shifted texture copies keyed by source instance id. A null value means the
+        // source texture was already warm (nothing to shift), so we don't re-scan it.
+        private static readonly Dictionary<int, Texture2D> ShiftedTextures = new Dictionary<int, Texture2D>();
+        private static readonly string[] TexProps = { "_MainTex", "_BaseMap", "_Texture", "_MainTexture", "_EmissionMap" };
 
         // [2026-10-06] The ice colour is baked into the renderer material (particle startColor logs as #FFFFFF),
-        // so we tint every common colour property the shader exposes.
+        // so we tint every common colour property the shader exposes. Names below were collected from the actual
+        // shader property dumps: URP Particles/Unlit uses _BaseColor/_Color; Shader Graph Basic_FadeMultiply uses
+        // _Main_Color; Trail_01/Trail_02 use _Color_HDR_1/_Color_HDR_2 (the javelin projectile trail);
+        // Dissolve/Outline shaders use _Main_Color/_edge_color/_Outline_Color; FF_Fire uses _Emission.
         private static readonly string[] ColorProps =
         {
-            "_Color", "_TintColor", "_BaseColor", "_MainColor", "_EmissionColor",
+            "_Color", "_TintColor", "_BaseColor", "_MainColor", "_Main_Color",
+            "_EmissionColor", "_Emission", "_emission",
             "_GlowColor", "_RimColor", "_Tint", "_MainTint", "_OverlayColor",
+            "_Color_HDR_1", "_Color_HDR_2", "_color_edge",
+            "_edge_color", "_edge_color_2", "_Outline_Color", "_OutlineColor",
+            "_Color1", "_Color2", "_Color_Tint",
             "_AllIn1VfxColor", "_AllIn1VfxMainColor", "_AllIn1VfxTintColor",
             "_All1VfxColor", "_All1VfxMainColor", "_AllIn1VfxEmissionColor",
         };
@@ -813,7 +824,99 @@ namespace PyromancerConverter
                 }
                 LogVfx(tag, "Mat." + prop, owner, before, after);
             }
+
+            // [2026-10-06] Some ice materials carry a white tint and a blue texture (e.g. "Fire Anim - blue"),
+            // so also hue-shift the texture itself.
+            changed |= ShiftMaterialTextures(m, tag, owner);
             return changed;
+        }
+
+        private static bool ShiftMaterialTextures(Material m, string tag, string owner)
+        {
+            bool changed = false;
+            foreach (string prop in TexProps)
+            {
+                bool has = false;
+                try { has = m.HasProperty(prop); } catch { }
+                if (!has) continue;
+
+                Texture t = null;
+                try { t = m.GetTexture(prop); } catch { }
+                Texture2D tex = t != null ? t.TryCast<Texture2D>() : null;
+                if (tex == null) continue;
+
+                Texture2D shifted = GetShiftedTexture(tex, tag);
+                if (shifted == null) continue;
+
+                try { m.SetTexture(prop, shifted); changed = true; } catch { }
+                LogVfx(tag, "Tex." + prop, owner, Color.white, Color.white);
+            }
+            return changed;
+        }
+
+        /// <summary>
+        /// Returns a hue-shifted copy of <paramref name="src"/> (cold pixels -> fire), or null when the texture is
+        /// already warm. Copies are cached per source texture so each texture is converted at most once per session.
+        /// </summary>
+        private static Texture2D GetShiftedTexture(Texture2D src, string tag)
+        {
+            int id;
+            try { id = src.GetInstanceID(); } catch { return null; }
+            if (ShiftedTextures.TryGetValue(id, out Texture2D cached)) return cached;
+
+            Texture2D result = null;
+            try
+            {
+                int w = src.width, h = src.height;
+                if (w <= 0 || h <= 0 || w > 4096 || h > 4096)
+                {
+                    ShiftedTextures[id] = null;
+                    return null;
+                }
+
+                // Blit through a RenderTexture so we can read textures that are not CPU-readable.
+                RenderTexture rt = RenderTexture.GetTemporary(w, h, 0, RenderTextureFormat.ARGB32, RenderTextureReadWrite.sRGB);
+                Graphics.Blit(src, rt);
+                RenderTexture prev = RenderTexture.active;
+                RenderTexture.active = rt;
+
+                Texture2D copy = new Texture2D(w, h, TextureFormat.RGBA32, false);
+                copy.ReadPixels(new Rect(0f, 0f, w, h), 0, 0);
+                copy.Apply();
+
+                RenderTexture.active = prev;
+                RenderTexture.ReleaseTemporary(rt);
+
+                Color[] px = copy.GetPixels();
+                bool any = false;
+                for (int i = 0; i < px.Length; i++)
+                {
+                    Color c = px[i];
+                    Color n = ToFire(c);
+                    if (n != c) { px[i] = n; any = true; }
+                }
+
+                if (!any)
+                {
+                    UnityEngine.Object.Destroy(copy);
+                    ShiftedTextures[id] = null;
+                    return null;
+                }
+
+                copy.SetPixels(px);
+                copy.Apply();
+                ShiftedTextures[id] = copy;
+                result = copy;
+
+                if (PyromancerConverterPlugin.LogVfx.Value)
+                    PyromancerConverterPlugin.Log.LogInfo($"[vfx] {tag}: shifted texture '{src.name}' ({w}x{h})");
+            }
+            catch (Exception ex)
+            {
+                PyromancerConverterPlugin.Log?.LogError($"[vfx] tex {tag} {ex.Message}");
+                ShiftedTextures[id] = null;
+            }
+            return result;
         }
 
         private static void LogMaterialOnce(string tag, Material m, string owner, string shaderName, string texName)
