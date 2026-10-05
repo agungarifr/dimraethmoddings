@@ -117,29 +117,17 @@ through the link `modding\BepInExModsSource\`.
 
 All under `modding\BepInExModsSource\`:
 
-- **AlwaysRegenMod** — constant health/stamina regeneration.
 - **AntiCheatBypassMod** — disables the game's anti-cheat checks.
-- **AttackSpeedMod** — edits combat stats: attack speed, crit rate, spell haste, max stamina.
-- **AutoPickupMod** — auto-picks up nearby loot.
 - **BarrageOfArrowsTuner** — tunes the Barrage of Arrows spell.
-- **CarryWeightMod** — raises/removes the carry-weight limit.
 - **ContagionTuner** — tunes the Contagion poison spell (ticks, duration, damage).
 - **DamageNumberTuner** — controls floating damage numbers (hotkey cycles modes).
 - **DayNightToggleMod** — toggles/controls the day-night cycle.
-- **DeedUnlockerMod** — unlocks all Deed Board tiers and raises quest loot rarity.
 - **DimraethMapActionsShopPatch** — patches the DimraethMapActions mod's shop button.
 - **DimraethModPack** — 13-mod QoL/progression pack with an in-game menu (Backquote / F8).
 - **DimraethSanctumChests** — adds Sanctum Chest buttons to the map quick-actions.
 - **EquipmentStatEditor** — in-game (F8) editor for equipped gear stats.
-- **EquippedStatModifier** — live editor for equipped gear secondary stats.
 - **FireballTuner** — tunes the Fireball spell.
-- **HellModeMod** — unlocks the Hell Mode difficulty.
-- **LootAndExpMod** — 10× loot and EXP (legacy).
-- **LootModV2** — 10× loot only (monsters, harvesting, interactables).
 - **NavMeshFixMod** — fixes monster movement/navmesh glitches.
-- **PerfectParryMod** — improves perfect parry (window, stamina, effects).
 - ~~**PlagueShardsHoming** — makes Plague Shards home in on enemies.~~ **broken**
 - **PursuingBlizzardTuner** — tunes the Pursuing Blizzard spell.
-- **RahanerChestMod** — open any chest and expand backpack slots.
 - **TwisterTuner** — tunes the Twister (Vortex) upgrade; optional black-hole pull.
-- **UpgradeBonusStatIsNotRandom** — makes rune upgrade bonus stats fixed.
