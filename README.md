@@ -220,38 +220,20 @@ newer works.
 
 ```
 D:\SteamLibrary\steamapps\common\Dimraeth\
-├─ BepInEx\                        the runtime the GAME loads (from step 4)
-│  ├─ core\
-│  ├─ interop\                     game wrappers, generated on first launch
-│  └─ plugins\                     built mods are copied here
-├─ dimraethmoddings\               the git clone of this repo
-│  └─ BepInExModsSource\           the 29 mod projects (+ docs, tools)
-└─ modding\                        created in step 6.3
-   ├─ BepInEx\                     → link to ..\BepInEx
-   └─ BepInExModsSource\           → link to ..\dimraethmoddings\BepInExModsSource
+├─ BepInEx\                     the game runtime (from step 4)
+├─ dimraethmoddings\            the git clone
+│  └─ BepInExModsSource\        the mod projects
+└─ modding\                     links created in 6.3
+   ├─ BepInEx\                  → ..\BepInEx
+   └─ BepInExModsSource\        → ..\dimraethmoddings\BepInExModsSource
 ```
 
-There are **two** folders named BepInEx on purpose:
+Two BepInEx folders, on purpose:
 
-| Path | Used by | What it is for |
-|---|---|---|
-| `Dimraeth\BepInEx\` | the **game** | BepInEx actually runs from here; the game loads mods from `plugins\` |
-| `Dimraeth\modding\BepInEx\` | the **compiler** | `dotnet build` reads `core\` and `interop\` from here |
+- `Dimraeth\BepInEx\` — the **game** runs from here.
+- `Dimraeth\modding\BepInEx\` — the **compiler** reads `core\` + `interop\` here. Every `.csproj` uses `..\..\BepInEx\...`, which from `modding\BepInExModsSource\<Mod>\` points at `modding\`. It is never used at runtime; 6.3 links it to the real one so only one copy exists.
 
-Why the second one? Every mod `.csproj` points at BepInEx with a path that goes **up two folders**:
-
-```xml
-<HintPath>..\..\BepInEx\core\BepInEx.Core.dll</HintPath>
-<HintPath>..\..\BepInEx\interop\Assembly-CSharp.dll</HintPath>
-```
-
-From `modding\BepInExModsSource\ContagionTuner\`, "up two folders" is `modding\`, so the compiler
-always looks for `modding\BepInEx\`. That copy is **never used at runtime** — the game ignores the
-`modding\` folder completely. Step 6.3 just points it at the real `BepInEx` so there is only one
-copy of the files on disk. (Only `core\` and `interop\` matter; `config\`, `plugins\` and logs do not.)
-
-When a mod builds, it copies its DLL **up three folders** into `Dimraeth\BepInEx\plugins\` — the
-game's real plugins folder — so the mod loads the next time you launch.
+On build, a mod's DLL is copied into `Dimraeth\BepInEx\plugins\` so it loads next launch.
 
 ### 6.2 Clone the repository
 
@@ -260,16 +242,9 @@ cd /d "D:\SteamLibrary\steamapps\common\Dimraeth"
 git clone https://github.com/agungarifr/dimraethmoddings.git dimraethmoddings
 ```
 
-You now have `Dimraeth\dimraethmoddings\BepInExModsSource\` holding the 29 projects (plus the docs
-and tools). Do not build here yet — the compiler still needs the `modding\BepInEx\` folder that the
-next step creates.
-
 ### 6.3 Link the clone into `modding\`
 
-This creates the two links shown in 6.1. A **junction** is a "shortcut folder": no administrator
-rights needed, and no files are duplicated.
-
-**Option A — junctions (recommended: you edit one copy, and git tracks it directly).**
+A junction is a shortcut folder — no admin rights, no duplicated files.
 
 ```bat
 cd /d "D:\SteamLibrary\steamapps\common\Dimraeth"
@@ -285,11 +260,7 @@ New-Item -ItemType Junction -Path "modding\BepInExModsSource" -Target "dimraethm
 New-Item -ItemType Junction -Path "modding\BepInEx" -Target "BepInEx"
 ```
 
-Result: `modding\BepInExModsSource` **is** the clone's source (edit it and git sees the change), and
-`modding\BepInEx` **is** the game's BepInEx (so `interop` is always current).
-
-**Option B — plain copies (if you would rather not use links).** With this option you must copy your
-edits back into `dimraethmoddings\BepInExModsSource` before committing them.
+<details><summary>Option B — plain copies instead of junctions</summary>
 
 ```bat
 cd /d "D:\SteamLibrary\steamapps\common\Dimraeth"
@@ -299,15 +270,17 @@ xcopy /E /I /Y "BepInEx\core"    "modding\BepInEx\core"
 xcopy /E /I /Y "BepInEx\interop" "modding\BepInEx\interop"
 ```
 
+Copy edits back into `dimraethmoddings\BepInExModsSource` before committing.
+</details>
+
 ### 6.4 Confirm it worked
 
 ```powershell
-Test-Path "modding\BepInEx\core\BepInEx.Core.dll"                          # True
-Test-Path "modding\BepInEx\interop\Assembly-CSharp.dll"                    # True
-Test-Path "modding\BepInExModsSource\ContagionTuner\ContagionTuner.csproj" # True
+Test-Path "modding\BepInEx\core\BepInEx.Core.dll"
+Test-Path "modding\BepInEx\interop\Assembly-CSharp.dll"
 ```
 
-If any line is `False`, redo step 6.3.
+If either is `False`, redo 6.3.
 
 ---
 
