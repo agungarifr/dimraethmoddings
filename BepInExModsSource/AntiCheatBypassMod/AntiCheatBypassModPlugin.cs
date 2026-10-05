@@ -20,6 +20,7 @@ namespace AntiCheatBypassMod
     /// Covered mechanisms (one line each, see the patch table in ApplyPatches):
     ///   02 GearLegality item destruction        -> Inspect returns Violation.None
     ///   02 GearLegality inflated-value correction-> InspectStats/ExceedsValueCeiling/IsStatAllowedOnSlot swept benign
+    ///                                                + TryExactStatValue (the real mutator) forced false
     ///   04 Character identity (current build)    -> CharacterIdentityFromSkillTree.Reconcile skipped
     ///   05 CharacterPlausibility (hide + join)   -> FilterImplausible/IsImplausible/RejectsJoiningCharacter
     ///   03 Player XP/rune/attribute validators   -> always "clean"; kick/save-block/report disabled
@@ -57,7 +58,15 @@ namespace AntiCheatBypassMod
         // Re-skip Player.InitializeAntiCheat (v1.2.0 was stable), drop CollectContraband and every
         // byref-Rune corrector target, and neutralize the corrector via by-value checks instead
         // (InspectStats -> None, ExceedsValueCeiling -> false, IsStatAllowedOnSlot -> true).
-        public const string PluginVersion = "1.4.0";
+        // [2026-10-05] 1.4.0 -> 1.5.0: v1.4.0 no longer crashed, but an EquipmentStatEditor write
+        // still showed vanilla stats. Fresh ISIL of the CURRENT build (modding/cpp2il_new_isil)
+        // shows the real mutator, GearLegality.CorrectIfOverstated, does NOT consult InspectStats or
+        // ExceedsValueCeiling at all: it calls TryExactStatValue(Stat, Stars, int, out float)
+        // directly, at the primary AND each secondary slot, and rewrites StatValues whenever the
+        // stored value exceeds exact+epsilon. That single by-value method is now forced to false
+        // (result only; the caller checks the bool before reading the out value), which makes every
+        // correction a no-op while keeping the stable v1.4.0 bootstrap behaviour.
+        public const string PluginVersion = "1.5.0";
 
         internal static new ManualLogSource Log;
 
@@ -105,6 +114,17 @@ namespace AntiCheatBypassMod
             PatchByName(harmony, "GearLegality", "IsContraband",
                 nameof(AntiCheatBypassPatches.FalseResultPrefix));
             PatchByName(harmony, "GearLegality", "IsChargeContraband",
+                nameof(AntiCheatBypassPatches.FalseResultPrefix));
+            // [2026-10-05 v1.5.0] THE actual corrector mutator (found in cpp2il_new_isil ISIL):
+            // CorrectIfOverstated calls TryExactStatValue(Stat, Stars, int, out float) at the
+            // primary slot (ISIL line ~2119) and again per secondary slot (~2189); each call site is
+            // `Compare rax,0; JumpIfEqual {skip}`, and only when it returns true (exact found) AND
+            // stored > exact+epsilon does it overwrite StatValues and set the "corrected" flag.
+            // Forcing it false skips every rewrite; the out float is left untouched and never read
+            // because the caller branches on the bool first. It is by-VALUE (enum, enum, int, out
+            // float) so it does not reintroduce the v1.3.0 byref-Rune crash, and it is private
+            // static on GearLegality (no other caller), so legitimate display is unaffected.
+            PatchByName(harmony, "GearLegality", "TryExactStatValue",
                 nameof(AntiCheatBypassPatches.FalseResultPrefix));
             // [2026-10-05 v1.4.0] Dropped (byref-Rune): CorrectIfOverstated, CorrectOverstated,
             // CollectContraband, DestroyIfUnobtainable, DestroyIfChargesUnobtainable. The

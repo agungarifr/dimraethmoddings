@@ -630,3 +630,54 @@ stopped at their first `MoveNext`. `Player.InitializeAntiCheat` / `SubscribeAnti
 / `InitializeOwnerAntiCheatClientRpc` are skipped again (v1.2.0 behaviour, known stable). The
 rune signature store stays null (`signature store count=-1`), which is harmless once the
 validators and corrector are no-ops.
+
+## 12. Correction — 2026-10-05: the corrector calls `TryExactStatValue`, not `InspectStats`
+
+> **v1.4.0 did not work.** It crashed no more, but an EquipmentStatEditor write still showed
+> vanilla stats. The claim in §11 that `InspectStats` / `ExceedsValueCeiling` "stop the corrector
+> at its decision points" was **wrong**.
+
+The reason surfaced when the *current* build was disassembled to ISIL with the bundled Cpp2IL
+(`--output-as isil --use-processor attributeanalyzer`, output in
+`modding/cpp2il_new_isil/IsilDump/Assembly-CSharp/GearLegality.txt`). `CorrectIfOverstated`
+touches neither `InspectStats` nor `ExceedsValueCeiling`; it calls a **different** private method
+directly:
+
+| Member | Signature (from 2026-10-05 interop) | Evidence in the new ISIL |
+|---|---|---|
+| `GearLegality.TryExactStatValue` | `private static bool TryExactStatValue(Stat stat, Stars stars, int level, out float exact)` | called from `CorrectIfOverstated` at ISIL line ~2119 (primary slot) and ~2189 (each secondary slot) |
+| `GearLegality.MostStatUpgrades` | `private static int MostStatUpgrades(int runeLevel, int index)` | used to cap the upgrade count feeding `TryExactStatValue` |
+
+The correction loop is:
+
+```
+Call TryExactStatValue, …            ; returns exact legal value in `out float`
+Compare rax, 0
+JumpIfEqual {skip}                   ; false => this stat is left alone
+; true => compare stored value against exact + epsilon
+Compare xmm0, xmm1                   ; stored vs exact+eps
+JumpIfLessOrEqual {skip}
+; stored > exact+eps  =>  overwrite StatValues and set the "corrected" flag (r12 = 1)
+```
+
+So every value above the exact legal roll (the editor's edited `StatValues`) is rewritten at the
+next `CorrectIfOverstated` (save/load/periodic). Patching the *decision* predicates had no effect
+because the corrector never asks them.
+
+**Fix — `AntiCheatBypassMod` v1.5.0** (2026-10-05). One added by-value prefix:
+
+* `GearLegality.TryExactStatValue` → `false` (reusing `FalseResultPrefix`, `ref bool __result` only).
+
+Returning `false` makes both call sites `JumpIfEqual {skip}`, so `CorrectIfOverstated` rewrites
+nothing and returns `false`. The `out float exact` is intentionally left unset: the caller branches
+on the bool before reading it, so it is never consumed. The shape is **by value** (`Stat`, `Stars`,
+`int`, `out float`) — no `ref Rune` — so it does **not** reintroduce the v1.3.0 `coreclr.dll` crash.
+`TryExactStatValue` is `private static` on `GearLegality` with no other caller, so legitimate stat
+display (which goes through `Runes.GetTotalRuneFlatBonus` / `GetTotalRunePercentBonus`, reading the
+stored `StatValues` directly) is unaffected.
+
+**Verification of the write path (new build).** ISIL of `Runes.GetTotalRuneFlatBonus` indexes the
+rune's `PrimaryStat` (offset `0x60`) and its `FixedList` secondaries and reads their stored values,
+confirming `StatValues` really do drive the applied bonuses. The symptom was therefore an
+unconditional **rewrite**, not a formula recompute — which is exactly what the `TryExactStatValue`
+patch stops.
