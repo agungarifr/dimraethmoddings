@@ -78,33 +78,46 @@ The DLL loads the next time you start the game.
 
 ## Folders
 
-```
-D:\SteamLibrary\steamapps\common\Dimraeth\
-├─ Dimraeth.exe, GameAssembly.dll, Dimraeth_Data\   the game
-├─ winhttp.dll, doorstop_config.ini, dotnet\        BepInEx loader + its .NET runtime
-├─ BepInEx\                                         the loader the game runs
-│  ├─ core\                                          BepInEx / Harmony / Il2CppInterop DLLs
-│  ├─ interop\                                       generated C# wrappers for the game's classes
-│  ├─ plugins\                                       built mods land here
-│  ├─ config\                                        per-mod .cfg settings
-│  └─ LogOutput.log                                  BepInEx + mod log
-├─ dimraethmoddings\                                the cloned GitHub repo
-│  └─ BepInExModsSource\                             the mod projects
-└─ modding\                                         links the compiler builds through
-   ├─ BepInEx\             → ..\BepInEx             compiler reads core\ + interop\ here
-   └─ BepInExModsSource\   → ..\dimraethmoddings\BepInExModsSource
-```
+The mod projects live in `dimraethmoddings\BepInExModsSource\` (the clone); you build/open them
+through the link `modding\BepInExModsSource\`.
 
-| Folder | What it is for |
-|---|---|
-| `BepInEx\` | The mod loader the game starts. |
-| `BepInEx\core\` | BepInEx, Harmony and Il2CppInterop themselves — what a mod is compiled against. |
-| `BepInEx\interop\` | C# wrappers for every game class, generated on first launch. Mods call the game through these. |
-| `BepInEx\plugins\` | Every built mod `.dll` is copied here; the game loads them on launch. |
-| `BepInEx\config\` | Per-mod settings (`.cfg`), editable. |
-| `BepInEx\LogOutput.log` | BepInEx and mod log — where you check whether a mod loaded. |
-| `dimraethmoddings\` | The cloned GitHub repository. |
-| `dimraethmoddings\BepInExModsSource\` | The mod projects (`.csproj` + `.cs`). |
-| `modding\BepInExModsSource\` | Link to the repo source — you edit and build through this path. |
-| `modding\BepInEx\` | Link to the real `BepInEx`. The `.csproj` files reference `..\..\BepInEx`, so the compiler needs `core\` + `interop\` inside `modding\`. It is never loaded at runtime. |
-| `dotnet\` | BepInEx's private .NET runtime (not the build SDK). |
+- `BepInEx\` — the loader the game runs. `core\` = BepInEx/Harmony/Il2CppInterop; `interop\` = C#
+  wrappers for the game's classes, generated on first launch; `plugins\` = built mods land here;
+  `config\` = per-mod settings; `LogOutput.log` = the log.
+- `modding\BepInEx\` — link to the real `BepInEx`. The `.csproj` files use `..\..\BepInEx`, so the
+  compiler reads `core\` + `interop\` here. Never loaded at runtime.
+- `dotnet\` — BepInEx's private .NET runtime (not the build SDK).
+
+## Mods
+
+All under `modding\BepInExModsSource\`:
+
+- **AlwaysRegenMod** — constant health/stamina regeneration.
+- **AntiCheatBypassMod** — disables the game's anti-cheat checks.
+- **AttackSpeedMod** — edits combat stats: attack speed, crit rate, spell haste, max stamina.
+- **AutoPickupMod** — auto-picks up nearby loot.
+- **BarrageOfArrowsTuner** — tunes the Barrage of Arrows spell.
+- **CarryWeightMod** — raises/removes the carry-weight limit.
+- **ConfigurableLevelCapFreebuff** — replaces the level-25 cap with a configurable one (default 99).
+- **ConfigurableLevelCapFreebuff_Debug** — debug build of the same.
+- **ContagionTuner** — tunes the Contagion poison spell (ticks, duration, damage).
+- **DamageNumberTuner** — controls floating damage numbers (hotkey cycles modes).
+- **DayNightToggleMod** — toggles/controls the day-night cycle.
+- **DeedUnlockerMod** — unlocks all Deed Board tiers and raises quest loot rarity.
+- **DimraethMapActionsShopPatch** — patches the DimraethMapActions mod's shop button.
+- **DimraethModPack** — 13-mod QoL/progression pack with an in-game menu (Backquote / F8).
+- **DimraethSanctumChests** — adds Sanctum Chest buttons to the map quick-actions.
+- **EquipmentStatEditor** — in-game (F8) editor for equipped gear stats.
+- **EquippedStatModifier** — live editor for equipped gear secondary stats.
+- **FireballTuner** — tunes the Fireball spell.
+- **HellModeLevel75Freebuff** — adds Hell Mode + a level-75 cap at world creation.
+- **HellModeMod** — unlocks the Hell Mode difficulty.
+- **LootAndExpMod** — 10× loot and EXP (legacy).
+- **LootModV2** — 10× loot only (monsters, harvesting, interactables).
+- **NavMeshFixMod** — fixes monster movement/navmesh glitches.
+- **PerfectParryMod** — improves perfect parry (window, stamina, effects).
+- **PlagueShardsHoming** — makes Plague Shards home in on enemies.
+- **PursuingBlizzardTuner** — tunes the Pursuing Blizzard spell.
+- **RahanerChestMod** — open any chest and expand backpack slots.
+- **TwisterTuner** — tunes the Twister (Vortex) upgrade; optional black-hole pull.
+- **UpgradeBonusStatIsNotRandom** — makes rune upgrade bonus stats fixed.
