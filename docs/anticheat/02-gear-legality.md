@@ -605,4 +605,8 @@ then showed vanilla stats again (and why its `VerifyPending` rolled the edit bac
 `AntiCheatBypassMod` **v1.1.0** (2026-10-05): `ContrabandPreflight` → `false`,
 `Corrupt` → returns its input rune unchanged, `RepairRuneCounts` → skipped,
 `IsChargeContraband` → `false`, and both `Player.Periodic*Check` coroutines are stopped at
-their first `MoveNext` step (same technique as `SpeedHackDetectionRoutine`).
+their first `MoveNext` step (same technique as `SpeedHackDetectionRoutine`). v1.2.0
+additionally skips the engine's bootstrap so it never arms: `Player.InitializeAntiCheat`
+(starts the periodic coroutines), `Player.SubscribeAntiCheatValueChangedHooks` (wires the
+value tripwires), and `Player.InitializeOwnerAntiCheatClientRpc` (the "you may run checks"
+handshake).

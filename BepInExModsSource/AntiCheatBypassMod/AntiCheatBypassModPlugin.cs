@@ -45,7 +45,10 @@ namespace AntiCheatBypassMod
         // rune-correction engine (ContrabandPreflight / Corrupt / RepairRuneCounts +
         // Player.PeriodicRuneIntegrityCheck / PeriodicAntiCheatCheck). Those are now bypassed too,
         // so edited gear is no longer silently reverted to vanilla.
-        public const string PluginVersion = "1.1.0";
+        // [2026-10-05] 1.1.0 -> 1.2.0: also neutralize the anti-cheat bootstrap (Player.InitializeAntiCheat,
+        // SubscribeAntiCheatValueChangedHooks, InitializeOwnerAntiCheatClientRpc) so the new engine
+        // never arms its coroutines/value tripwires in the first place.
+        public const string PluginVersion = "1.2.0";
 
         internal static new ManualLogSource Log;
 
@@ -168,6 +171,19 @@ namespace AntiCheatBypassMod
                 nameof(AntiCheatBypassPatches.FalseResultPrefix));
             PatchCoroutineMoveNext(harmony, "Player", "PeriodicAntiCheatCheck",
                 nameof(AntiCheatBypassPatches.FalseResultPrefix));
+
+            // ----- 03) 2026-10-05 hotfix: anti-cheat bootstrap --------------------------------
+            // Stop the new engine from arming at all: InitializeAntiCheat starts the periodic
+            // coroutines and SubscribeAntiCheatValueChangedHooks wires the obfuscated-value
+            // tripwires. Skipping both means the loops/tripwires never register, so there is
+            // nothing left to correct edited runes or flag the session. The owner-side client RPC
+            // is neutralized too (it is the "you may run the checks" handshake).
+            PatchByName(harmony, "Player", "InitializeAntiCheat",
+                nameof(AntiCheatBypassPatches.SkipPrefix));
+            PatchByName(harmony, "Player", "SubscribeAntiCheatValueChangedHooks",
+                nameof(AntiCheatBypassPatches.SkipPrefix));
+            PatchByName(harmony, "Player", "InitializeOwnerAntiCheatClientRpc",
+                nameof(AntiCheatBypassPatches.SkipPrefix));
         }
 
         /// <summary>
