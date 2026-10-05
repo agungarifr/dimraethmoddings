@@ -16,6 +16,45 @@ opencode --version
 
 Give it a model with `opencode auth login` (or add a provider in `opencode.json`).
 
+### 1.1 Optional agent helpers
+
+These make the AI better at this repo. **None are required to build mods.**
+
+- **CodeGraph** — code-graph index (the successor to graphify). Install and index:
+
+  ```bat
+  npm i -g @colbymchenry/codegraph
+  codegraph init "D:\SteamLibrary\steamapps\common\Dimraeth\modding\BepInExModsSource"
+  ```
+
+  Then add it to `opencode.json` as an MCP server:
+
+  ```jsonc
+  "mcp": { "servers": { "codegraph": {
+    "type": "local", "command": ["codegraph", "serve", "--mcp"],
+    "cwd": "modding/BepInExModsSource" } } }
+  ```
+
+- **Memento** — persistent memory across sessions. Install and add:
+
+  ```bat
+  npm i -g @iachilles/memento
+  ```
+
+  ```jsonc
+  "mcp": { "servers": { "memory": {
+    "type": "local", "command": ["memento"],
+    "environment": { "MEMORY_DB_PATH": "C:\\Users\\<you>\\.local\\share\\memento\\memory.db" } } } }
+  ```
+
+- **Karpathy guidelines** — coding-behavior skill used by this project:
+
+  ```bat
+  git clone https://github.com/multica-ai/andrej-karpathy-skills
+  ```
+
+  Then add its `skills\` folder to the `skills` list in your opencode config.
+
 ---
 
 ## 2. Open the game folder
