@@ -31,12 +31,12 @@ opencode.example.json   Redacted sample of the local agent config
 | AlwaysRegenMod | AntiCheatBypassMod | AttackSpeedMod |
 | AutoPickupMod | BarrageOfArrowsTuner | CarryWeightMod |
 | ConfigurableLevelCapFreebuff | ConfigurableLevelCapFreebuff_Debug | ContagionTuner |
-| DayNightToggleMod | DeedUnlockerMod | DimraethMapActionsShopPatch |
-| DimraethModPack | DimraethSanctumChests | EquipmentStatEditor |
-| EquippedStatModifier | FireballTuner | HellModeLevel75Freebuff |
-| HellModeMod | LootAndExpMod | LootModV2 |
-| NavMeshFixMod | PerfectParryMod | PlagueShardsHoming |
-| PursuingBlizzardTuner | RahanerChestMod | RenosUtilitiesSource |
+| DamageNumberTuner | DayNightToggleMod | DeedUnlockerMod |
+| DimraethMapActionsShopPatch | DimraethModPack | DimraethSanctumChests |
+| EquipmentStatEditor | EquippedStatModifier | FireballTuner |
+| HellModeLevel75Freebuff | HellModeMod | LootAndExpMod |
+| LootModV2 | NavMeshFixMod | PerfectParryMod |
+| PlagueShardsHoming | PursuingBlizzardTuner | RahanerChestMod |
 | TwisterTuner | UpgradeBonusStatIsNotRandom | |
 
 ## Analysis tools
