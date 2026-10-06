@@ -40,7 +40,9 @@ namespace DimraethModPack.Modules.Loot
                 _empowered = false;
                 // [2026-09-30 11:40] Kembalikan pool asli monster setelah drop selesai (opsi c').
                 RestoreNarrowing();
-                _hasForce = false;
+                // [2026-10-06 09:00] OBSOLETE: _hasForce (satu tipe) digantikan _hasPlan/ClearPlan.
+                // _hasForce = false;
+                ClearPlan();
             }
         }
 
@@ -112,93 +114,201 @@ namespace DimraethModPack.Modules.Loot
         }
 
         // =====================================================================
-        // [2026-09-30 11:40] Opsi (c'): "tepat N per (set,slot)" TANPA menyentuh ServerRPC.
-        // Desain memang menginginkan N keping bertipe (set,slot) SAMA dengan stat di-reroll.
-        // Kita wujudkan dengan mengunci SATU tipe per drop di loop multi-drop native:
-        //   1) PlanRuneDrop(): sample 1 tipe memakai RNG ber-bobot milik game
-        //      (Runes.ReturnRandomRuneData), lalu N = EquipmentDropCounts.Resolve(set,slot).
-        //   2) ApplyNarrowing(): persempit cfg.RuneSets/cfg.Slots monster ke tipe itu selama drop,
-        //      sehingga loop native men-spawn tepat N keping tipe sama (tiap keping di-reroll).
-        //   3) RestoreNarrowing(): kembalikan list asli (dipanggil di EndSource, saat depth 0).
-        // Aman: hanya memakai patch RuneDropCheck (prefix/postfix) + Runes.ReturnRandomRuneData
-        // (prefix). Tidak ada panggilan ke ServerRPC sama sekali.
+        // [2026-10-06 09:00] DESAIN BARU (permintaan user 2026-10-06): "semua slot dari SATU set".
+        // Menggantikan opsi (c') lama "tepat N keping untuk SATU (set,slot)":
+        //   1) PlanRuneDrop(): pilih SATU set acak (peluang sama antar set monster), lalu kumpulkan
+        //      SEMUA slot = cfg.Slots ∩ slot yang didukung set itu (RuneSetDefinition.SlotDefinitions),
+        //      tiap slot digandakan sesuai EquipmentDropCounts.Resolve(set, slot).
+        //   2) ApplyPlan(): set cfg.RuneDropCount = total keping rencana. cfg.RuneSets/Slots monster
+        //      TIDAK diubah; tipe setiap keping dipaksa lewat prefix ReturnRandomRuneData.
+        //   3) ApplyPlannedType(): prefix Runes.ReturnRandomRuneData memberi tipe (set,slot) rencana
+        //      satu per keping -> satu kill = seluruh slot set terpilih.
+        // Alasan ganti: desain lama mengunci satu tipe sehingga slot lain (Bracer/Ring/Charm/…)
+        // tak pernah bisa muncul walaupun monster mengizinkannya.
+        // Desain lama (disimpan untuk rujukan):
+        //   - PlanRuneDrop() menyampling 1 tipe via Runes.ReturnRandomRuneData.
+        //   - ApplyNarrowing() mempersempit cfg.RuneSets/cfg.Slots ke tipe itu; loop native spawn N.
+        //   - RestoreNarrowing() mengembalikan list asli (dipanggil di EndSource).
         // =====================================================================
-        static bool _sampling;
-        static bool _hasForce;
-        static Runes.RuneSet _forceSet;
-        static Runes.SlotType _forceSlot;
-        static MonsterConfiguration _narrowCfg;
-        static Il2CppSystem.Collections.Generic.List<Runes.RuneSet> _origSets;
-        static Il2CppSystem.Collections.Generic.List<Runes.SlotType> _origSlots;
+        // [2026-10-06 09:00] OBSOLETE: _sampling tak lagi dipakai — PlanRuneDrop kini memilih set
+        // langsung (tanpa sampling via Runes.ReturnRandomRuneData), jadi tidak ada log keping yang
+        // perlu disembunyikan. Digantikan guard _hasPlan di bawah.
+        // static bool _sampling;
+        static bool _hasPlan;
+        static readonly System.Collections.Generic.List<PlannedSlot> _plan =
+            new System.Collections.Generic.List<PlannedSlot>();
+        static int _planCursor;
+        static MonsterConfiguration _planCfg;
+        static int _planOrigCount;
 
-        /// <summary>True saat mengambil sample tipe (agar log keping tidak ikut tercatat).</summary>
-        public static bool Sampling => _sampling;
-
-        /// <summary>Label tipe terkunci untuk diagnostik.</summary>
-        public static string ForcedLabel => _hasForce ? _forceSet + "/" + _forceSlot : "none";
-
-        /// <summary>Rencanakan drop: sample 1 tipe, kembalikan N yang harus diterapkan.</summary>
-        public static int PlanRuneDrop(MonsterConfiguration cfg)
+        struct PlannedSlot
         {
-            _hasForce = false;
-            if (cfg == null) return 0;
-            Rune sample = Rune.Empty;
-            _sampling = true;
-            try
-            {
-                sample = Runes.ReturnRandomRuneData(cfg.RuneSets, cfg.Slots, cfg.Rarities, cfg.Stars, false);
-            }
-            catch { }
-            finally { _sampling = false; }
-
-            if (!sample.IsEmpty())
-            {
-                _forceSet = sample.Set;
-                _forceSlot = sample.SlotType;
-                _hasForce = true;
-                return EquipmentDropCounts.Resolve(_forceSet, _forceSlot);
-            }
-            // Fallback (gagal sample): pakai nilai tertinggi antar tipe yang diizinkan.
-            return EquipmentDropCounts.ResolveForConfig(cfg);
+            public Runes.RuneSet Set;
+            public Runes.SlotType Slot;
         }
 
-        /// <summary>Terapkan N + persempit pool monster (bila N&gt;1); restore nilai bila N&lt;=1.</summary>
-        public static void ApplyNarrowing(MonsterConfiguration cfg, int n, int origCount)
+        // [2026-10-06 09:00] OBSOLETE (lihat catatan _sampling di atas):
+        // /// <summary>True saat mengambil sample tipe (agar log keping tidak ikut tercatat).</summary>
+        // public static bool Sampling => _sampling;
+
+        // [2026-10-06 09:00] OBSOLETE: label satu-tipe (ForcedLabel) digantikan PlanLabel karena
+        // rencana kini memuat banyak tipe. Kode lama disimpan untuk rujukan:
+        // public static string ForcedLabel => _hasForce ? _forceSet + "/" + _forceSlot : "none";
+
+        /// <summary>Label rencana untuk diagnostik (tipe pertama + jumlah keping).</summary>
+        public static string PlanLabel
+        {
+            get
+            {
+                if (!_hasPlan || _plan.Count == 0) return "none";
+                return _plan[0].Set + "/" + _plan[0].Slot + " x" + _plan.Count;
+            }
+        }
+
+        /// <summary>Rencanakan drop: pilih 1 set (peluang sama), kumpulkan semua slot viable-nya.</summary>
+        public static int PlanRuneDrop(MonsterConfiguration cfg)
+        {
+            RestoreNarrowing();
+            ClearPlan();
+            if (cfg == null || cfg.RuneSets == null || cfg.RuneSets.Count == 0
+                || cfg.Slots == null || cfg.Slots.Count == 0) return 0;
+
+            // [2026-10-06 09:00] Peluang sama antar set. Bila set terpilih tak beririsan dengan
+            // cfg.Slots, coba set berikutnya (rotasi) agar drop tidak kosong.
+            int setCount = cfg.RuneSets.Count;
+            int start = UnityEngine.Random.Range(0, setCount);
+            Runes.RuneSet chosen = default(Runes.RuneSet);
+            Il2CppSystem.Collections.Generic.List<Runes.SlotType> viable = null;
+            for (int k = 0; k < setCount; k++)
+            {
+                Runes.RuneSet set = cfg.RuneSets[(start + k) % setCount];
+                Il2CppSystem.Collections.Generic.List<Runes.SlotType> v = TryViableSlots(set, cfg.Slots);
+                if (v != null && v.Count > 0)
+                {
+                    chosen = set;
+                    viable = v;
+                    break;
+                }
+            }
+            if (viable == null || viable.Count == 0) return 0;
+
+            for (int i = 0; i < viable.Count; i++)
+            {
+                Runes.SlotType slot = viable[i];
+                int copies = EquipmentDropCounts.Resolve(chosen, slot);
+                if (copies < 1) copies = 1;
+                for (int c = 0; c < copies; c++)
+                {
+                    PlannedSlot entry = default(PlannedSlot);
+                    entry.Set = chosen;
+                    entry.Slot = slot;
+                    _plan.Add(entry);
+                }
+            }
+            if (_plan.Count == 0) return 0;
+            _hasPlan = true;
+            return _plan.Count;
+        }
+
+        static Il2CppSystem.Collections.Generic.List<Runes.SlotType> TryViableSlots(
+            Runes.RuneSet set, Il2CppSystem.Collections.Generic.List<Runes.SlotType> slots)
+        {
+            // [2026-10-06 09:00] Irisan manual cfg.Slots ∩ slot yang didukung set (setara
+            // Runes.ViableSlotsFor(..., warnOnFallback:false), tapi lolos dari kendala tipe
+            // IEnumerable interop). ViableSlotsFor sendiri hanya membandingkan SlotType, jadi
+            // kita memakai sumber data yang sama (RuneSetDefinition.SlotDefinitions).
+            try
+            {
+                RuneManager mgr = RuneManager.Singleton;
+                if (mgr == null) return null;
+                RuneSetDefinition def = mgr.GetRuneSetDefinition(set);
+                if (def == null || def.SlotDefinitions == null) return null;
+                var result = new Il2CppSystem.Collections.Generic.List<Runes.SlotType>();
+                for (int i = 0; i < slots.Count; i++)
+                {
+                    Runes.SlotType slot = slots[i];
+                    for (int j = 0; j < def.SlotDefinitions.Count; j++)
+                    {
+                        RuneSlotDefinition sd = def.SlotDefinitions[j];
+                        if (sd != null && sd.SlotType == slot)
+                        {
+                            result.Add(slot);
+                            break;
+                        }
+                    }
+                }
+                return result;
+            }
+            catch { return null; }
+        }
+
+        /// <summary>Ambil tipe (set,slot) berikutnya untuk satu keping native.</summary>
+        public static bool TakePlannedType(out Runes.RuneSet set, out Runes.SlotType slot)
+        {
+            set = default(Runes.RuneSet);
+            slot = default(Runes.SlotType);
+            if (!_hasPlan || _plan.Count == 0) return false;
+            // [2026-10-06 09:00] Monster "empowered" menggandakan RuneDropCount di RuneDropCheck; wrap
+            // agar keping ekstra tetap di dalam set terpilih (bukan tipe acak dari seluruh pool).
+            PlannedSlot entry = _plan[_planCursor % _plan.Count];
+            _planCursor++;
+            set = entry.Set;
+            slot = entry.Slot;
+            return true;
+        }
+
+        /// <summary>Prefix Runes.ReturnRandomRuneData: paksa tipe (set,slot) rencana per keping.</summary>
+        public static void ApplyPlannedType(
+            ref Il2CppSystem.Collections.Generic.List<Runes.RuneSet> runeSets,
+            ref Il2CppSystem.Collections.Generic.List<Runes.SlotType> slotTypes)
+        {
+            // [2026-10-06 09:00] Guard _sampling dihapus (kini selalu false / tak dipakai).
+            if (!Enabled || !Active || !_hasPlan) return;
+            Runes.RuneSet set;
+            Runes.SlotType slot;
+            if (!TakePlannedType(out set, out slot)) return;
+            var sets = new Il2CppSystem.Collections.Generic.List<Runes.RuneSet>();
+            sets.Add(set);
+            var slots = new Il2CppSystem.Collections.Generic.List<Runes.SlotType>();
+            slots.Add(slot);
+            runeSets = sets;
+            slotTypes = slots;
+        }
+
+        /// <summary>Terapkan total keping rencana; restore count asli bila tak ada rencana.</summary>
+        public static void ApplyPlan(MonsterConfiguration cfg, int n, int origCount)
         {
             RestoreNarrowing();
             if (cfg == null) return;
-            if (!_hasForce || n <= 1)
+            if (!_hasPlan || n <= 0)
             {
                 cfg.RuneDropCount = origCount;
                 return;
             }
-            _narrowCfg = cfg;
-            _origSets = cfg.RuneSets;
-            _origSlots = cfg.Slots;
-            var sets = new Il2CppSystem.Collections.Generic.List<Runes.RuneSet>();
-            sets.Add(_forceSet);
-            var slots = new Il2CppSystem.Collections.Generic.List<Runes.SlotType>();
-            slots.Add(_forceSlot);
-            cfg.RuneSets = sets;
-            cfg.Slots = slots;
+            _planCfg = cfg;
+            _planOrigCount = origCount;
+            // [2026-10-06 09:00] Tidak lagi mengubah cfg.RuneSets/cfg.Slots (dulu ApplyNarrowing).
             cfg.RuneDropCount = n;
         }
 
-        /// <summary>Kembalikan cfg.RuneSets/Slots asli. Tidak mengubah _hasForce.</summary>
+        /// <summary>Kembalikan RuneDropCount asli (tidak menyentuh rencana).</summary>
         public static void RestoreNarrowing()
         {
-            if (_narrowCfg != null)
+            if (_planCfg != null)
             {
-                try
-                {
-                    _narrowCfg.RuneSets = _origSets;
-                    _narrowCfg.Slots = _origSlots;
-                }
+                try { _planCfg.RuneDropCount = _planOrigCount; }
                 catch { }
             }
-            _narrowCfg = null;
-            _origSets = null;
-            _origSlots = null;
+            _planCfg = null;
+            _planOrigCount = 0;
+        }
+
+        /// <summary>Bersihkan rencana + kursor.</summary>
+        public static void ClearPlan()
+        {
+            _plan.Clear();
+            _planCursor = 0;
+            _hasPlan = false;
         }
 
         public static void DrainWorld(ServerRPC rpc, Rune trigger, int count,

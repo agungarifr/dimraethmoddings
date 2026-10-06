@@ -456,11 +456,15 @@ namespace DimraethModPack.Modules.Loot
     {
         [HarmonyPrefix]
         public static void Prefix(
+            ref Il2CppSystem.Collections.Generic.List<Runes.RuneSet> runeSets,
+            ref Il2CppSystem.Collections.Generic.List<Runes.SlotType> slotTypes,
             Il2CppSystem.Collections.Generic.List<Runes.Rarity> rarities,
             Il2CppSystem.Collections.Generic.List<Runes.Stars> stars,
             bool empowered)
         {
             EquipmentDropBoost.NotePools(rarities, stars, empowered);
+            // [2026-10-06 09:00] Paksa tipe (set,slot) sesuai rencana "semua slot satu set".
+            EquipmentDropBoost.ApplyPlannedType(ref runeSets, ref slotTypes);
             // [2026-09-30 11:15] Diagnostik drop: dipanggil sekali per keping rune yang digenerate.
             // [2026-09-30 11:40] Lewati saat sampling tipe (bukan keping nyata).
             // [2026-09-30 12:45] OBSOLETE — diagnostik per-keping hanya untuk verifikasi awal dan sudah
@@ -487,13 +491,14 @@ namespace DimraethModPack.Modules.Loot
     [HarmonyPatch(typeof(MonsterUtils), "RuneDropCheck")]
     public static class Patch_SrcFlag_RuneDropCheck
     {
-        // [2026-09-30 11:10] Jumlah drop equipment kini di-set di sini lewat field native
+        // [2026-09-30 11:10] Jumlah drop equipment di-set di sini lewat field native
         // MonsterConfiguration.RuneDropCount. Game sendiri sudah punya loop multi-drop
-        // (MonsterUtils.RuneDropCheck) yang men-spawn sampai RuneDropCount keping, tiap keping
-        // di-reroll set/slot/stat-nya secara acak dari daftar RuneSets/Slots monster tsb.
+        // (MonsterUtils.RuneDropCheck) yang men-spawn sampai RuneDropCount keping.
+        // [2026-10-06 09:00] UBAH: tiap keping kini dipaksa ke tipe (set,slot) dari rencana
+        // "semua slot satu set" via prefix Runes.ReturnRandomRuneData (lihat EquipmentDropBoost).
         // Karena itu kita tidak perlu (dan tidak boleh) menyentuh ServerRPC-nya.
         // Obsolete (dipindah dari drain di jalur add rune): lihat ApplyPatches() + EquipmentDropBoost.
-        // Catatan: nilai asli tiap config disimpan agar tidak "nyangkut" saat config diturunkan (n<=1).
+        // Catatan: nilai asli tiap config disimpan agar tidak "nyangkut" saat config diturunkan.
         static readonly System.Collections.Generic.Dictionary<int, int> _origRuneCount = new();
         [HarmonyPrefix]
         public static void Prefix(MonsterUtils __instance)
@@ -511,10 +516,12 @@ namespace DimraethModPack.Modules.Loot
                     _origRuneCount[id] = orig;
                 }
                 int n = EquipmentDropBoost.PlanRuneDrop(cfg);
-                EquipmentDropBoost.ApplyNarrowing(cfg, n, orig);
+                // [2026-10-06 09:00] ApplyNarrowing (kunci SATU tipe) -> ApplyPlan (semua slot satu set).
+                // EquipmentDropBoost.ApplyNarrowing(cfg, n, orig);
+                EquipmentDropBoost.ApplyPlan(cfg, n, orig);
                 // [2026-09-30 11:15] Diagnostik drop: log nilai + tipe terkunci agar bisa diverifikasi user.
                 // [2026-09-30 12:45] OBSOLETE — sudah terverifikasi, dihilangkan agar tidak banjir tiap drop.
-                // Nilai N tetap diterapkan lewat ApplyNarrowing(cfg, n, orig) di atas.
+                // Nilai N tetap diterapkan lewat ApplyPlan(cfg, n, orig) di atas.
                 // DimraethModPackPlugin.Log?.LogInfo($"[LootDrop] RuneDropCheck '{cfg.MonsterName}': N={n}, RuneDropCount={cfg.RuneDropCount}, tipe={EquipmentDropBoost.ForcedLabel}");
             }
             catch { }
