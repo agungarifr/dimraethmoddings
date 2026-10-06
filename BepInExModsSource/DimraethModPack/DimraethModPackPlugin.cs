@@ -203,6 +203,9 @@ namespace DimraethModPack
                 }
 
                 DiagnosticsManager.OnUpdate();
+                // [2026-10-06 12:35] Fast Crops: one-time rescale of already-loaded plots when the
+                // module is enabled mid-session (newly planted plots are handled by its own patch).
+                FastCropsModule.OnUpdate();
                 /* [2026-09-26 01:48] Obsolete: module unregistered (see Modules list in DimraethModPackPlugin.Load).
                    Feature moved to standalone EquipmentStatEditor plugin; kept commented for reference.
                 EquippedStatModifierModule.OnUpdate();
