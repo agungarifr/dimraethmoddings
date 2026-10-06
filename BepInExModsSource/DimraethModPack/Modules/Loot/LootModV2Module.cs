@@ -81,6 +81,9 @@ namespace DimraethModPack.Modules.Loot
             harmony.PatchAll(typeof(Patch_CalculateGoldDrop));
             harmony.PatchAll(typeof(Patch_HarvestCalculate));
             harmony.PatchAll(typeof(Patch_HarvestBonus));
+            // [2026-10-06 12:20] BUGFIX: Patch_RequestHarvestClientRpc was defined but never
+            // registered here, so the sanctum farm-plot (crop) yield was never multiplied.
+            harmony.PatchAll(typeof(Patch_RequestHarvestClientRpc));
             harmony.PatchAll(typeof(Patch_ReturnRandomRuneData));
             harmony.PatchAll(typeof(Patch_InteractableReward));
             harmony.PatchAll(typeof(Patch_DungeonChest_TrySpawn));
@@ -277,22 +280,36 @@ namespace DimraethModPack.Modules.Loot
     // FarmingClient interactables, and their yield is granted server-side through
     // PlayerBaseManager.RequestHarvestServerRpc -> RequestHarvestClientRpc(itemType, amount).
     // The older HarvestMultiplier patch (Patch_HarvestCalculate/Bonus) only covers wild HarvestClient
-    // nodes, so farm-plot yields were never multiplied. This patch extends the InteractableMultiplier
-    // to that give-items path (user #3: "the multiplier should also affect interactable/node in sanctum").
+    // nodes, so farm-plot yields were never multiplied. This patch applies the HarvestMultiplier to that
+    // give-items path (user clarified: "i meant crops not nodes" — crops are harvested plants).
+    // [2026-10-06 12:20] BUGFIX: this class was previously defined but never registered in ApplyPatches,
+    // so it never ran — hence the feature "didn't work".
     [HarmonyPatch(typeof(PlayerBaseManager), nameof(PlayerBaseManager.RequestHarvestClientRpc))]
     public static class Patch_RequestHarvestClientRpc
     {
+        // [2026-10-06 12:20] One-time diagnostic so an in-game test can confirm the crop harvest
+        // path is intercepted (the earlier build never registered this patch).
+        private static bool _loggedFirst;
+
         [HarmonyPrefix]
         public static void Prefix(ItemType itemType, ref int amount)
         {
             if (LootModV2Module.Instance == null || !LootModV2Module.Instance.IsEnabled) return;
             // [2026-09-30 09:15] Recipe di-exclude dari multiplier — tetap drop 1 (permintaan user).
             if (LootModV2Module.IsRecipe(itemType)) return;
-            int mult = LootModV2Module.Instance.InteractableMultiplier.Value;
+            // [2026-10-06 12:20] Crops are HARVESTED plants (HarvestMultiplier's description covers
+            // "plants"); user clarified this is about crops, not resource nodes / interactables.
+            int mult = LootModV2Module.Instance.HarvestMultiplier.Value;
             if (mult <= 1 || amount <= 0) return;
             try
             {
+                int before = amount;
                 amount = Math.Max(1, amount) * mult;
+                if (!_loggedFirst)
+                {
+                    _loggedFirst = true;
+                    DimraethModPackPlugin.Log?.LogInfo($"[Loot] crop harvest {itemType}: {before} -> {amount} (x{mult})");
+                }
             }
             catch { }
         }
