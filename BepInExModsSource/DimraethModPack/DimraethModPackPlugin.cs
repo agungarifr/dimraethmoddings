@@ -81,6 +81,9 @@ namespace DimraethModPack
             // [2026-10-06 11:15] New: Fast Crops (user request) — configurable growth-speed multiplier for
             // FarmingClient plots (apple tree, flax, etc.). Config: Gameplay.FastCrops.
             Modules.Add(new FastCropsModule());
+            // [2026-10-06 11:55] New: Fast Production (user request) — configurable crafting-speed multiplier
+            // for the workbench + alchemy table (CraftingBench.Update postfix). Config: Gameplay.FastProduction.
+            Modules.Add(new FastProductionModule());
 
             /* [2026-09-28 13:59] OBSOLETE (superseded 2026-10-04 00:00, module re-enabled above).
                Kept the original "why disabled" reasoning for history/reference only - do not act on it.
