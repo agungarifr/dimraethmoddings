@@ -7,6 +7,7 @@ using BepInEx.Logging;
 using BepInEx.Unity.IL2CPP;
 using HarmonyLib;
 using Il2CppInterop.Runtime;
+using Il2CppInterop.Runtime.Injection;
 using Il2CppInterop.Runtime.InteropTypes;
 using UnityEngine;
 
@@ -189,6 +190,21 @@ namespace PyromancerConverter
             PatchOrLog(harmony, typeof(Patch_SkillTreeNode_GetLocalizedDescription));
             PatchOrLog(harmony, typeof(Patch_SpellTooltipDatabase_GetLocalizedDescription));
             PatchOrLog(harmony, typeof(Patch_SpellTooltipDatabase_GetLocalizedEffects));
+
+            // [2026-10-06 16:05] Inject the behaviour that drains the deferred VFX texture-probe queue one
+            // texture per frame, so the first cast of a converted spell no longer stalls. Previously there was
+            // no behaviour at all (the texture work ran inline on the first cast).
+            try
+            {
+                ClassInjector.RegisterTypeInIl2Cpp<VfxPrewarmBehaviour>();
+                var prewarmGo = new GameObject("PyromancerConverter.VfxPrewarm");
+                UnityEngine.Object.DontDestroyOnLoad(prewarmGo);
+                prewarmGo.AddComponent<VfxPrewarmBehaviour>();
+            }
+            catch (Exception ex)
+            {
+                Log.LogWarning($"[{NAME}] Could not start VFX prewarm behaviour: {ex.Message}");
+            }
 
             Log.LogInfo("=================================================");
             Log.LogInfo($"{NAME} v{VERSION} loaded.");
@@ -854,15 +870,64 @@ namespace PyromancerConverter
             return changed;
         }
 
+        /* [2026-10-06 16:05] ===== DEFERRED TEXTURE WORK (first-cast hitch fix) =====
+           The old design ran Graphics.Blit + ReadPixels + GetPixels + a per-pixel HSV scan INLINE, the
+           first time each texture was seen - i.e. during the first cast of the spell - which stalled that
+           cast. The log proved it never actually changed any texture (there were zero "shifted texture"
+           lines; the ice blue lives in the MATERIAL tint, not the texture), so it was pure wasted cost:
+           it probed every texture once and cached "nothing to do". Now GetShiftedTexture enqueues the probe
+           and returns null immediately; VfxPrewarmBehaviour runs ONE texture per frame. This is invisible
+           because the fire recolour is applied from the material colour synchronously - only the (usually
+           no-op) texture copy is deferred - and later casts hit the cache.
+
+           Obsolete inline body (kept per repo rule): it computed and cached the shifted texture here in one go:
+             int id; try { id = src.GetInstanceID(); } catch { return null; }
+             if (ShiftedTextures.TryGetValue(id, out Texture2D cached)) return cached;   // cache check now in GetShiftedTexture
+             Texture2D result = null; try { [Blit + ReadPixels + GetPixels + HSV loop + SetPixels/Apply] } ... */
+        private struct PendingTex { public int Id; public Texture2D Src; public string Tag; }
+        private static readonly Queue<PendingTex> PendingTextures = new Queue<PendingTex>();
+        private static readonly HashSet<int> PendingTextureIds = new HashSet<int>();
+
+        internal static int ProcessOnePendingTexture()
+        {
+            if (PendingTextures.Count == 0) return 0;
+            PendingTex job = PendingTextures.Dequeue();
+            PendingTextureIds.Remove(job.Id);
+            Texture2D result = null;
+            try
+            {
+                if (job.Src != null) result = ComputeShiftedTexture(job.Src, job.Tag);
+            }
+            catch (Exception ex)
+            {
+                PyromancerConverterPlugin.Log?.LogError($"[vfx] tex {job.Tag} {ex.Message}");
+            }
+            ShiftedTextures[job.Id] = result; // null == already warm / nothing to do; cached so we never re-probe
+            return 1;
+        }
+
         /// <summary>
         /// Returns a hue-shifted copy of <paramref name="src"/> (cold pixels -> fire), or null when the texture is
-        /// already warm. Copies are cached per source texture so each texture is converted at most once per session.
+        /// already warm. If the texture has not been probed yet the work is queued for the prewarm behaviour and
+        /// null is returned now, so the calling cast never blocks. Results are cached per source texture.
         /// </summary>
         private static Texture2D GetShiftedTexture(Texture2D src, string tag)
         {
             int id;
             try { id = src.GetInstanceID(); } catch { return null; }
             if (ShiftedTextures.TryGetValue(id, out Texture2D cached)) return cached;
+
+            if (PendingTextureIds.Add(id))
+            {
+                PendingTextures.Enqueue(new PendingTex { Id = id, Src = src, Tag = tag });
+            }
+            return null; // not ready yet; the next cast will read the cached result
+        }
+
+        private static Texture2D ComputeShiftedTexture(Texture2D src, string tag)
+        {
+            int id;
+            try { id = src.GetInstanceID(); } catch { return null; }
 
             Texture2D result = null;
             try
@@ -1070,6 +1135,23 @@ namespace PyromancerConverter
                        + Mathf.RoundToInt(c.g * 255f).ToString("X2")
                        + Mathf.RoundToInt(c.b * 255f).ToString("X2")
                        + Mathf.RoundToInt(c.a * 255f).ToString("X2");
+        }
+    }
+
+    /// <summary>
+    /// [2026-10-06 16:05] Runs the deferred VFX texture probes, ONE per frame, so the first cast of a spell
+    /// never stalls on Graphics.Blit/ReadPixels/GetPixels. One texture per frame is invisible because the
+    /// fire recolour is applied from the material colour synchronously; only the (usually no-op) texture copy
+    /// is deferred. Injected at load, mirroring the modpack's injected behaviours.
+    /// </summary>
+    public class VfxPrewarmBehaviour : MonoBehaviour
+    {
+        public VfxPrewarmBehaviour(IntPtr ptr) : base(ptr) { }
+
+        private void Update()
+        {
+            try { VfxRecolor.ProcessOnePendingTexture(); }
+            catch { /* prewarm is best-effort */ }
         }
     }
 
