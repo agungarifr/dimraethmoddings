@@ -272,6 +272,32 @@ namespace DimraethModPack.Modules.Loot
         }
     }
 
+    // [2026-10-06 10:30] Sanctum farm-plot nodes (apple tree, flax, etc. — BuildItemType.FlaxPlot=27,
+    // AppleTreePlot=45; FarmingPlantType.Flax=4, AppleTree=5) are NOT HarvestClient. They are
+    // FarmingClient interactables, and their yield is granted server-side through
+    // PlayerBaseManager.RequestHarvestServerRpc -> RequestHarvestClientRpc(itemType, amount).
+    // The older HarvestMultiplier patch (Patch_HarvestCalculate/Bonus) only covers wild HarvestClient
+    // nodes, so farm-plot yields were never multiplied. This patch extends the InteractableMultiplier
+    // to that give-items path (user #3: "the multiplier should also affect interactable/node in sanctum").
+    [HarmonyPatch(typeof(PlayerBaseManager), nameof(PlayerBaseManager.RequestHarvestClientRpc))]
+    public static class Patch_RequestHarvestClientRpc
+    {
+        [HarmonyPrefix]
+        public static void Prefix(ItemType itemType, ref int amount)
+        {
+            if (LootModV2Module.Instance == null || !LootModV2Module.Instance.IsEnabled) return;
+            // [2026-09-30 09:15] Recipe di-exclude dari multiplier — tetap drop 1 (permintaan user).
+            if (LootModV2Module.IsRecipe(itemType)) return;
+            int mult = LootModV2Module.Instance.InteractableMultiplier.Value;
+            if (mult <= 1 || amount <= 0) return;
+            try
+            {
+                amount = Math.Max(1, amount) * mult;
+            }
+            catch { }
+        }
+    }
+
     [HarmonyPatch(typeof(Runes), nameof(Runes.ReturnRandomRuneData))]
     public static class Patch_ReturnRandomRuneData
     {
