@@ -2,6 +2,7 @@ using System;
 using BepInEx.Configuration;
 using DimraethModPack.Core;
 using HarmonyLib;
+using Unity.Netcode;
 using UnityEngine;
 
 namespace DimraethModPack.Modules.Gameplay
@@ -42,6 +43,12 @@ namespace DimraethModPack.Modules.Gameplay
         // idle (or the safety deadline is hit).
         private static bool _draining;
         private static int _drainDeadlineFrame;
+
+        // [2026-10-06 14:00] Temporary diagnostics for the "button doesn't work" report. Logs the network
+        // role, the bench's authority/state, and a write read-back for the first few frames after a press
+        // so we can tell whether the NetworkVariable write is authoritative (host) or silently ignored
+        // (client / no write permission). Remove once the root cause is fixed.
+        private static int _diagFrames;
 
         // Safety cap so a stuck bench (e.g. permanently output-blocked) can't keep the drain alive forever.
         private const int DrainSafetyFrames = 3600; // ~60s at 60fps; real queues finish far sooner
@@ -125,6 +132,7 @@ namespace DimraethModPack.Modules.Gameplay
         {
             _draining = true;
             _drainDeadlineFrame = Time.frameCount + DrainSafetyFrames;
+            _diagFrames = 12; // [2026-10-06 14:00] temporary diagnostics for first frames of a press
             _lastResult = "<color=#55FF55>Finishing…</color>";
             FinishActiveCrafts(); // act immediately on the press frame
         }
@@ -141,6 +149,7 @@ namespace DimraethModPack.Modules.Gameplay
 
                 int pending = 0;
                 int touched = 0;
+                bool diagLogged = false;
                 for (int i = 0; i < benches.Length; i++)
                 {
                     var bench = benches[i];
@@ -158,6 +167,17 @@ namespace DimraethModPack.Modules.Gameplay
 
                     var progress = bench._currentProgress;
                     if (progress == null) continue;
+
+                    // [2026-10-06 14:00] Temporary diagnostics (see _diagFrames). One-shot dump on the first
+                    // frame of a drain, then a few frames of quantity/progress so we can see whether the
+                    // craft is actually advancing. Remove once the root cause is fixed.
+                    if (_diagFrames > 0)
+                    {
+                        LogDiag(bench, recipe, target, progress, ref diagLogged);
+                        touched++;
+                        continue;
+                    }
+
                     if (progress.Value < target)
                     {
                         progress.Value = target;
@@ -177,6 +197,41 @@ namespace DimraethModPack.Modules.Gameplay
                 return 0;
             }
         }
+
+        // [2026-10-06 14:00] Temporary diagnostic helper. Remove once the write-permission issue is fixed.
+        private static void LogDiag(CraftingBench bench, Recipe recipe, float target, NetworkVariable<float> progress, ref bool logged)
+        {
+            try
+            {
+                var nm = NetworkManager.Singleton;
+                string role = nm != null
+                    ? $"IsServer={nm.IsServer} IsHost={nm.IsHost} IsClient={nm.IsClient}"
+                    : "nm=null";
+
+                if (!logged)
+                {
+                    logged = true;
+                    float before = progress.Value;
+                    progress.Value = target;
+                    float after = progress.Value;
+                    DimraethModPackPlugin.Log?.LogInfo(
+                        $"[InstantProduction][diag] {role} | bench={bench.name} netId={bench.NetworkObjectId} isServer={bench.IsServer} isOwner={bench.IsOwner} qty={bench.CurrentQuantity} prog01={bench.Progress01} active={bench.HasActiveJob} crafting={bench.IsCrafting} blocked={bench.IsOutputBlocked} ct={recipe.CraftingTime} container={bench.Container}");
+                    DimraethModPackPlugin.Log?.LogInfo(
+                        $"[InstantProduction][diag] write progress {before} -> {after} (target {target})");
+                }
+                else
+                {
+                    DimraethModPackPlugin.Log?.LogInfo(
+                        $"[InstantProduction][diag] f={_diagFrames} qty={bench.CurrentQuantity} prog={progress.Value} prog01={bench.Progress01} blocked={bench.IsOutputBlocked} active={bench.HasActiveJob}");
+                }
+                _diagFrames--;
+            }
+            catch (Exception ex)
+            {
+                DimraethModPackPlugin.Log?.LogError($"[InstantProduction][diag] failed: {ex}");
+            }
+        }
+
 
         // Workbench + Alchemy Table only (placed and player-built spellings).
         private static bool IsFastStation(StorageContainers container)
