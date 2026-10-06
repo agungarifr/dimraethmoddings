@@ -78,8 +78,9 @@ namespace DimraethModPack
             // NOTE: cfg [Gameplay.SkillPointMod] SkillPointMultiplier = 1 (vanilla) -> grants nothing until
             // raised above 1 from the Mod Manager UI.
             Modules.Add(new SkillPointMultiplierModule()); // [2026-09-26 14:09] New: x3 skill points per level-up (configurable).
-            // [2026-10-06 11:15] New: Fast Crops (user request) — configurable growth-speed multiplier for
-            // FarmingClient plots (apple tree, flax, etc.). Config: Gameplay.FastCrops.
+            // [2026-10-06 13:05] Revamped: "Instant Crops" (was "Fast Crops") — no longer a growth-rate
+            // multiplier; it is a manual button that calls PlayerBaseManager.AdvanceAllFarmGrowth so
+            // there is zero per-frame overhead. Config section kept as Gameplay.FastCrops.
             Modules.Add(new FastCropsModule());
             // [2026-10-06 11:55] New: Fast Production (user request) — configurable crafting-speed multiplier
             // for the workbench + alchemy table (CraftingBench.Update postfix). Config: Gameplay.FastProduction.
@@ -203,9 +204,14 @@ namespace DimraethModPack
                 }
 
                 DiagnosticsManager.OnUpdate();
+                /* [2026-10-06 13:05] Obsolete: Fast Crops is no longer a continuous growth-rate modifier,
+                   so its per-frame OnUpdate hook is gone. The revamped module ("Instant Crops") instead
+                   exposes a manual button that calls PlayerBaseManager.AdvanceAllFarmGrowth once, which
+                   is why nothing needs to run here each frame. Kept commented per repo rule.
                 // [2026-10-06 12:35] Fast Crops: one-time rescale of already-loaded plots when the
                 // module is enabled mid-session (newly planted plots are handled by its own patch).
                 FastCropsModule.OnUpdate();
+                */
                 /* [2026-09-26 01:48] Obsolete: module unregistered (see Modules list in DimraethModPackPlugin.Load).
                    Feature moved to standalone EquipmentStatEditor plugin; kept commented for reference.
                 EquippedStatModifierModule.OnUpdate();
