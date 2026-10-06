@@ -95,7 +95,9 @@ namespace DimraethModPack.Modules.SystemMod
             {
                 try
                 {
-                    int added = VfxDump.Capture(includeAssets: true);
+                    // [2026-10-06 15:10] forceWrite=true so a manual "Dump Now" still records the
+                    // timestamped header even when there is nothing new (see the auto-scan stutter fix).
+                    int added = VfxDump.Capture(includeAssets: true, forceWrite: true);
                     SetStatus($"<color=#55FF55>Dumped {added} new object(s).</color>");
                 }
                 catch (Exception ex)
@@ -150,7 +152,10 @@ namespace DimraethModPack.Modules.SystemMod
 
             try
             {
-                VfxDump.Capture(includeAssets: mod.IncludePrefabAssets == null || mod.IncludePrefabAssets.Value);
+                // [2026-10-06 15:10] forceWrite=false: an auto-scan with nothing new does NOT touch the
+                // disk. Previously every scan (once per ScanIntervalSec, default 1s) appended to
+                // VfxFlashDump.txt even when it found nothing, which caused a constant per-second hitch.
+                VfxDump.Capture(includeAssets: mod.IncludePrefabAssets == null || mod.IncludePrefabAssets.Value, forceWrite: false);
             }
             catch (Exception ex)
             {
@@ -172,8 +177,10 @@ namespace DimraethModPack.Modules.SystemMod
 
         private static string FilePath => Path.Combine(Paths.BepInExRootPath, "VfxFlashDump.txt");
 
-        /// <summary>Enumerates VFX and appends anything not yet catalogued. Returns the number of new entries.</summary>
-        public static int Capture(bool includeAssets)
+        /// <summary>Enumerates VFX and appends anything not yet catalogued. Returns the number of new entries.
+        /// [2026-10-06 15:10] forceWrite=true writes the header even when nothing new was found (manual dump);
+        /// the periodic auto-scan passes false so it never touches the disk on an empty pass.</summary>
+        public static int Capture(bool includeAssets, bool forceWrite = false)
         {
             var sb = new StringBuilder();
             sb.AppendLine($"==== VFX capture {DateTime.Now:yyyy-MM-dd HH:mm:ss} (assets={includeAssets}) ====");
@@ -233,6 +240,13 @@ namespace DimraethModPack.Modules.SystemMod
             if (added == 0)
             {
                 sb.AppendLine("(no new VFX objects this pass)");
+                /* [2026-10-06 15:10] STUTTER FIX: was unconditionally:
+                     AppendToFile(sb.ToString());
+                   which wrote to VfxFlashDump.txt on EVERY scan (default once per second) even when
+                   nothing new was found, on top of the FindObjectsOfType + Resources.FindObjectsOfTypeAll
+                   sweep. That per-second disk write + full-asset enumeration hitched the game constantly.
+                   Now an empty auto-scan skips the write; only a manual "Dump Now" forces it. */
+                if (!forceWrite) return 0;
             }
 
             AppendToFile(sb.ToString());
