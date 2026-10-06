@@ -82,8 +82,9 @@ namespace DimraethModPack
             // multiplier; it is a manual button that calls PlayerBaseManager.AdvanceAllFarmGrowth so
             // there is zero per-frame overhead. Config section kept as Gameplay.FastCrops.
             Modules.Add(new FastCropsModule());
-            // [2026-10-06 11:55] New: Fast Production (user request) — configurable crafting-speed multiplier
-            // for the workbench + alchemy table (CraftingBench.Update postfix). Config: Gameplay.FastProduction.
+            // [2026-10-06 13:20] Revamped: "Instant Production" (was "Fast Production") — no longer a
+            // per-frame CraftingBench.Update postfix; it is a manual button that finishes current crafts
+            // through the game's own deposit path. Config section kept as Gameplay.FastProduction.
             Modules.Add(new FastProductionModule());
 
             /* [2026-09-28 13:59] OBSOLETE (superseded 2026-10-04 00:00, module re-enabled above).
@@ -212,6 +213,19 @@ namespace DimraethModPack
                 // module is enabled mid-session (newly planted plots are handled by its own patch).
                 FastCropsModule.OnUpdate();
                 */
+                /* [2026-10-06 13:35] Superseded: the drain was originally a fixed ~10-frame window, which was
+                   too short for large stacks (e.g. a queued "water x99" is one BenchQueueItem with
+                   Quantity=99 that the game crafts one batch per tick). The drain now runs until every target
+                   bench is idle (with a safety cap), so one click finishes any stack size. Original wording
+                   kept commented per repo rule.
+                // [2026-10-06 13:20] Instant Production: dormant unless a button press armed its short
+                // drain window (~10 frames), during which it finishes queued crafts via the game's own
+                // deposit path. The rest of the time this is a single bool check.
+                */
+                // [2026-10-06 13:35] Instant Production: dormant unless a button press armed the drain,
+                // during which it finishes queued crafts one batch per tick via the game's own deposit path
+                // until all target benches are idle. The rest of the time this is a single bool check.
+                FastProductionModule.OnUpdate();
                 /* [2026-09-26 01:48] Obsolete: module unregistered (see Modules list in DimraethModPackPlugin.Load).
                    Feature moved to standalone EquipmentStatEditor plugin; kept commented for reference.
                 EquippedStatModifierModule.OnUpdate();
