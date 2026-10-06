@@ -2,7 +2,6 @@ using System;
 using BepInEx.Configuration;
 using DimraethModPack.Core;
 using HarmonyLib;
-using Unity.Netcode;
 using UnityEngine;
 
 namespace DimraethModPack.Modules.Gameplay
@@ -11,11 +10,11 @@ namespace DimraethModPack.Modules.Gameplay
     // CraftingBench.Update() that added extra progress every frame. The user asked to lean on the game's
     // own system and use a BUTTON, like the revamped Instant Crops module, "so it doesnt burden the game".
     //
-    // Implementation: a manual button ("Finish All Current Crafts Now"). When pressed it arms a short
-    // drain that finishes every current/queued craft using the game's OWN completion path:
-    //   - For each workbench/alchemy CraftingBench with an active job we write _currentProgress to
-    //     Recipe.CraftingTime. Vanilla Update then sees progress >= CraftingTime, calls
-    //     DepositIntoOutput(...) and resets progress.
+    // Implementation: a manual button ("Finish All Current Crafts Now"). When pressed it caches the
+    // workbench/alchemy CraftingBench instances ONCE and arms a short drain that finishes every
+    // current/queued craft using the game's OWN completion path:
+    //   - For each cached bench with an active job we write _currentProgress to Recipe.CraftingTime.
+    //     Vanilla Update then sees progress >= CraftingTime, calls DepositIntoOutput(...) and resets progress.
     //   - The bench then decrements _currentQuantity by 1 (one batch per tick) and, when it reaches 0,
     //     pops the next queue entry. So we keep writing progress each frame until the bench is idle.
     //
@@ -24,6 +23,12 @@ namespace DimraethModPack.Modules.Gameplay
     // "water x99" job is ONE entry with Quantity=99 and the bench crafts it one batch per tick. Therefore
     // one click cannot be a single frame for large stacks; it drains the whole thing in ~1 tick per batch
     // (~1.5-2s for 99) with no further input, while keeping the game's real deposit (XP/credits/events).
+    //
+    // [2026-10-06 14:30] STUTTER FIX: the first drain implementation called
+    // UnityEngine.Object.FindObjectsOfType<CraftingBench>() EVERY frame while draining, which is the
+    // expensive call that stuttered the game. We now call it exactly ONCE per button press (StartDrain),
+    // cache the array, and iterate the cache each drain frame. There is no per-frame scene search.
+    //
     // Outside the drain window OnUpdate is a single bool check, so there is no standing per-frame cost.
     public class FastProductionModule : ModModuleBase
     {
@@ -43,15 +48,17 @@ namespace DimraethModPack.Modules.Gameplay
         // idle (or the safety deadline is hit).
         private static bool _draining;
         private static int _drainDeadlineFrame;
+        private static int _lastTouchFrame;
+        private static int _lastPending;
 
-        // [2026-10-06 14:00] Temporary diagnostics for the "button doesn't work" report. Logs the network
-        // role, the bench's authority/state, and a write read-back for the first few frames after a press
-        // so we can tell whether the NetworkVariable write is authoritative (host) or silently ignored
-        // (client / no write permission). Remove once the root cause is fixed.
-        private static int _diagFrames;
+        // [2026-10-06 14:30] Benches are found ONCE on press and cached here instead of re-running
+        // FindObjectsOfType every frame (that per-frame scene search was the source of the stutter).
+        private static CraftingBench[] _targets;
 
         // Safety cap so a stuck bench (e.g. permanently output-blocked) can't keep the drain alive forever.
         private const int DrainSafetyFrames = 3600; // ~60s at 60fps; real queues finish far sooner
+        // Stop once this many consecutive frames pass without advancing any bench.
+        private const int DrainIdleFrames = 3;
 
         public override void BindConfig(ConfigFile config)
         {
@@ -111,48 +118,53 @@ namespace DimraethModPack.Modules.Gameplay
             if (!_draining) return;
             if (Time.frameCount > _drainDeadlineFrame)
             {
-                _draining = false;
-                _lastResult = "<color=#FFAA44>Stopped (safety cap) — some benches may be output-blocked.</color>";
+                StopDrain("<color=#FFAA44>Stopped (safety cap) — some benches may be output-blocked.</color>");
                 return;
             }
 
-            int pending = FinishActiveCrafts();
-            if (pending == 0)
+            int touched = Tick();
+            if (touched > 0)
             {
-                _draining = false;
-                _lastResult = "<color=#55FF55>All crafts finished.</color>";
+                _lastTouchFrame = Time.frameCount;
+                _lastResult = $"<color=#55FF55>Finishing… {_lastPending} bench(es) still busy.</color>";
             }
-            else
+            else if (Time.frameCount - _lastTouchFrame > DrainIdleFrames)
             {
-                _lastResult = $"<color=#55FF55>Finishing… {pending} bench(es) still busy.</color>";
+                StopDrain("<color=#55FF55>All crafts finished.</color>");
             }
         }
 
         private static void StartDrain()
         {
+            // [2026-10-06 14:30] Find the benches exactly once here (not every frame).
+            _targets = UnityEngine.Object.FindObjectsOfType<CraftingBench>();
             _draining = true;
             _drainDeadlineFrame = Time.frameCount + DrainSafetyFrames;
-            _diagFrames = 12; // [2026-10-06 14:00] temporary diagnostics for first frames of a press
+            _lastTouchFrame = Time.frameCount;
             _lastResult = "<color=#55FF55>Finishing…</color>";
-            FinishActiveCrafts(); // act immediately on the press frame
+            Tick(); // act immediately on the press frame
         }
 
-        // Writes each matching bench's progress to Recipe.CraftingTime; vanilla Update then deposits one
-        // batch that tick and the bench advances. Returns how many target benches still have a job they can
-        // actually deposit (output-blocked benches are excluded so they can't stall the drain).
-        private static int FinishActiveCrafts()
+        private static void StopDrain(string message)
+        {
+            _draining = false;
+            _targets = null;
+            _lastResult = message;
+        }
+
+        // Writes each cached bench's progress to Recipe.CraftingTime; vanilla Update then deposits one
+        // batch that tick and the bench advances. Returns how many benches were advanced this frame.
+        private static int Tick()
         {
             try
             {
-                var benches = UnityEngine.Object.FindObjectsOfType<CraftingBench>();
-                if (benches == null) return 0;
+                if (_targets == null) return 0;
 
-                int pending = 0;
                 int touched = 0;
-                bool diagLogged = false;
-                for (int i = 0; i < benches.Length; i++)
+                int pending = 0;
+                for (int i = 0; i < _targets.Length; i++)
                 {
-                    var bench = benches[i];
+                    var bench = _targets[i];
                     if (bench == null) continue;
                     if (!IsFastStation(bench.Container)) continue;
                     if (!bench.HasActiveJob) continue;      // idle: nothing to do
@@ -167,17 +179,6 @@ namespace DimraethModPack.Modules.Gameplay
 
                     var progress = bench._currentProgress;
                     if (progress == null) continue;
-
-                    // [2026-10-06 14:00] Temporary diagnostics (see _diagFrames). One-shot dump on the first
-                    // frame of a drain, then a few frames of quantity/progress so we can see whether the
-                    // craft is actually advancing. Remove once the root cause is fixed.
-                    if (_diagFrames > 0)
-                    {
-                        LogDiag(bench, recipe, target, progress, ref diagLogged);
-                        touched++;
-                        continue;
-                    }
-
                     if (progress.Value < target)
                     {
                         progress.Value = target;
@@ -185,11 +186,8 @@ namespace DimraethModPack.Modules.Gameplay
                     }
                 }
 
-                if (touched > 0)
-                {
-                    DimraethModPackPlugin.Log?.LogInfo($"[InstantProduction] progress->CraftingTime on {touched} bench(es)");
-                }
-                return pending;
+                _lastPending = pending;
+                return touched;
             }
             catch (Exception ex)
             {
@@ -197,41 +195,6 @@ namespace DimraethModPack.Modules.Gameplay
                 return 0;
             }
         }
-
-        // [2026-10-06 14:00] Temporary diagnostic helper. Remove once the write-permission issue is fixed.
-        private static void LogDiag(CraftingBench bench, Recipe recipe, float target, NetworkVariable<float> progress, ref bool logged)
-        {
-            try
-            {
-                var nm = NetworkManager.Singleton;
-                string role = nm != null
-                    ? $"IsServer={nm.IsServer} IsHost={nm.IsHost} IsClient={nm.IsClient}"
-                    : "nm=null";
-
-                if (!logged)
-                {
-                    logged = true;
-                    float before = progress.Value;
-                    progress.Value = target;
-                    float after = progress.Value;
-                    DimraethModPackPlugin.Log?.LogInfo(
-                        $"[InstantProduction][diag] {role} | bench={bench.name} netId={bench.NetworkObjectId} isServer={bench.IsServer} isOwner={bench.IsOwner} qty={bench.CurrentQuantity} prog01={bench.Progress01} active={bench.HasActiveJob} crafting={bench.IsCrafting} blocked={bench.IsOutputBlocked} ct={recipe.CraftingTime} container={bench.Container}");
-                    DimraethModPackPlugin.Log?.LogInfo(
-                        $"[InstantProduction][diag] write progress {before} -> {after} (target {target})");
-                }
-                else
-                {
-                    DimraethModPackPlugin.Log?.LogInfo(
-                        $"[InstantProduction][diag] f={_diagFrames} qty={bench.CurrentQuantity} prog={progress.Value} prog01={bench.Progress01} blocked={bench.IsOutputBlocked} active={bench.HasActiveJob}");
-                }
-                _diagFrames--;
-            }
-            catch (Exception ex)
-            {
-                DimraethModPackPlugin.Log?.LogError($"[InstantProduction][diag] failed: {ex}");
-            }
-        }
-
 
         // Workbench + Alchemy Table only (placed and player-built spellings).
         private static bool IsFastStation(StorageContainers container)
@@ -287,6 +250,50 @@ namespace DimraethModPack.Modules.Gameplay
                 {
                     DimraethModPackPlugin.Log?.LogError($"[FastProduction] CraftingBench.Update postfix failed: {ex}");
                 }
+            }
+        }
+        */
+
+        /* [2026-10-06 14:30] ===== OBSOLETE (temporary diagnostics), kept per repo rule. =====
+           Added 2026-10-06 14:00 to diagnose the "button doesn't work" report. The log output PROVED the
+           button works: IsServer=True IsHost=True IsClient=True, bench isServer/isOwner both true, the
+           write read-back went 0 -> 2 (target 2), and qty decremented 82->81->80->... one per frame (i.e.
+           one batch completed per tick). The real complaint was the per-frame FindObjectsOfType stutter,
+           now fixed by caching _targets in StartDrain. Removed here; kept commented per repo rule.
+
+        using Unity.Netcode; // was needed only by LogDiag
+
+        private static int _diagFrames;
+
+        private static void LogDiag(CraftingBench bench, Recipe recipe, float target, NetworkVariable<float> progress, ref bool logged)
+        {
+            try
+            {
+                var nm = NetworkManager.Singleton;
+                string role = nm != null
+                    ? $"IsServer={nm.IsServer} IsHost={nm.IsHost} IsClient={nm.IsClient}"
+                    : "nm=null";
+                if (!logged)
+                {
+                    logged = true;
+                    float before = progress.Value;
+                    progress.Value = target;
+                    float after = progress.Value;
+                    DimraethModPackPlugin.Log?.LogInfo(
+                        $"[InstantProduction][diag] {role} | bench={bench.name} netId={bench.NetworkObjectId} isServer={bench.IsServer} isOwner={bench.IsOwner} qty={bench.CurrentQuantity} prog01={bench.Progress01} active={bench.HasActiveJob} crafting={bench.IsCrafting} blocked={bench.IsOutputBlocked} ct={recipe.CraftingTime} container={bench.Container}");
+                    DimraethModPackPlugin.Log?.LogInfo(
+                        $"[InstantProduction][diag] write progress {before} -> {after} (target {target})");
+                }
+                else
+                {
+                    DimraethModPackPlugin.Log?.LogInfo(
+                        $"[InstantProduction][diag] f={_diagFrames} qty={bench.CurrentQuantity} prog={progress.Value} prog01={bench.Progress01} blocked={bench.IsOutputBlocked} active={bench.HasActiveJob}");
+                }
+                _diagFrames--;
+            }
+            catch (Exception ex)
+            {
+                DimraethModPackPlugin.Log?.LogError($"[InstantProduction][diag] failed: {ex}");
             }
         }
         */
