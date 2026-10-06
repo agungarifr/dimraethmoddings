@@ -73,6 +73,17 @@ namespace DimraethModPack.Modules.Gameplay
 
                     if (__instance == null) return;
 
+                    // [2026-10-06 12:45] STUTTER FIX: read the cheap per-bench idle gate FIRST, before
+                    // touching Container / IsOutputBlocked / CurrentRecipe. Vanilla Update leaves
+                    // _currentProgress at 0 when no job is running, so most benches bail out here every
+                    // frame. Previously the heavy members were read for EVERY bench EVERY frame, which
+                    // was the newly-added per-frame cost behind the stutter reported after deploy.
+                    var progress = __instance._currentProgress;
+                    if (progress == null) return;
+
+                    float current = progress.Value;
+                    if (current <= 0f) return; // idle: no active job, nothing to add
+
                     // One-time diagnostic: confirms which StorageContainers value benches carry at runtime.
                     if (!_loggedFirstBench)
                     {
@@ -90,10 +101,13 @@ namespace DimraethModPack.Modules.Gameplay
                     if (recipe == null) return;          // no active job
                     if (recipe.CraftingTime <= 0) return; // instant craft; leave vanilla alone
 
-                    var progress = __instance._currentProgress;
-                    if (progress == null) return;
-
-                    float current = progress.Value;
+                    // [2026-10-06 12:45] OBSOLETE (moved up above): progress/current are now read before
+                    // the station check as the idle gate, so this later read is redundant. Kept commented
+                    // per repo rule; the `current >= CraftingTime` guard moved down unchanged.
+                    // var progress = __instance._currentProgress;
+                    // if (progress == null) return;
+                    //
+                    // float current = progress.Value;
                     if (current >= recipe.CraftingTime) return; // vanilla completes it this frame
 
                     float next = current + Time.deltaTime * (mult - 1);

@@ -20,6 +20,10 @@ namespace DimraethModPack.Modules.Loot
         public ConfigEntry<int> GoldMultiplier;
         public ConfigEntry<int> HarvestMultiplier;
         public ConfigEntry<int> InteractableMultiplier;
+        // [2026-10-06 12:40] Dedicated crop slider (user: "crops not nodes"). Crops were previously
+        // riding HarvestMultiplier — the RESOURCE-NODE slider (wood/stone/plants, often set very high),
+        // which blew farm-plot yields up (e.g. apple tree -> 300 at x50). Crops now have their own knob.
+        public ConfigEntry<int> CropMultiplier;
         public ConfigEntry<bool> GuaranteeDrops;
         public ConfigEntry<bool> ForceHighestRarity;
 
@@ -51,6 +55,12 @@ namespace DimraethModPack.Modules.Loot
 
             InteractableMultiplier = config.Bind(sec, "InteractableMultiplier", 10,
                 "Multiplier for map interactions, bodies, and loot boxes (Default: 10, Vanilla: 1)");
+
+            // [2026-10-06 12:40] Crops get their OWN multiplier, separate from resource nodes.
+            // Default 1 = vanilla so enabling the module never surprises farm-plot yields;
+            // raise it to taste. (User: "i meant crops not nodes".)
+            CropMultiplier = config.Bind(sec, "CropMultiplier", 1,
+                "Multiplier for harvesting farm-plot crops (apple tree, flax, etc.) (Default: 1, Vanilla: 1)");
 
             GuaranteeDrops = config.Bind(sec, "GuaranteeDrops", true,
                 "Guarantees 100% monster item drop chance (Default: true, Vanilla: false)");
@@ -124,6 +134,8 @@ namespace DimraethModPack.Modules.Loot
             curY += DrawIntSpinner(x, curY, width, "Gold Multiplier", GoldMultiplier, 1, 1, 100, "Vanilla: 1x", labelStyle, btnStyle);
             curY += DrawIntSpinner(x, curY, width, "Harvest Multiplier", HarvestMultiplier, 1, 1, 100, "Vanilla: 1x", labelStyle, btnStyle);
             curY += DrawIntSpinner(x, curY, width, "Interactable Multiplier", InteractableMultiplier, 1, 1, 100, "Vanilla: 1x", labelStyle, btnStyle);
+            // [2026-10-06 12:40] Dedicated crop slider (farm plots), kept separate from resource nodes.
+            curY += DrawIntSpinner(x, curY, width, "Crop Harvest Multiplier", CropMultiplier, 1, 1, 100, "Vanilla: 1x", labelStyle, btnStyle);
             curY += DrawToggle(x, curY, width, "Guarantee Drops (100%)", GuaranteeDrops, "Vanilla: OFF", labelStyle, btnStyle);
             curY += DrawToggle(x, curY, width, "Force Highest Rarity", ForceHighestRarity, "Vanilla: OFF", labelStyle, btnStyle);
 
@@ -280,10 +292,14 @@ namespace DimraethModPack.Modules.Loot
     // FarmingClient interactables, and their yield is granted server-side through
     // PlayerBaseManager.RequestHarvestServerRpc -> RequestHarvestClientRpc(itemType, amount).
     // The older HarvestMultiplier patch (Patch_HarvestCalculate/Bonus) only covers wild HarvestClient
-    // nodes, so farm-plot yields were never multiplied. This patch applies the HarvestMultiplier to that
+    // nodes, so farm-plot yields were never multiplied. This patch applies its own CropMultiplier to that
     // give-items path (user clarified: "i meant crops not nodes" — crops are harvested plants).
     // [2026-10-06 12:20] BUGFIX: this class was previously defined but never registered in ApplyPatches,
     // so it never ran — hence the feature "didn't work".
+    // [2026-10-06 12:40] Now uses the DEDICATED CropMultiplier. Previously it rode HarvestMultiplier
+    // (the RESOURCE-NODE slider), so a high node value (e.g. 50) turned one apple tree into 300 apples.
+    // The server loops the drop list and calls this RPC once PER drop entry, so each entry is scaled;
+    // keeping crops on their own low-default slider makes the result predictable (Vanilla x1).
     [HarmonyPatch(typeof(PlayerBaseManager), nameof(PlayerBaseManager.RequestHarvestClientRpc))]
     public static class Patch_RequestHarvestClientRpc
     {
@@ -297,9 +313,9 @@ namespace DimraethModPack.Modules.Loot
             if (LootModV2Module.Instance == null || !LootModV2Module.Instance.IsEnabled) return;
             // [2026-09-30 09:15] Recipe di-exclude dari multiplier — tetap drop 1 (permintaan user).
             if (LootModV2Module.IsRecipe(itemType)) return;
-            // [2026-10-06 12:20] Crops are HARVESTED plants (HarvestMultiplier's description covers
-            // "plants"); user clarified this is about crops, not resource nodes / interactables.
-            int mult = LootModV2Module.Instance.HarvestMultiplier.Value;
+            // [2026-10-06 12:40] Crops use their own dedicated CropMultiplier (farm-plot harvests only),
+            // deliberately NOT HarvestMultiplier (that one targets resource nodes and is often set high).
+            int mult = LootModV2Module.Instance.CropMultiplier.Value;
             if (mult <= 1 || amount <= 0) return;
             try
             {
