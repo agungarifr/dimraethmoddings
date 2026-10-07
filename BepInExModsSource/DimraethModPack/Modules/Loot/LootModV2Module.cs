@@ -149,7 +149,11 @@ namespace DimraethModPack.Modules.Loot
         {
             if (list == null || list.Count == 0) return;
             int mult = Instance != null ? Instance.HarvestMultiplier.Value : 10;
-            if (mult <= 1) return;
+            int cropMult = Instance != null ? Instance.CropMultiplier.Value : 1;
+            bool sanctum = InSanctum();
+            // [2026-10-07 14:30] Only short-circuit when there is nothing to scale at all
+            // (no harvest multiplier AND no in-sanctum crop multiplier).
+            if (mult <= 1 && !(sanctum && cropMult > 1)) return;
             try
             {
                 var temp = new List<HarvestedItem>();
@@ -158,6 +162,20 @@ namespace DimraethModPack.Modules.Loot
                     var item = list[i];
                     // [2026-09-30 09:15] Recipe tidak pernah di-multiplier (tetap drop 1) — permintaan user.
                     if (IsRecipe(item.ItemType)) { temp.Add(item); continue; }
+                    // [2026-10-07 14:30] Crops are the Crop slider's exclusive domain, and ONLY inside
+                    // the sanctum; a crop-type wild node outside the base keeps its vanilla yield. Never
+                    // scale a crop with HarvestMultiplier (the old code did — that is exactly how the
+                    // East Farm ground apples ended up under the wrong slider).
+                    if (IsCrop(item.ItemType))
+                    {
+                        if (sanctum && cropMult > 1)
+                        {
+                            item.ItemCount = Math.Max(1, item.ItemCount) * cropMult;
+                            list[i] = item;
+                        }
+                        temp.Add(item);
+                        continue;
+                    }
                     item.ItemCount = Math.Max(1, item.ItemCount) * mult;
                     list[i] = item;
                     temp.Add(item);
@@ -187,6 +205,44 @@ namespace DimraethModPack.Modules.Loot
                 }
             }
             return _recipeItems.Contains(item);
+        }
+
+        // [2026-10-07 14:30] Crop classification + sanctum gate (user "revisit crop harvest"): the Crop
+        // Harvest Multiplier must apply EXCLUSIVELY to crops in the sanctum (player base), and NO other
+        // multiplier (Item Drop / Harvest / Interactable) may touch a crop. "Crops" = the produce + seeds
+        // of the six farm plants (FarmingPlantType Tenderberry/Thaumablossom/Flax/AppleTree/
+        // SingingBellflower/Emberbloom). This is what puts the East Farm ground-apple node back under the
+        // Crop slider and takes it off the Item Drop / Interactable / Harvest sliders.
+        private static HashSet<ItemType> _cropItems;
+
+        public static bool IsCrop(ItemType item)
+        {
+            if (_cropItems == null)
+            {
+                _cropItems = new HashSet<ItemType>
+                {
+                    ItemType.Apple, ItemType.AppleSeed,
+                    ItemType.Tenderberry, ItemType.TenderberrySeed,
+                    ItemType.Thaumablossom, ItemType.ThaumablossomSeed,
+                    ItemType.BrushFlax, ItemType.Linen, ItemType.FlaxSeed,
+                    ItemType.SingingBellflower, ItemType.SingingBellflowerSeed,
+                    ItemType.Emberbloom, ItemType.EmberbloomSeed,
+                };
+            }
+            return _cropItems.Contains(item);
+        }
+
+        // [2026-10-07 14:30] True while the LOCAL player is inside their sanctum (player base). Crops
+        // only ride the Crop slider there; a crop-type node reached outside the base (e.g. a wild plant)
+        // is left vanilla so no other slider can inflate it either.
+        public static bool InSanctum()
+        {
+            try
+            {
+                var mgr = PlayerBaseManager.Singleton;
+                return mgr != null && mgr.IsInPlayerBase();
+            }
+            catch { return false; }
         }
     }
 
@@ -231,6 +287,9 @@ namespace DimraethModPack.Modules.Loot
                     var drop = drops[i];
                     // [2026-09-30 09:15] Recipe di-exclude dari multiplier — tetap drop 1 (permintaan user).
                     if (LootModV2Module.IsRecipe(drop.item)) continue;
+                    // [2026-10-07 14:30] Crops never ride the Item Drop multiplier (user: "item drop
+                    // multiplier also affect apples on the ground"). Crops belong to the Crop slider.
+                    if (LootModV2Module.IsCrop(drop.item)) continue;
                     var range = drop.dropRange;
                     range.min = Math.Max(1, range.min) * mult;
                     range.max = Math.Max(1, range.max) * mult;
@@ -365,16 +424,31 @@ namespace DimraethModPack.Modules.Loot
         {
             __state = 0;
             if (LootModV2Module.Instance == null || !LootModV2Module.Instance.IsEnabled || entry == null) return;
-            int mult = LootModV2Module.Instance.InteractableMultiplier.Value;
-            if (mult <= 1) return;
             try
             {
-                if (entry.Type == InteractableRewardType.GrantItem && entry.GrantedItemAmount > 0
-                    // [2026-09-30 09:15] Recipe di-exclude dari multiplier — tetap drop 1 (permintaan user).
-                    && !LootModV2Module.IsRecipe(entry.GrantedItem))
+                if (entry.Type == InteractableRewardType.GrantItem && entry.GrantedItemAmount > 0)
                 {
-                    __state = entry.GrantedItemAmount;
-                    entry.GrantedItemAmount = Math.Max(1, entry.GrantedItemAmount) * mult;
+                    // [2026-10-07 14:30] Crops are governed ONLY by the Crop slider, and only in the
+                    // sanctum. A crop reward must never ride InteractableMultiplier — this is the
+                    // East-Farm ground-apple path the user flagged. Outside the sanctum it stays vanilla.
+                    if (LootModV2Module.IsCrop(entry.GrantedItem))
+                    {
+                        int cm = LootModV2Module.Instance.CropMultiplier.Value;
+                        if (LootModV2Module.InSanctum() && cm > 1)
+                        {
+                            __state = entry.GrantedItemAmount;
+                            entry.GrantedItemAmount = Math.Max(1, entry.GrantedItemAmount) * cm;
+                        }
+                        return;
+                    }
+                    // [2026-09-30 09:15] Recipe di-exclude dari multiplier — tetap drop 1 (permintaan user).
+                    if (LootModV2Module.IsRecipe(entry.GrantedItem)) return;
+                    int mult = LootModV2Module.Instance.InteractableMultiplier.Value;
+                    if (mult > 1)
+                    {
+                        __state = entry.GrantedItemAmount;
+                        entry.GrantedItemAmount = Math.Max(1, entry.GrantedItemAmount) * mult;
+                    }
                 }
             }
             catch { }
@@ -404,6 +478,8 @@ namespace DimraethModPack.Modules.Loot
             if (LootModV2Module.Instance == null || !LootModV2Module.Instance.IsEnabled || drop == null) return;
             // [2026-09-30 09:15] Recipe di-exclude dari multiplier — tetap drop 1 (permintaan user).
             if (LootModV2Module.IsRecipe(drop.item)) return;
+            // [2026-10-07 14:30] Crops never ride InteractableMultiplier; they belong to the Crop slider.
+            if (LootModV2Module.IsCrop(drop.item)) return;
             int mult = LootModV2Module.Instance.InteractableMultiplier.Value;
             if (mult <= 1) return;
             try
@@ -457,6 +533,8 @@ namespace DimraethModPack.Modules.Loot
             if (!LootModV2Module.IsSpawningChestLoot) return;
             // [2026-09-30 09:15] Recipe di-exclude dari multiplier — tetap drop 1 (permintaan user).
             if (LootModV2Module.IsRecipe(item)) return;
+            // [2026-10-07 14:30] Crops never ride InteractableMultiplier; they belong to the Crop slider.
+            if (LootModV2Module.IsCrop(item)) return;
             int mult = LootModV2Module.Instance.InteractableMultiplier.Value;
             if (mult <= 1 || amount <= 0) return;
             try
@@ -493,6 +571,8 @@ namespace DimraethModPack.Modules.Loot
                     var item = items[i];
                     // [2026-09-30 09:15] Recipe di-exclude dari multiplier — tetap drop 1 (permintaan user).
                     if (LootModV2Module.IsRecipe(item.Item)) continue;
+                    // [2026-10-07 14:30] Crops never ride InteractableMultiplier; they belong to the Crop slider.
+                    if (LootModV2Module.IsCrop(item.Item)) continue;
                     if (item.Amount > 0)
                     {
                         item.Amount = Math.Max(1, item.Amount) * mult;

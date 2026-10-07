@@ -72,6 +72,12 @@ namespace DimraethModPack.Modules.Stats
 
         public static class Patches
         {
+            // [2026-10-07] TEMP DIAGNOSTICS for the "No Regen Lockout doesn't work" report.
+            // Remove once the firing/flag values are confirmed in BepInEx\LogOutput.log.
+            private static int _diagSetTimer;
+            private static int _diagZp1Prefix;
+            private static int _diagZp1Postfix;
+
             [HarmonyPatch(typeof(Formulas), nameof(Formulas.CalculateHealthRegeneration))]
             [HarmonyPostfix]
             public static void Postfix_CalculateHealthRegeneration(ref float __result, ObjectsCommon obj)
@@ -129,6 +135,12 @@ namespace DimraethModPack.Modules.Stats
             public static void Prefix_SetRegenTimer(ref float time)
             {
                 if (Instance == null || !Instance.IsEnabled) return;
+                if (_diagSetTimer < 5)
+                {
+                    _diagSetTimer++;
+                    DimraethModPackPlugin.Log?.LogInfo(
+                        $"[AlwaysRegen][diag] BaseSpellLibrary.SetRegenTimer incoming time={time} noLockout={Instance.NoRegenLockout.Value}");
+                }
                 if (Instance.NoRegenLockout.Value)
                 {
                     // [2026-10-07 10:01] FIX: vanilla stamina regen requires RegenTimer > 0.2
@@ -148,6 +160,15 @@ namespace DimraethModPack.Modules.Stats
                 public static void Prefix(ObjectsCommon __instance)
                 {
                     if (Instance == null || !Instance.IsEnabled) return;
+                    bool isLocal = PlayerIdentity.IsLocalPlayer(__instance);
+                    if (_diagZp1Prefix < 8)
+                    {
+                        _diagZp1Prefix++;
+                        DimraethModPackPlugin.Log?.LogInfo(
+                            $"[AlwaysRegen][diag] zp1 PREFIX isLocal={isLocal} isOwner={__instance.IsOwner} " +
+                            $"isServer={__instance.IsServer} isClient={__instance.IsClient} " +
+                            $"noLockout={Instance.NoRegenLockout.Value} cont={Instance.ContinuousRegen.Value} regen={__instance.RegenTimer}");
+                    }
                     // [2026-09-28 10:35] OBSOLETE - `__instance.IsPlayer` may deref a stale
                     // pointer. IsLocalPlayer already validated the pointer, so the following
                     // __instance.IsOwner access is safe.
@@ -166,9 +187,22 @@ namespace DimraethModPack.Modules.Stats
                 public static void Postfix(ObjectsCommon __instance)
                 {
                     if (Instance == null || !Instance.IsEnabled) return;
+                    bool isLocal = PlayerIdentity.IsLocalPlayer(__instance);
+                    if (_diagZp1Postfix < 8)
+                    {
+                        _diagZp1Postfix++;
+                        try
+                        {
+                            DimraethModPackPlugin.Log?.LogInfo(
+                                $"[AlwaysRegen][diag] zp1 POSTFIX isLocal={isLocal} isOwner={__instance.IsOwner} " +
+                                $"cont={Instance.ContinuousRegen.Value} stam={__instance.Stamina?.Value}/{__instance.MaxStamina?.Value} " +
+                                $"hp={__instance.Health?.Value}/{__instance.MaxHealth?.Value}");
+                        }
+                        catch { }
+                    }
                     // [2026-09-28 10:35] OBSOLETE - see Prefix above.
                     // if (__instance != null && __instance.IsPlayer && __instance.IsOwner && Instance.ContinuousRegen.Value)
-                    if (PlayerIdentity.IsLocalPlayer(__instance) && __instance.IsOwner && Instance.ContinuousRegen.Value)
+                    if (isLocal && __instance.IsOwner && Instance.ContinuousRegen.Value)
                     {
                         try
                         {
