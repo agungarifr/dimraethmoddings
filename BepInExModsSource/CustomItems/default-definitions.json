@@ -1,0 +1,53 @@
+{
+  // Custom Items definitions. Edit freely; reload = restart the game.
+  // Item names here may be used anywhere a vanilla ItemType name is expected
+  // (recipe results, ingredients, icon sources, decay targets).
+  "items": [
+    {
+      "name": "SatayMadura",
+      "numericId": 1000,
+      "category": "Food",
+      "shopName": "Satay Madura",
+      "description": "Skewers of seasoned monster meat, grilled over open flame. A traveler's favorite from the eastern isles.",
+      "effectDescription": "Restores 50% of max Health, Stamina and Concentration over 30 minutes.",
+      "itemBarEquippable": true,
+      "stackLimit": 20,
+      "weight": 0.4,
+      "buyValue": 40,
+      "sellValue": 12,
+      "proficiency": "Cooking",
+      "icon": {
+        "fromItem": "RoastedDroopCore",
+        "tint": "#E2372B"
+      },
+      "edible": {
+        "type": "Food",
+        "nourishment": 45,
+        "regenOverTime": {
+          "healthFraction": 0.5,
+          "staminaFraction": 0.5,
+          "concentrationFraction": 0.5,
+          "durationSeconds": 1800
+        }
+      }
+    }
+  ],
+  "recipes": [
+    {
+      "uuid": "custom_sataymadura",
+      "name": "SatayMadura",
+      "result": "SatayMadura",
+      "resultQuantity": 1,
+      "ingredients": [
+        { "item": "BeastMeat", "amount": 10 }
+      ],
+      "proficiency": "Cooking",
+      "bench": "Campfire",
+      "craftingTime": 20,
+      "awardedXp": 15,
+      "levelRequired": 1,
+      "craftingStationRequired": true,
+      "unlockedByDefault": true
+    }
+  ]
+}
