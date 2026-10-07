@@ -96,6 +96,11 @@ namespace DimraethModPack
             // No Harmony patches, no per-frame work; lists persist via PlayerData on save.
             // Config: Gameplay.UnlockAll.
             Modules.Add(new UnlockAllModule());
+            // [2026-10-07 11:30] New: "Free Spellbook Crafting" — empties Recipe.Ingredients on every
+            // spellbook recipe (result item has SpellUnlock != None) so spellbooks cost no materials.
+            // Applied/restored on toggle via its OnUpdate hook (wired in ModPackManagerBehaviour.Update).
+            // Config: Gameplay.FreeSpellbooks.
+            Modules.Add(new FreeSpellbookCraftModule());
 
             /* [2026-09-28 13:59] OBSOLETE (superseded 2026-10-04 00:00, module re-enabled above).
                Kept the original "why disabled" reasoning for history/reference only - do not act on it.
@@ -236,6 +241,10 @@ namespace DimraethModPack
                 // during which it finishes queued crafts one batch per tick via the game's own deposit path
                 // until all target benches are idle. The rest of the time this is a single bool check.
                 FastProductionModule.OnUpdate();
+                // [2026-10-07 11:30] Free Spellbook Crafting: applies/restores the empty-ingredients
+                // state when the toggle flips (and waits for ItemManager at startup). One bool check
+                // the rest of the time.
+                FreeSpellbookCraftModule.OnUpdate();
                 /* [2026-09-26 01:48] Obsolete: module unregistered (see Modules list in DimraethModPackPlugin.Load).
                    Feature moved to standalone EquipmentStatEditor plugin; kept commented for reference.
                 EquippedStatModifierModule.OnUpdate();
