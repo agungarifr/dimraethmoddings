@@ -70,6 +70,10 @@ namespace DimraethModPack
             // report as unlocked, skipping the one-step completion ladder. Host-side postfixes on
             // DeedManager.GetWorldTierCap / IsTierUnlocked / GetUnlockedTierForDeed. Config: Gameplay.DeedProgression.
             Modules.Add(new DeedProgressionModule());
+            // [2026-10-07 09:00] New: manual "Refresh Bounty Board" button. Rerolls every Deed & Bounty
+            // board on demand via DeedManager.RefreshAllBoardsServerRpc() - the same path the game's own
+            // daily OnTimeChanged refresh uses. No Harmony patches, no per-frame work. Config: Gameplay.BountyBoardRefresh.
+            Modules.Add(new BountyBoardRefreshModule());
             // [2026-10-04 00:00] RE-ENABLED by user request: "Skill Point Multiplier" (@Gameplay.SkillPointMod)
             // registered again. Safe now because over-cap characters are kept visible by the STANDALONE
             // AntiCheatBypassMod.dll (BepInEx/plugins), which replaced the in-pack AntiCheatBypassModule
