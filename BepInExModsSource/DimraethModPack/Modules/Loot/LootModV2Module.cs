@@ -162,13 +162,22 @@ namespace DimraethModPack.Modules.Loot
                     var item = list[i];
                     // [2026-09-30 09:15] Recipe tidak pernah di-multiplier (tetap drop 1) — permintaan user.
                     if (IsRecipe(item.ItemType)) { temp.Add(item); continue; }
-                    // [2026-10-07 14:30] Crops are the Crop slider's exclusive domain, and ONLY inside
-                    // the sanctum; a crop-type wild node outside the base keeps its vanilla yield. Never
-                    // scale a crop with HarvestMultiplier (the old code did — that is exactly how the
-                    // East Farm ground apples ended up under the wrong slider).
-                    if (IsCrop(item.ItemType))
+                    // [2026-10-07 14:30] Crops are the Crop slider's exclusive domain, but ONLY inside the
+                    // sanctum. (This is how the East Farm ground apples were pulled off the wrong slider.)
+                    // [2026-10-07 15:10] REFINEMENT (user: wild Earlwood tenderberry bush gave only 1):
+                    // sanctum-only exclusivity is preserved above, but a crop-type node OUTSIDE the base is
+                    // a normal wild resource node and must keep the HarvestMultiplier. Previously the crop
+                    // branch `continue`d unconditionally, so wild crops were left vanilla (x1).
+                    // Obsolete unconditional crop branch (kept per comment-preservation rule):
+                    //   if (IsCrop(item.ItemType))
+                    //   {
+                    //       if (sanctum && cropMult > 1) { item.ItemCount = Math.Max(1, item.ItemCount) * cropMult; list[i] = item; }
+                    //       temp.Add(item);
+                    //       continue;
+                    //   }
+                    if (IsCrop(item.ItemType) && sanctum)
                     {
-                        if (sanctum && cropMult > 1)
+                        if (cropMult > 1)
                         {
                             item.ItemCount = Math.Max(1, item.ItemCount) * cropMult;
                             list[i] = item;
@@ -176,6 +185,7 @@ namespace DimraethModPack.Modules.Loot
                         temp.Add(item);
                         continue;
                     }
+                    // Non-sanctum crop (and every non-crop) rides the Harvest multiplier as before.
                     item.ItemCount = Math.Max(1, item.ItemCount) * mult;
                     list[i] = item;
                     temp.Add(item);
@@ -289,7 +299,9 @@ namespace DimraethModPack.Modules.Loot
                     if (LootModV2Module.IsRecipe(drop.item)) continue;
                     // [2026-10-07 14:30] Crops never ride the Item Drop multiplier (user: "item drop
                     // multiplier also affect apples on the ground"). Crops belong to the Crop slider.
-                    if (LootModV2Module.IsCrop(drop.item)) continue;
+                    // [2026-10-07 15:10] REFINEMENT: only a SANCTUM crop is special-cased; a wild crop
+                    // dropped by a monster keeps normal Item Drop behaviour (obsolete unconditional skip).
+                    if (LootModV2Module.IsCrop(drop.item) && LootModV2Module.InSanctum()) continue;
                     var range = drop.dropRange;
                     range.min = Math.Max(1, range.min) * mult;
                     range.max = Math.Max(1, range.max) * mult;
@@ -429,12 +441,15 @@ namespace DimraethModPack.Modules.Loot
                 if (entry.Type == InteractableRewardType.GrantItem && entry.GrantedItemAmount > 0)
                 {
                     // [2026-10-07 14:30] Crops are governed ONLY by the Crop slider, and only in the
-                    // sanctum. A crop reward must never ride InteractableMultiplier — this is the
-                    // East-Farm ground-apple path the user flagged. Outside the sanctum it stays vanilla.
-                    if (LootModV2Module.IsCrop(entry.GrantedItem))
+                    // sanctum. A sanctum crop reward must never ride InteractableMultiplier — this is the
+                    // East-Farm ground-apple path the user flagged.
+                    // [2026-10-07 15:10] REFINEMENT: only a SANCTUM crop is special-cased. A crop-type
+                    // reward outside the base (wild) keeps normal InteractableMultiplier behaviour
+                    // (obsolete unconditional crop branch — returned before the sanity of wild crops).
+                    if (LootModV2Module.IsCrop(entry.GrantedItem) && LootModV2Module.InSanctum())
                     {
                         int cm = LootModV2Module.Instance.CropMultiplier.Value;
-                        if (LootModV2Module.InSanctum() && cm > 1)
+                        if (cm > 1)
                         {
                             __state = entry.GrantedItemAmount;
                             entry.GrantedItemAmount = Math.Max(1, entry.GrantedItemAmount) * cm;
@@ -479,7 +494,8 @@ namespace DimraethModPack.Modules.Loot
             // [2026-09-30 09:15] Recipe di-exclude dari multiplier — tetap drop 1 (permintaan user).
             if (LootModV2Module.IsRecipe(drop.item)) return;
             // [2026-10-07 14:30] Crops never ride InteractableMultiplier; they belong to the Crop slider.
-            if (LootModV2Module.IsCrop(drop.item)) return;
+            // [2026-10-07 15:10] REFINEMENT: sanctum-only (obsolete unconditional crop skip).
+            if (LootModV2Module.IsCrop(drop.item) && LootModV2Module.InSanctum()) return;
             int mult = LootModV2Module.Instance.InteractableMultiplier.Value;
             if (mult <= 1) return;
             try
@@ -534,7 +550,8 @@ namespace DimraethModPack.Modules.Loot
             // [2026-09-30 09:15] Recipe di-exclude dari multiplier — tetap drop 1 (permintaan user).
             if (LootModV2Module.IsRecipe(item)) return;
             // [2026-10-07 14:30] Crops never ride InteractableMultiplier; they belong to the Crop slider.
-            if (LootModV2Module.IsCrop(item)) return;
+            // [2026-10-07 15:10] REFINEMENT: sanctum-only (obsolete unconditional crop skip).
+            if (LootModV2Module.IsCrop(item) && LootModV2Module.InSanctum()) return;
             int mult = LootModV2Module.Instance.InteractableMultiplier.Value;
             if (mult <= 1 || amount <= 0) return;
             try
@@ -572,7 +589,8 @@ namespace DimraethModPack.Modules.Loot
                     // [2026-09-30 09:15] Recipe di-exclude dari multiplier — tetap drop 1 (permintaan user).
                     if (LootModV2Module.IsRecipe(item.Item)) continue;
                     // [2026-10-07 14:30] Crops never ride InteractableMultiplier; they belong to the Crop slider.
-                    if (LootModV2Module.IsCrop(item.Item)) continue;
+                    // [2026-10-07 15:10] REFINEMENT: sanctum-only (obsolete unconditional crop skip).
+                    if (LootModV2Module.IsCrop(item.Item) && LootModV2Module.InSanctum()) continue;
                     if (item.Amount > 0)
                     {
                         item.Amount = Math.Max(1, item.Amount) * mult;
