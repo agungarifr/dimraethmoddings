@@ -90,6 +90,12 @@ namespace DimraethModPack
             // per-frame CraftingBench.Update postfix; it is a manual button that finishes current crafts
             // through the game's own deposit path. Config section kept as Gameplay.FastProduction.
             Modules.Add(new FastProductionModule());
+            // [2026-10-07 10:15] New: "Unlock All (Recipes & Spells)" manual button — unlocks every
+            // crafting recipe (recipe.UUID into Player.UnlockedRecipes) and learns every spell
+            // (SpellManager.AllSpellsInGame into Player.UnlockedSpells = the effect of all spellbooks).
+            // No Harmony patches, no per-frame work; lists persist via PlayerData on save.
+            // Config: Gameplay.UnlockAll.
+            Modules.Add(new UnlockAllModule());
 
             /* [2026-09-28 13:59] OBSOLETE (superseded 2026-10-04 00:00, module re-enabled above).
                Kept the original "why disabled" reasoning for history/reference only - do not act on it.
