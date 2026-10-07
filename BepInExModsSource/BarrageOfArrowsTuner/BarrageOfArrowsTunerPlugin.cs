@@ -21,7 +21,7 @@ namespace BarrageOfArrowsTuner
     ///   * The barrage's enemy detection range is multiplied (Barrage.DetectionRangeMultiplier).
     ///   * [2026-10-07] The barrage's arrow-drop area and its drop-indicator visual are enlarged
     ///     (Barrage.DropAreaMultiplier, default 2.0).
-    ///   * [2026-10-07] Arrows drop in sequence on a configurable tick (Barrage.TickInterval, default 0.5s
+    ///   * [2026-10-07] Arrows drop in sequence on a configurable tick (Barrage.TickInterval, default 0.2s
     ///     instead of the vanilla 0.15s) and, if the current target dies mid-sequence, the remaining arrows
     ///     re-target the nearest still-living enemy and resume the drop (Barrage.RetargetOnDeath).
     ///
@@ -86,9 +86,9 @@ namespace BarrageOfArrowsTuner
             // [2026-10-07] New: sequential barrage ("Pursuing Blizzard" style). Each arrow drops TickInterval
             // seconds apart instead of the vanilla 0.15s cadence, and if the current target dies the remaining
             // arrows are re-pointed at the nearest still-living enemy.
-            TickInterval = Config.Bind("Barrage", "TickInterval", 0.5f,
+            TickInterval = Config.Bind("Barrage", "TickInterval", 0.2f,
                 "Seconds between each arrow in the barrage sequence (vanilla cadence is 0.15). Set to 0 to keep " +
-                "the vanilla cadence. (Default: 0.5)");
+                "the vanilla cadence. (Default: 0.2)");
 
             RetargetOnDeath = Config.Bind("Barrage", "RetargetOnDeath", true,
                 "If true, when the barrage's current target dies mid-sequence the remaining arrows re-target the " +
@@ -339,7 +339,7 @@ namespace BarrageOfArrowsTuner
     /// <para>
     /// Postfix: when the coroutine yields the between-arrow cadence (state 1), replaces the yielded
     /// <c>&lt;&gt;2__current</c> with <c>WaitForSeconds(Barrage.TickInterval)</c> so arrows drop on the
-    /// configured 0.5s tick instead of the vanilla 0.15s. The final post-loop wait (state 2) is untouched.
+    /// configured 0.2s tick instead of the vanilla 0.15s. The final post-loop wait (state 2) is untouched.
     /// </para>
     /// The coroutine type is used only by the "Barrage of Arrows" cast, so the base (channeled) Hail of
     /// Arrows is unaffected.
