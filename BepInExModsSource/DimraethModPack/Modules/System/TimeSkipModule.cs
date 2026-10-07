@@ -7,6 +7,12 @@ using UnityEngine;
 namespace DimraethModPack.Modules.SystemMod
 {
     /// <summary>
+    /// Advances the world clock forward by N hours (or to a preset hour) through the game's own
+    /// natural time path, so elapsed hours are real: minutes tick, hours/days/months/years roll over,
+    /// weather rerolls on day changes and OnTimeChanged fires for every consumer - just applied instantly.
+    /// [2026-10-07 09:05] Previously this was a clock-face jump that only overwrote GameTime.Hour and
+    /// called ChangeGameTime; that never advanced the day/month/year counters nor rerolled weather, so the
+    /// "spent" hours were not real. Old description kept below per repo rule.
     /// Jumps the world clock instantly to a preset hour or forward by N hours.
     /// Mirrors the working CheatMenu path: copy CurrentGameTime, set Hour, then ChangeGameTime.
     /// This is a jump, not a fast-forward.
@@ -22,6 +28,10 @@ namespace DimraethModPack.Modules.SystemMod
         public ConfigEntry<int> SkipHours;
 
         private string _status = "";
+
+        // [2026-10-07 09:05] Cached handle to TimeManager's private IncrementGameTime - the game's own
+        // one-minute natural tick (see TimeUpdateCoroutine). Resolved once via reflection on first skip.
+        private static System.Reflection.MethodInfo _incrementGameTime;
 
         public override void BindConfig(ConfigFile config)
         {
@@ -92,8 +102,10 @@ namespace DimraethModPack.Modules.SystemMod
             return curY - y;
         }
 
-        // Single helper: jump the world clock forward by delta hours
-        // (wrap at midnight via (Hour + delta + 24) % 24, minutes reset to 0 - same as the CheatMenu).
+        // Single helper: advance the world clock forward by delta hours of NATURAL time.
+        // [2026-10-07 09:05] Was: a clock-face jump. Old description kept below per repo rule:
+        // // Single helper: jump the world clock forward by delta hours
+        // // (wrap at midnight via (Hour + delta + 24) % 24, minutes reset to 0 - same as the CheatMenu).
         private void ApplySkip(int delta)
         {
             try
@@ -105,6 +117,10 @@ namespace DimraethModPack.Modules.SystemMod
                     return;
                 }
 
+                /* [2026-10-07 09:05] Obsolete: this clock-face jump only overwrote the hour (minutes reset to 0)
+                   and called ChangeGameTime, which sets the networked time value but does NOT roll hours into
+                   days/months/years nor reroll weather. Result: skipping from 20:00 +6h showed 02:00 of the
+                   SAME day, so the "hours spent" never actually elapsed. Kept per repo rule.
                 GameTime gt = new GameTime(tm.CurrentGameTime);
                 gt.Hour = (gt.Hour + delta + 24) % 24;
                 gt.Minute = 0;
@@ -112,6 +128,30 @@ namespace DimraethModPack.Modules.SystemMod
 
                 _status = $"<color=#55FF55>Skipped to {gt.Hour:00}:{gt.Minute:00}</color>";
                 DiagnosticsManager.Log("TimeSkip", $"Skipped world clock to {gt.Hour:00}:{gt.Minute:00} (delta {delta}h).");
+                */
+
+                // [2026-10-07 09:05] New: advance through the game's natural time path. IncrementGameTime
+                // adds exactly one in-game minute per call and handles hour->day->month->year rollover,
+                // weather rerolls on a day change, and publishing the new time (which fires OnTimeChanged
+                // for all consumers). Looping it delta*60 times makes the elapsed hours/days real while
+                // staying instant; it runs once per button press, not as a per-frame hook.
+                if (_incrementGameTime == null)
+                    _incrementGameTime = HarmonyLib.AccessTools.Method(typeof(TimeManager), "IncrementGameTime");
+
+                if (_incrementGameTime == null)
+                {
+                    _status = "<color=#FF5555>Time skip failed: IncrementGameTime not found.</color>";
+                    DiagnosticsManager.Log("TimeSkip", "IncrementGameTime method not found via reflection.");
+                    return;
+                }
+
+                int steps = delta * 60;
+                for (int i = 0; i < steps; i++)
+                    _incrementGameTime.Invoke(tm, null);
+
+                GameTime now = tm.CurrentGameTime;
+                _status = $"<color=#55FF55>Skipped +{delta}h to {now.Hour:00}:{now.Minute:00} (Day {now.Day})</color>";
+                DiagnosticsManager.Log("TimeSkip", $"Advanced natural time +{delta}h ({steps} min) to {now.Hour:00}:{now.Minute:00} Day {now.Day}.");
             }
             catch (Exception ex)
             {
