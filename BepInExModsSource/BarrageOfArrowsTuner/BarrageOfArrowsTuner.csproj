@@ -38,6 +38,11 @@
       <HintPath>..\..\BepInEx\interop\UnityEngine.CoreModule.dll</HintPath>
       <Private>false</Private>
     </Reference>
+    <!-- [2026-10-07] Needed for Collider2D (base Hail of Arrows AoE collider scaling). -->
+    <Reference Include="UnityEngine.Physics2DModule">
+      <HintPath>..\..\BepInEx\interop\UnityEngine.Physics2DModule.dll</HintPath>
+      <Private>false</Private>
+    </Reference>
     <Reference Include="Il2Cppmscorlib">
       <HintPath>..\..\BepInEx\interop\Il2Cppmscorlib.dll</HintPath>
       <Private>false</Private>

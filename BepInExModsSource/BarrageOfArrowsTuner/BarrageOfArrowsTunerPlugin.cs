@@ -18,10 +18,18 @@ namespace BarrageOfArrowsTuner
     ///     with a small scatter so the hit area is a tight cluster (not 6 separate enemies).
     ///   * The barrage leaves a poison pool at the impact area.
     ///   * The barrage's enemy detection range is multiplied (Barrage.DetectionRangeMultiplier).
+    ///   * [2026-10-07] The barrage drags surrounding enemies toward its centre using the game's own
+    ///     BaseSpellLibrary.DashTargetToPosition - the exact Black Hole primitive PursuingBlizzardTuner uses.
     ///
-    /// Both behaviours are gated to the "Barrage of Arrows" upgrade only: the gate is armed when the
-    /// HailOfArrowsPrefab reads a "Barrage of Arrows" upgrade level greater than zero. The base
-    /// (channeled) Hail of Arrows is left untouched.
+    /// It also tunes the BASE (channeled) Hail of Arrows:
+    ///   * [2026-10-07] The base spell's impact area is scaled (BaseHailOfArrows.AoeRadiusMultiplier, default 1.5).
+    ///     The base spell spawns HailOfArrowsArrowPrefab arrows whose AreaOfEffect trigger collider is the real
+    ///     hit area (the spell prefab's own AreaOfEffectStrike is a no-op), so that collider is scaled. Barrage
+    ///     arrows are the same prefab but are excluded.
+    ///
+    /// The barrage behaviours are gated to the "Barrage of Arrows" upgrade only: the gate is armed when the
+    /// HailOfArrowsPrefab reads a "Barrage of Arrows" upgrade level greater than zero. The base AoE scaling is the
+    /// mirror image - it only applies when that gate is NOT armed.
     ///
     /// Co-op: the pool reuses the game's own "Poison Pool" upgrade path
     /// (HailOfArrowsArrowPrefab.OnStart -> BaseSpellLibrary.SpawnElementalPool), so networking behaves
@@ -32,7 +40,7 @@ namespace BarrageOfArrowsTuner
     {
         public const string GUID = "com.custom.barrageofarrowstuner";
         public const string NAME = "Barrage of Arrows Tuner";
-        public const string VERSION = "1.0.0";
+        public const string VERSION = "1.1.0";
 
         internal static new ManualLogSource Log;
         internal static BarrageOfArrowsTunerPlugin Instance;
@@ -45,6 +53,23 @@ namespace BarrageOfArrowsTuner
         public static ConfigEntry<int> MaxPoolsPerCast;
         public static ConfigEntry<bool> ShowTunedStatsInTooltip;
         public static ConfigEntry<bool> DiagnosticLogging;
+
+        // [2026-10-07] Base Hail of Arrows impact-AoE scaling (base/channeled spell only).
+        public static ConfigEntry<float> BaseAoeRadiusMultiplier;
+
+        // [2026-10-07] Barrage-of-Arrows enemy drag (mirrors PursuingBlizzardTuner's Black Hole suction).
+        public static ConfigEntry<bool> DragEnabled;
+        public static ConfigEntry<bool> DragOnActivate;
+        public static ConfigEntry<bool> DragOnTick;
+        public static ConfigEntry<float> DragTickInterval;
+        public static ConfigEntry<float> DragRadius;
+        public static ConfigEntry<float> DragDashTime;
+        public static ConfigEntry<float> DragDistanceMultiplier;
+
+        // [2026-10-07] Field offsets verified against this build's decompiled metadata.
+        internal static int BarrageOfArrowsOffset = 0x2F4; // HailOfArrowsPrefab._barrageOfArrows (bool)
+        internal static int AoeColliderOffset = 0x288;      // AreaOfEffect._aoeCollider (Collider2D)
+        internal static float LastDragTime = float.NegativeInfinity;
 
         public override void Load()
         {
@@ -76,6 +101,43 @@ namespace BarrageOfArrowsTuner
             DiagnosticLogging = Config.Bind("Diagnostics", "LogBarrageValues", false,
                 "Log barrage point selection and poison pool decisions to the BepInEx console. (Default: false)");
 
+            // [2026-10-07] Base Hail of Arrows impact-AoE scaling. The base (channeled) spell drops
+            // HailOfArrowsArrowPrefab arrows; each arrow's AreaOfEffect trigger collider is the actual hit area
+            // (the spell prefab's own AreaOfEffectStrike is a no-op). Scaling that collider widens the base AoE.
+            BaseAoeRadiusMultiplier = Config.Bind("BaseHailOfArrows", "AoeRadiusMultiplier", 1.5f,
+                "Scale the BASE (channeled) Hail of Arrows impact area. 1.5 = +50%. Applied by scaling each base " +
+                "arrow's AreaOfEffect trigger collider geometry. The Barrage of Arrows upgrade is deliberately " +
+                "excluded (its arrows are untouched). 1.0 disables. (Default: 1.5)");
+
+            // [2026-10-07] Barrage enemy drag. Mirrors PursuingBlizzardTuner's Black Hole suction: uses the game's
+            // own BaseSpellLibrary.DashTargetToPosition (the primitive Black Hole uses) so the pull disables the
+            // NavMeshAgent during the lerp, raycasts walls, and honours Immune/DisplaceExempt/authority.
+            DragEnabled = Config.Bind("BlackHoleDrag", "Enabled", true,
+                "If true the Barrage of Arrows upgrade drags surrounding enemies toward the barrage centre using the " +
+                "game's own BaseSpellLibrary.DashTargetToPosition (the exact Black Hole primitive). Barrage upgrade " +
+                "only; the base Hail of Arrows is not dragged. (Default: true)");
+
+            DragOnActivate = Config.Bind("BlackHoleDrag", "DragOnActivate", true,
+                "Pull all enemies in range into the barrage centre immediately when the barrage starts. (Default: true)");
+
+            DragOnTick = Config.Bind("BlackHoleDrag", "DragOnTick", true,
+                "Repeat the pull every TickInterval seconds while the barrage is alive. (Default: true)");
+
+            DragTickInterval = Config.Bind("BlackHoleDrag", "TickInterval", 0.15f,
+                "Seconds between repeated drags (matches the barrage's 0.15s arrow cadence). Lower = stronger, " +
+                "more continuous suction. (Default: 0.15)");
+
+            DragRadius = Config.Bind("BlackHoleDrag", "Radius", 10.0f,
+                "Radius (world units) around the barrage centre in which enemies are dragged. Vanilla barrage " +
+                "detection radius is 10. (Default: 10.0)");
+
+            DragDashTime = Config.Bind("BlackHoleDrag", "DashTime", 0.2f,
+                "Seconds for each enemy's drag lerp. Lower = faster/snappier yank (Black Hole uses 0.3). (Default: 0.2)");
+
+            DragDistanceMultiplier = Config.Bind("BlackHoleDrag", "DistanceMultiplier", 1.0f,
+                "Multiplier on the drag distance passed to DashTargetToPosition. 1.0 = pull the enemy exactly onto " +
+                "the barrage centre; >1 pulls it past the centre (clamped by walls). (Default: 1.0)");
+
             var harmony = new Harmony(GUID);
 
             PatchOrLog(harmony, typeof(Patch_HailOfArrowsPrefab_ComputeBarragePoints));
@@ -84,6 +146,11 @@ namespace BarrageOfArrowsTuner
             PatchOrLog(harmony, typeof(Patch_BaseSpellLibrary_GetAllEnemiesInRange));
             // [2026-10-01 15:15] New: make the in-game "Barrage of Arrows" description reflect the modded behaviour.
             PatchOrLog(harmony, typeof(Patch_LocalizationManager_Get_BarrageText));
+            // [2026-10-07] Base (channeled) Hail of Arrows impact-AoE scaling.
+            PatchOrLog(harmony, typeof(Patch_AreaOfEffect_Start_BaseArrowAoe));
+            // [2026-10-07] Barrage-of-Arrows enemy drag (activate + per tick), like PursuingBlizzardTuner.
+            PatchOrLog(harmony, typeof(Patch_HailOfArrowsPrefab_OnStart_Drag));
+            PatchOrLog(harmony, typeof(Patch_HailOfArrowsPrefab_Update_Drag));
 
             Log.LogInfo("=================================================");
             Log.LogInfo($"{NAME} v{VERSION} loaded.");
@@ -95,6 +162,8 @@ namespace BarrageOfArrowsTuner
             Log.LogInfo($"MaxPoolsPerCast: {MaxPoolsPerCast.Value}");
             Log.LogInfo($"ShowTunedStatsInTooltip: {ShowTunedStatsInTooltip.Value}");
             Log.LogInfo($"DiagnosticLogging: {DiagnosticLogging.Value}");
+            Log.LogInfo($"BaseHailOfArrows.AoeRadiusMultiplier: {BaseAoeRadiusMultiplier.Value}");
+            Log.LogInfo($"BlackHoleDrag: {DragEnabled.Value} (activate={DragOnActivate.Value}, tick={DragOnTick.Value}, interval={DragTickInterval.Value}s, radius={DragRadius.Value}, distX={DragDistanceMultiplier.Value}, dashTime={DragDashTime.Value}s)");
             Log.LogInfo("=================================================");
         }
 
@@ -144,6 +213,8 @@ namespace BarrageOfArrowsTuner
             if (PoisonPoolEnabled.Value && MaxPoolsPerCast.Value > 0) parts.Add("leaves a poison pool");
             if (DetectionRangeMultiplier.Value > 0f && DetectionRangeMultiplier.Value != 1f)
                 parts.Add($"detection range x{FormatMultiplier(DetectionRangeMultiplier.Value)}");
+            // [2026-10-07] The barrage now drags enemies inward (see BlackHoleDrag).
+            if (DragEnabled.Value) parts.Add("drags nearby enemies inward");
 
             if (parts.Count == 0) return null;
             return "\n\n[Barrage Tuner] " + string.Join(", ", parts) + ".";
@@ -152,6 +223,148 @@ namespace BarrageOfArrowsTuner
         private static string FormatMultiplier(float value)
         {
             return value.ToString("0.##", CultureInfo.InvariantCulture);
+        }
+
+        /// <summary>
+        /// [2026-10-07] True when the HailOfArrowsPrefab instance resolved the "Barrage of Arrows" upgrade
+        /// (_barrageOfArrows, offset 0x2F4), so the drag only touches the barrage cast, never the base spell.
+        /// </summary>
+        internal static unsafe bool IsBarrage(HailOfArrowsPrefab hp)
+        {
+            if (hp == null || hp.Pointer == IntPtr.Zero) return false;
+            return *(byte*)((byte*)hp.Pointer + BarrageOfArrowsOffset) != 0;
+        }
+
+        /// <summary>
+        /// [2026-10-07] Widen the BASE Hail of Arrows impact area. The base (channeled) spell spawns
+        /// HailOfArrowsArrowPrefab arrows whose AreaOfEffect trigger collider (AreaOfEffect._aoeCollider, resolved
+        /// in AreaOfEffect.Start) is the real hit area - the spell prefab's own AreaOfEffectStrike is a no-op - so
+        /// we scale that collider's geometry. Barrage arrows are the same prefab, so they are excluded via the
+        /// BarrageGate (armed only during a barrage cast).
+        /// </summary>
+        internal static unsafe void ApplyBaseArrowAoe(AreaOfEffect aoe)
+        {
+            try
+            {
+                if (aoe == null || aoe.Pointer == IntPtr.Zero) return;
+                // Only the Hail of Arrows arrow prefab carries this spell's impact collider.
+                if (!IsSpellInstance<HailOfArrowsArrowPrefab>(aoe)) return;
+                // The gate is armed only during a barrage cast, so an armed gate means "barrage arrow": leave it alone.
+                if (BarrageGate.IsArmed()) return;
+
+                float mult = BaseAoeRadiusMultiplier.Value;
+                if (mult <= 0f || Math.Abs(mult - 1f) < 0.0001f) return;
+
+                IntPtr colPtr = *(IntPtr*)((byte*)aoe.Pointer + AoeColliderOffset);
+                if (colPtr == IntPtr.Zero) return;
+
+                var col = new Collider2D(colPtr);
+                ScaleColliderGeometry(col, mult);
+
+                if (DiagnosticLogging.Value)
+                {
+                    Log.LogInfo($"[BaseAoE] HailOfArrowsArrowPrefab impact collider ({col.GetType().Name}) scaled x{FormatMultiplier(mult)}");
+                }
+            }
+            catch (Exception ex)
+            {
+                Log?.LogError($"[ApplyBaseArrowAoe] {ex}");
+            }
+        }
+
+        /// <summary>
+        /// [2026-10-07] Multiply a Collider2D's own shape by <paramref name="mult"/>. Mirrors
+        /// TwisterTunerPlugin.ScaleColliderGeometry so the trigger area grows in world space regardless of whether
+        /// this build's Collider2D follows its Transform.
+        /// </summary>
+        internal static void ScaleColliderGeometry(Collider2D col, float mult)
+        {
+            var circle = col.TryCast<CircleCollider2D>();
+            if (circle != null) { circle.radius *= mult; circle.offset *= mult; return; }
+
+            var box = col.TryCast<BoxCollider2D>();
+            if (box != null) { box.size *= mult; box.offset *= mult; box.edgeRadius *= mult; return; }
+
+            var capsule = col.TryCast<CapsuleCollider2D>();
+            if (capsule != null) { capsule.size *= mult; capsule.offset *= mult; return; }
+
+            var poly = col.TryCast<PolygonCollider2D>();
+            if (poly != null)
+            {
+                var pts = poly.points;
+                for (int i = 0; i < pts.Length; i++) pts[i] *= mult;
+                poly.points = pts;
+                return;
+            }
+
+            var edge = col.TryCast<EdgeCollider2D>();
+            if (edge != null)
+            {
+                var pts = edge.points;
+                for (int i = 0; i < pts.Length; i++) pts[i] *= mult;
+                edge.points = pts;
+                return;
+            }
+
+            // Unknown 2D collider type: fall back to scaling its own transform.
+            var t = col.transform;
+            var s = t.localScale;
+            t.localScale = new Vector3(s.x * mult, s.y * mult, s.z);
+        }
+
+        /// <summary>
+        /// [2026-10-07] Drag every live enemy inside the barrage's radius toward its centre using the game's own
+        /// BaseSpellLibrary.DashTargetToPosition - the exact primitive BlackholePrefab.AreaOfEffectStrike (and
+        /// PursuingBlizzardTuner) use. The pull reuses the game's knockback coroutine, which disables the
+        /// NavMeshAgent during the lerp and restores it afterward, raycasts walls, and honours
+        /// ObjectsCommon.Immune / MonsterBehaviourLibrary.DisplaceExempt / authority.
+        /// </summary>
+        internal static void ApplySuction(HailOfArrowsPrefab hp)
+        {
+            if (!Enabled.Value || !DragEnabled.Value) return;
+            if (hp == null || hp.Pointer == IntPtr.Zero) return;
+
+            try
+            {
+                var t = hp.transform;
+                if (t == null) return;
+                Vector3 p = t.position;
+                Vector2 center = new Vector2(p.x, p.y);
+
+                float radius = DragRadius.Value;
+                if (radius <= 0.1f) return;
+
+                var enemies = hp.GetAllEnemiesInRangeOfPosition(center, radius);
+                if (enemies == null) return;
+
+                float dashTime = DragDashTime.Value;
+                float distMult = DragDistanceMultiplier.Value;
+                int pulled = 0;
+                int count = enemies.Count;
+                for (int i = 0; i < count; i++)
+                {
+                    ObjectsCommon enemy = enemies[i];
+                    if (enemy == null || enemy.Pointer == IntPtr.Zero) continue;
+                    if (enemy.IsDead()) continue;
+
+                    Vector3 ep = enemy.transform.position;
+                    float dist = Vector2.Distance(new Vector2(ep.x, ep.y), center);
+                    if (dist <= 0.05f) continue;
+
+                    // DashTargetToPosition(target, center, time, distance, useMiddleOfSprite, ignoreImmune, ignoreExempt, ignoreBodyRoot)
+                    hp.DashTargetToPosition(enemy, center, dashTime, dist * distMult, false, false, false, null);
+                    pulled++;
+                }
+
+                if (DiagnosticLogging.Value && pulled > 0)
+                {
+                    Log.LogInfo($"[BarrageDrag] dragged {pulled} enemies toward barrage ({center.x:F1}, {center.y:F1}), radius {radius:F1}, distX{distMult:F2}, time {dashTime:F2}s");
+                }
+            }
+            catch (Exception ex)
+            {
+                Log?.LogError($"[ApplySuction] {ex}");
+            }
         }
     }
 
@@ -433,6 +646,85 @@ namespace BarrageOfArrowsTuner
             catch (Exception ex)
             {
                 BarrageOfArrowsTunerPlugin.Log?.LogError($"[Patch_LocalizationManager_Get_BarrageText] {ex}");
+            }
+        }
+    }
+
+    /// <summary>
+    /// [2026-10-07] Postfix on <c>AreaOfEffect.Start</c>. By the time this runs the game has resolved
+    /// <c>AreaOfEffect._aoeCollider</c> (assigned in Start), so this is the reliable point to widen the BASE Hail
+    /// of Arrows arrow impact area. Only HailOfArrowsArrowPrefab instances are affected, and only when no barrage
+    /// cast is in flight (BarrageGate), so the Barrage of Arrows upgrade keeps its vanilla impact area.
+    /// </summary>
+    [HarmonyPatch(typeof(AreaOfEffect), "Start")]
+    public static class Patch_AreaOfEffect_Start_BaseArrowAoe
+    {
+        public static void Postfix(AreaOfEffect __instance)
+        {
+            try
+            {
+                if (!BarrageOfArrowsTunerPlugin.Enabled.Value) return;
+                BarrageOfArrowsTunerPlugin.ApplyBaseArrowAoe(__instance);
+            }
+            catch (Exception ex)
+            {
+                BarrageOfArrowsTunerPlugin.Log?.LogError($"[Patch_AreaOfEffect_Start_BaseArrowAoe] {ex}");
+            }
+        }
+    }
+
+    /// <summary>
+    /// [2026-10-07] Postfix on <c>HailOfArrowsPrefab.OnStart</c>. When the spell resolved the "Barrage of Arrows"
+    /// upgrade (<c>_barrageOfArrows</c>) it drags surrounding enemies toward the barrage centre once on activation,
+    /// mirroring PursuingBlizzardTuner's Black Hole suction. Base Hail of Arrows casts are not dragged.
+    /// </summary>
+    [HarmonyPatch(typeof(HailOfArrowsPrefab), "OnStart")]
+    public static class Patch_HailOfArrowsPrefab_OnStart_Drag
+    {
+        public static void Postfix(HailOfArrowsPrefab __instance)
+        {
+            try
+            {
+                if (!BarrageOfArrowsTunerPlugin.Enabled.Value) return;
+                if (!BarrageOfArrowsTunerPlugin.DragEnabled.Value) return;
+                if (!BarrageOfArrowsTunerPlugin.DragOnActivate.Value) return;
+                if (!BarrageOfArrowsTunerPlugin.IsBarrage(__instance)) return;
+                BarrageOfArrowsTunerPlugin.ApplySuction(__instance);
+            }
+            catch (Exception ex)
+            {
+                BarrageOfArrowsTunerPlugin.Log?.LogError($"[Patch_HailOfArrowsPrefab_OnStart_Drag] {ex}");
+            }
+        }
+    }
+
+    /// <summary>
+    /// [2026-10-07] Postfix on <c>HailOfArrowsPrefab.Update</c>. Repeats the barrage drag every TickInterval
+    /// seconds while a barrage is alive (the barrage prefab lingers ~5s), so enemies are repeatedly yanked onto
+    /// the cluster centre - the same "on activate + on tick" shape as PursuingBlizzardTuner.
+    /// </summary>
+    [HarmonyPatch(typeof(HailOfArrowsPrefab), "Update")]
+    public static class Patch_HailOfArrowsPrefab_Update_Drag
+    {
+        public static void Postfix(HailOfArrowsPrefab __instance)
+        {
+            try
+            {
+                if (!BarrageOfArrowsTunerPlugin.Enabled.Value) return;
+                if (!BarrageOfArrowsTunerPlugin.DragEnabled.Value) return;
+                if (!BarrageOfArrowsTunerPlugin.DragOnTick.Value) return;
+                if (!BarrageOfArrowsTunerPlugin.IsBarrage(__instance)) return;
+
+                float interval = BarrageOfArrowsTunerPlugin.DragTickInterval.Value;
+                if (interval < 0.01f) interval = 0.01f;
+                if (Time.time - BarrageOfArrowsTunerPlugin.LastDragTime < interval) return;
+                BarrageOfArrowsTunerPlugin.LastDragTime = Time.time;
+
+                BarrageOfArrowsTunerPlugin.ApplySuction(__instance);
+            }
+            catch (Exception ex)
+            {
+                BarrageOfArrowsTunerPlugin.Log?.LogError($"[Patch_HailOfArrowsPrefab_Update_Drag] {ex}");
             }
         }
     }
