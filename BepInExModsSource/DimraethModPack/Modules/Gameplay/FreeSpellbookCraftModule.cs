@@ -129,6 +129,12 @@ namespace DimraethModPack.Modules.Gameplay
             if (_isSpellbook.TryGetValue(recipe.Result, out bool cached)) return cached;
             Item item = manager.GetItem(recipe.Result);
             bool isBook = item != null && item.SpellUnlock != Spell.None;
+            // [2026-10-07 12:10] Belt-and-suspenders: if the item data ever leaves SpellUnlock
+            // unset, the spellbook items are still named Spellbook* in the ItemType enum
+            // (SpellbookBarrier=42 ... SpellbookBlackHole=47, verified in-game 2026-10-07), so
+            // fall back to the result name. Custom items resolve to numeric names -> no false hits.
+            if (!isBook)
+                isBook = recipe.Result.ToString().StartsWith("Spellbook", StringComparison.OrdinalIgnoreCase);
             _isSpellbook[recipe.Result] = isBook;
             return isBook;
         }
