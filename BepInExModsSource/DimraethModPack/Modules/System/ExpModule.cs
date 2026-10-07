@@ -31,6 +31,12 @@ namespace DimraethModPack.Modules.SystemMod
         public override void ApplyPatches(Harmony harmony)
         {
             harmony.PatchAll(typeof(Patches));
+            // [2026-10-07] BUGFIX: HarmonyX PatchAll(Type) only processes methods *declared* on the
+            // given type — it does NOT walk nested types. Patches.Patch_GrantXP is a nested class, so
+            // it was silently skipped and its Prefix/Finalizer never ran: _isCombatXpInFlight stayed
+            // false forever, making the double-scale guard in Prefix_GrantXPToPlayer inert.
+            // Register the nested class explicitly (same fix already applied to AlwaysRegenModule).
+            harmony.PatchAll(typeof(Patches.Patch_GrantXP));
         }
 
         public override float DrawSettings(float x, float y, float width, GUIStyle labelStyle, GUIStyle btnStyle)
