@@ -151,11 +151,21 @@ namespace DimraethModPack.Modules.SystemMod
         {
             float curY = y;
             curY += DrawToggle(x, curY, width, "Force Hell Mode All Worlds", ForceHellMode, "Vanilla: OFF", labelStyle, btnStyle);
-            curY += DrawFloatSpinner(x, curY, width, "Monster HP Multiplier", MonsterHealthMult, 0.5f, 1.0f, 20.0f, "Vanilla: 1.0x", labelStyle, btnStyle, "0.0x");
-            curY += DrawFloatSpinner(x, curY, width, "Monster Damage Mult", MonsterDamageMult, 0.5f, 1.0f, 10.0f, "Vanilla: 1.0x", labelStyle, btnStyle, "0.0x");
-            curY += DrawFloatSpinner(x, curY, width, "Combat Pace Mult", CombatPaceMult, 0.2f, 1.0f, 5.0f, "Vanilla: 1.0x", labelStyle, btnStyle, "0.0x");
-            curY += DrawFloatSpinner(x, curY, width, "Monster Move Speed", MonsterSpeedMult, 0.1f, 1.0f, 3.0f, "Vanilla: 1.0x", labelStyle, btnStyle, "0.0x");
-            curY += DrawFloatSpinner(x, curY, width, "Elite Spawn Chance", EmpowermentChanceMult, 0.5f, 1.0f, 10.0f, "Vanilla: 1.0x", labelStyle, btnStyle, "0.0x");
+            // [2026-10-07 12:00] Changed: all Hell Mode float multiplier caps raised from their old
+            // per-stat ceilings (HP 20.0, Damage 10.0, Pace 5.0, Speed 3.0, Elite 10.0) to a uniform
+            // 999.0 max so every multiplier can reach the requested 999x ceiling. The old capped
+            // DrawFloatSpinner lines are preserved here per repo rule (obsolete because they limited
+            // the UI spinner to values below 999):
+            // curY += DrawFloatSpinner(x, curY, width, "Monster HP Multiplier", MonsterHealthMult, 0.5f, 1.0f, 20.0f, "Vanilla: 1.0x", labelStyle, btnStyle, "0.0x");
+            // curY += DrawFloatSpinner(x, curY, width, "Monster Damage Mult", MonsterDamageMult, 0.5f, 1.0f, 10.0f, "Vanilla: 1.0x", labelStyle, btnStyle, "0.0x");
+            // curY += DrawFloatSpinner(x, curY, width, "Combat Pace Mult", CombatPaceMult, 0.2f, 1.0f, 5.0f, "Vanilla: 1.0x", labelStyle, btnStyle, "0.0x");
+            // curY += DrawFloatSpinner(x, curY, width, "Monster Move Speed", MonsterSpeedMult, 0.1f, 1.0f, 3.0f, "Vanilla: 1.0x", labelStyle, btnStyle, "0.0x");
+            // curY += DrawFloatSpinner(x, curY, width, "Elite Spawn Chance", EmpowermentChanceMult, 0.5f, 1.0f, 10.0f, "Vanilla: 1.0x", labelStyle, btnStyle, "0.0x");
+            curY += DrawFloatSpinner(x, curY, width, "Monster HP Multiplier", MonsterHealthMult, 0.5f, 1.0f, 999.0f, "Vanilla: 1.0x", labelStyle, btnStyle, "0.0x");
+            curY += DrawFloatSpinner(x, curY, width, "Monster Damage Mult", MonsterDamageMult, 0.5f, 1.0f, 999.0f, "Vanilla: 1.0x", labelStyle, btnStyle, "0.0x");
+            curY += DrawFloatSpinner(x, curY, width, "Combat Pace Mult", CombatPaceMult, 0.2f, 1.0f, 999.0f, "Vanilla: 1.0x", labelStyle, btnStyle, "0.0x");
+            curY += DrawFloatSpinner(x, curY, width, "Monster Move Speed", MonsterSpeedMult, 0.1f, 1.0f, 999.0f, "Vanilla: 1.0x", labelStyle, btnStyle, "0.0x");
+            curY += DrawFloatSpinner(x, curY, width, "Elite Spawn Chance", EmpowermentChanceMult, 0.5f, 1.0f, 999.0f, "Vanilla: 1.0x", labelStyle, btnStyle, "0.0x");
             curY += DrawIntSpinner(x, curY, width, "Monster Bonus Level", MonsterBonusLevelOverPlayer, 1, 0, 50, "Vanilla: +0", labelStyle, btnStyle);
             return curY - y;
         }
