@@ -47,6 +47,16 @@ namespace DimraethModPack.Modules.Stats
         public override void ApplyPatches(Harmony harmony)
         {
             harmony.PatchAll(typeof(Patches));
+            // [2026-10-07 10:01] FIX (Always Regen not working in combat). Verified against the
+            // current game (10/7 decompile) and HarmonyX 0Harmony.dll: Harmony.PatchAll(Type) only
+            // processes methods DECLARED on the given type (CreateClassProcessor ->
+            // PatchTools.GetPatchMethods -> AccessTools.GetDeclaredMethods -> Type.GetMethods), it
+            // does NOT walk nested classes. The Prefix/Postfix for
+            // ObjectsCommon.CommonsZeroPointOneSecond live in the nested class below, so they were
+            // silently never applied - NoRegenLockout and ContinuousRegen (the actual in-combat regen
+            // path) did nothing, leaving only the out-of-combat multiplier postfixes working.
+            // Apply the nested class explicitly, the same way LootModV2/PerfectParry already do.
+            harmony.PatchAll(typeof(Patches.Patch_CommonsZeroPointOneSecond));
         }
 
         public override float DrawSettings(float x, float y, float width, GUIStyle labelStyle, GUIStyle btnStyle)
@@ -121,7 +131,13 @@ namespace DimraethModPack.Modules.Stats
                 if (Instance == null || !Instance.IsEnabled) return;
                 if (Instance.NoRegenLockout.Value)
                 {
-                    time = 0f;
+                    // [2026-10-07 10:01] FIX: vanilla stamina regen requires RegenTimer > 0.2
+                    // (StaminaRegenTick does RegenTimer += 0.1 then skips regen while <= 0.2;
+                    // lockout seeds are negative - QA suppress sets -10). Passing 0 still left a
+                    // ~0.3s lockout every time the game re-seeded the timer on an attack/cast.
+                    // Use a value safely above the gate so regen is allowed immediately.
+                    // time = 0f;
+                    time = 1f;
                 }
             }
 
@@ -138,7 +154,11 @@ namespace DimraethModPack.Modules.Stats
                     // if (__instance != null && __instance.IsPlayer && __instance.IsOwner && Instance.NoRegenLockout.Value)
                     if (PlayerIdentity.IsLocalPlayer(__instance) && __instance.IsOwner && Instance.NoRegenLockout.Value)
                     {
-                        __instance.RegenTimer = 0f;
+                        // [2026-10-07 10:01] FIX: 0 still lost to the `RegenTimer > 0.2` gate -
+                        // because this ran every 0.1s tick, RegenTimer never climbed past 0.1 and
+                        // stamina regen never fired. Hold it above the gate instead.
+                        // __instance.RegenTimer = 0f;
+                        __instance.RegenTimer = 1f;
                     }
                 }
 
@@ -153,7 +173,12 @@ namespace DimraethModPack.Modules.Stats
                         try
                         {
                             float stamMult = Instance.StaminaRegenMultiplier.Value;
-                            if (stamMult > 1.0f)
+                            // [2026-10-07 10:01] FIX: ContinuousRegen is the in-combat regen path
+                            // and must run whenever the toggle is on. The old `> 1.0f` guard disabled
+                            // it at the config minimum (mult = 1), so turning the module on did
+                            // nothing during battle. mult is >= 1 by config, so gate on the toggle.
+                            // if (stamMult > 1.0f)
+                            if (stamMult >= 1.0f)
                             {
                                 var curStam = __instance.Stamina;
                                 var maxStam = __instance.MaxStamina;
@@ -170,7 +195,9 @@ namespace DimraethModPack.Modules.Stats
                             }
 
                             float hpMult = Instance.HealthRegenMultiplier.Value;
-                            if (hpMult > 1.0f)
+                            // [2026-10-07 10:01] FIX: see the stamina block above.
+                            // if (hpMult > 1.0f)
+                            if (hpMult >= 1.0f)
                             {
                                 var curHp = __instance.Health;
                                 var maxHp = __instance.MaxHealth;
