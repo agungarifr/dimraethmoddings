@@ -117,7 +117,7 @@ through the link `modding\BepInExModsSource\`.
 
 All under `modding\BepInExModsSource\`:
 
-- **AimedShotChargeTuner** — shortens the Aimed Shot spell's charge/draw time (default: half).
+- **AimedShotChargeTuner** — shortens the Aimed Shot charge/draw time (default: half) and extends its effective range (default x1.5), with a tuned-stats tooltip.
 - **AntiCheatBypassMod** — disables the game's anti-cheat checks.
 - **BarrageOfArrowsTuner** — tunes the Barrage of Arrows spell.
 - **ContagionTuner** — tunes the Contagion poison spell (ticks, duration, damage).
