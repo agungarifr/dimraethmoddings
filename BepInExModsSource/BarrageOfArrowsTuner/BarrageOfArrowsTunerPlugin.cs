@@ -18,8 +18,9 @@ namespace BarrageOfArrowsTuner
     ///     with a small scatter so the hit area is a tight cluster (not 6 separate enemies).
     ///   * The barrage leaves a poison pool at the impact area.
     ///   * The barrage's enemy detection range is multiplied (Barrage.DetectionRangeMultiplier).
-    ///   * [2026-10-07] The barrage drags surrounding enemies toward its centre using the game's own
-    ///     BaseSpellLibrary.DashTargetToPosition - the exact Black Hole primitive PursuingBlizzardTuner uses.
+    ///   * [2026-10-07] The barrage drags surrounding enemies onto its first target (the enemy the arrows drop
+    ///     on) using the game's own BaseSpellLibrary.DashTargetToPosition - the exact Black Hole primitive
+    ///     PursuingBlizzardTuner uses. The centre enemy itself is never dragged.
     ///
     /// It also tunes the BASE (channeled) Hail of Arrows:
     ///   * [2026-10-07] The base spell's impact area is scaled (BaseHailOfArrows.AoeRadiusMultiplier, default 1.5).
@@ -70,6 +71,13 @@ namespace BarrageOfArrowsTuner
         internal static int BarrageOfArrowsOffset = 0x2F4; // HailOfArrowsPrefab._barrageOfArrows (bool)
         internal static int AoeColliderOffset = 0x288;      // AreaOfEffect._aoeCollider (Collider2D)
         internal static float LastDragTime = float.NegativeInfinity;
+
+        // [2026-10-07] Barrage drag centre = the barrage's FIRST TARGET (the enemy the clustered arrows drop on,
+        // nearest to the spell centre). Captured in Patch_HailOfArrowsPrefab_ComputeBarragePoints. The centre enemy
+        // is never dragged, so it stays put while the surrounding enemies are pulled onto it.
+        internal static Vector2 BarrageTargetPos;
+        internal static IntPtr BarrageTargetPtr = IntPtr.Zero;
+        internal static bool BarrageTargetValid;
 
         public override void Load()
         {
@@ -313,10 +321,12 @@ namespace BarrageOfArrowsTuner
         }
 
         /// <summary>
-        /// [2026-10-07] Drag every live enemy inside the barrage's radius toward its centre using the game's own
-        /// BaseSpellLibrary.DashTargetToPosition - the exact primitive BlackholePrefab.AreaOfEffectStrike (and
-        /// PursuingBlizzardTuner) use. The pull reuses the game's knockback coroutine, which disables the
-        /// NavMeshAgent during the lerp and restores it afterward, raycasts walls, and honours
+        /// [2026-10-07] Drag every live enemy inside the barrage's radius onto the barrage's FIRST TARGET using the
+        /// game's own BaseSpellLibrary.DashTargetToPosition - the exact primitive BlackholePrefab.AreaOfEffectStrike
+        /// (and PursuingBlizzardTuner) use. The centre is the first target enemy captured by
+        /// Patch_HailOfArrowsPrefab_ComputeBarragePoints (where the clustered arrows drop); that centre enemy is
+        /// skipped so it is never dragged off its own position. The pull reuses the game's knockback coroutine,
+        /// which disables the NavMeshAgent during the lerp and restores it afterward, raycasts walls, and honours
         /// ObjectsCommon.Immune / MonsterBehaviourLibrary.DisplaceExempt / authority.
         /// </summary>
         internal static void ApplySuction(HailOfArrowsPrefab hp)
@@ -326,10 +336,20 @@ namespace BarrageOfArrowsTuner
 
             try
             {
-                var t = hp.transform;
-                if (t == null) return;
-                Vector3 p = t.position;
-                Vector2 center = new Vector2(p.x, p.y);
+                // [2026-10-07] Centre = the barrage's first target (the enemy the arrows drop on). Fall back to the
+                // spell transform only when no target was captured.
+                Vector2 center;
+                if (BarrageTargetValid)
+                {
+                    center = BarrageTargetPos;
+                }
+                else
+                {
+                    var t = hp.transform;
+                    if (t == null) return;
+                    Vector3 p = t.position;
+                    center = new Vector2(p.x, p.y);
+                }
 
                 float radius = DragRadius.Value;
                 if (radius <= 0.1f) return;
@@ -346,6 +366,9 @@ namespace BarrageOfArrowsTuner
                     ObjectsCommon enemy = enemies[i];
                     if (enemy == null || enemy.Pointer == IntPtr.Zero) continue;
                     if (enemy.IsDead()) continue;
+
+                    // The centre (first target) enemy must NOT be dragged.
+                    if (BarrageTargetValid && enemy.Pointer == BarrageTargetPtr) continue;
 
                     Vector3 ep = enemy.transform.position;
                     float dist = Vector2.Distance(new Vector2(ep.x, ep.y), center);
@@ -433,10 +456,13 @@ namespace BarrageOfArrowsTuner
                 }
 
                 if (!BarrageOfArrowsTunerPlugin.Enabled.Value) return true;
-                if (!BarrageOfArrowsTunerPlugin.ClusterOnNearestTarget.Value) return true;
-                if (count <= 0) return true;
 
+                // [2026-10-07] Capture the barrage's first target - the nearest enemy to the spell centre, which is
+                // where the clustered arrows drop. It becomes the DRAG CENTRE and is excluded from the drag so it
+                // stays put. Computed before the clustering early-outs so the drag still centres correctly even if
+                // clustering is disabled.
                 Vector2 anchor = center;
+                ObjectsCommon anchorEnemy = null;
                 bool foundTarget = false;
 
                 if (enemies != null)
@@ -445,7 +471,7 @@ namespace BarrageOfArrowsTuner
                     for (int i = 0; i < enemies.Count; i++)
                     {
                         var enemy = enemies[i];
-                        if (enemy == null) continue;
+                        if (enemy == null || enemy.Pointer == IntPtr.Zero) continue;
 
                         Vector2 p = enemy.transform.position;
                         float d = (p - center).sqrMagnitude;
@@ -453,10 +479,18 @@ namespace BarrageOfArrowsTuner
                         {
                             best = d;
                             anchor = p;
+                            anchorEnemy = enemy;
                             foundTarget = true;
                         }
                     }
                 }
+
+                BarrageOfArrowsTunerPlugin.BarrageTargetPos = anchor;
+                BarrageOfArrowsTunerPlugin.BarrageTargetPtr = anchorEnemy != null ? anchorEnemy.Pointer : IntPtr.Zero;
+                BarrageOfArrowsTunerPlugin.BarrageTargetValid = anchorEnemy != null;
+
+                if (!BarrageOfArrowsTunerPlugin.ClusterOnNearestTarget.Value) return true;
+                if (count <= 0) return true;
 
                 float scatter = BarrageOfArrowsTunerPlugin.ScatterRadius.Value;
                 if (scatter < 0f) scatter = 0f;
@@ -675,8 +709,8 @@ namespace BarrageOfArrowsTuner
 
     /// <summary>
     /// [2026-10-07] Postfix on <c>HailOfArrowsPrefab.OnStart</c>. When the spell resolved the "Barrage of Arrows"
-    /// upgrade (<c>_barrageOfArrows</c>) it drags surrounding enemies toward the barrage centre once on activation,
-    /// mirroring PursuingBlizzardTuner's Black Hole suction. Base Hail of Arrows casts are not dragged.
+    /// upgrade (<c>_barrageOfArrows</c>) it drags surrounding enemies onto the barrage's first target once on
+    /// activation, mirroring PursuingBlizzardTuner's Black Hole suction. Base Hail of Arrows casts are not dragged.
     /// </summary>
     [HarmonyPatch(typeof(HailOfArrowsPrefab), "OnStart")]
     public static class Patch_HailOfArrowsPrefab_OnStart_Drag
@@ -701,7 +735,7 @@ namespace BarrageOfArrowsTuner
     /// <summary>
     /// [2026-10-07] Postfix on <c>HailOfArrowsPrefab.Update</c>. Repeats the barrage drag every TickInterval
     /// seconds while a barrage is alive (the barrage prefab lingers ~5s), so enemies are repeatedly yanked onto
-    /// the cluster centre - the same "on activate + on tick" shape as PursuingBlizzardTuner.
+    /// the barrage's first target - the same "on activate + on tick" shape as PursuingBlizzardTuner.
     /// </summary>
     [HarmonyPatch(typeof(HailOfArrowsPrefab), "Update")]
     public static class Patch_HailOfArrowsPrefab_Update_Drag
