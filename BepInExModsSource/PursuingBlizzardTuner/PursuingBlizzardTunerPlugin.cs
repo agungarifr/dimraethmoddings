@@ -24,6 +24,12 @@ namespace PursuingBlizzardTuner
     ///     <c>BaseSpellLibrary.DashTargetToPosition</c> (the exact primitive Black Hole uses) on cast and on every
     ///     tick - a 2-per-second yank. Mirrors the Contagion Tuner suction (docs/BlackHole_Dragging_Mechanism.md).
     ///
+    /// [2026-10-07] Added BurningMultiplier (default x3): scales the Burning the (PyromancerConverter-converted)
+    /// pursuit Blizzard applies per damage tick. Vanilla applies 1 Chill/tick (converted to 1 Burning); this makes
+    /// it 3 Burning/tick, at the game's default stack duration (~5s). Only the converted Burning is scaled, never
+    /// the raw Chill. If the Shattering Blizzard upgrade is active the game skips the status call entirely, so
+    /// there is nothing to scale in that build.
+    ///
     /// If Pursuing Blizzard is not unlocked/active on the Blizzard instance, vanilla Blizzard is untouched.
     /// </summary>
     [BepInPlugin(GUID, NAME, VERSION)]
@@ -31,7 +37,7 @@ namespace PursuingBlizzardTuner
     {
         public const string GUID = "com.custom.pursuingblizzardtuner";
         public const string NAME = "Pursuing Blizzard Tuner";
-        public const string VERSION = "1.2.0";
+        public const string VERSION = "1.3.0";
 
         internal static new ManualLogSource Log;
         internal static PursuingBlizzardTunerPlugin Instance;
@@ -41,6 +47,15 @@ namespace PursuingBlizzardTuner
         public static ConfigEntry<float> TickInterval;
         public static ConfigEntry<int> TotalTicks;
         public static ConfigEntry<float> DamageMultiplier;
+
+        // [2026-10-07] Burning debuff scaling. The Blizzard's per-tick status flows through
+        // BaseSpellLibrary.AddStacksToTarget(target, effect, amount, time). Vanilla applies one Chill per damage
+        // tick (amount = 1) UNLESS the Shattering Blizzard upgrade is active, whose branch skips the call entirely.
+        // PyromancerConverter remaps that Chill to Burning (same amount/time), so the burn we see on a converted
+        // pursuit Blizzard is normally 1 stack/tick. BurningMultiplier scales the Burning the Blizzard applies;
+        // it deliberately only touches the already-converted Burning (never Chill) so it cannot double-apply when
+        // the converter re-dispatches Chill -> Burning.
+        public static ConfigEntry<float> BurningMultiplier;
 
         // [2026-10-06] VFX tuning: scale World-space particle sizes to match the larger area, and extend the
         // persistent storm/spike systems so the visuals cover the full spell lifetime.
@@ -92,6 +107,14 @@ namespace PursuingBlizzardTuner
                 "Multiplier applied to Pursuing Blizzard's per-tick damage. 1.0 = vanilla per-tick damage; " +
                 "0.9 = 10% less damage per tick. (Default: 0.90)");
 
+            // [2026-10-07] Scale the Burning the (converted) Blizzard applies each damage tick. The game applies
+            // one Chill per tick (converted to Burning by PyromancerConverter); this multiplies it. Only the
+            // already-converted Burning is scaled, never the raw Chill, so the converter's Chill -> Burning
+            // re-dispatch is not scaled twice. Duration keeps the game default (~5s).
+            BurningMultiplier = Config.Bind("PursuingBlizzard", "BurningMultiplier", 3f,
+                "Multiplier for the Burning stacks the Pursuing Blizzard applies per damage tick (converted from the " +
+                "game's 1 Chill). 1 = vanilla 1 Burning/tick, 3 = 3 Burning/tick. (Default: 3)");
+
             // [2026-10-06] VFX tuning binds.
             ScaleVfxParticles = Config.Bind("Vfx", "ScaleVfxParticles", true,
                 "If true, set the storm/spike particle systems to Hierarchy scaling so particle sizes follow the " +
@@ -137,6 +160,8 @@ namespace PursuingBlizzardTuner
             var harmony = new Harmony(GUID);
             PatchOrLog(harmony, typeof(Patch_BlizzardPrefab_ApplyScaleAndDamageModifiers));
             PatchOrLog(harmony, typeof(Patch_BlizzardPrefab_Update));
+            // [2026-10-07] Scale the Burning the converted Blizzard applies each tick (see BurningMultiplier).
+            PatchOrLog(harmony, typeof(Patch_BaseSpellLibrary_AddStacksToTarget_Burning));
 
             Log.LogInfo("=================================================");
             Log.LogInfo($"{NAME} v{VERSION} loaded.");
@@ -145,6 +170,7 @@ namespace PursuingBlizzardTuner
             Log.LogInfo($"TickInterval: {TickInterval.Value}s (half-second ticks)");
             Log.LogInfo($"TotalTicks: {TotalTicks.Value} (lifetime {TotalTicks.Value * TickInterval.Value:F2}s)");
             Log.LogInfo($"DamageMultiplier: x{DamageMultiplier.Value} per tick");
+            Log.LogInfo($"BurningMultiplier: x{BurningMultiplier.Value} Burning per tick (game default 1)");
             Log.LogInfo($"Vfx: scaleParticles={ScaleVfxParticles.Value}, matchLifetime={MatchVfxLifetime.Value}, log={LogVfxTuning.Value}");
             Log.LogInfo($"BlackHoleSuction: {SuctionEnabled.Value} (activate={SuctionOnActivate.Value}, tick={SuctionOnTick.Value}, radiusX{SuctionRadiusMultiplier.Value}, distX{SuctionDistanceMultiplier.Value}, dashTime={SuctionDashTime.Value}s)");
             Log.LogInfo("=================================================");
@@ -345,6 +371,24 @@ namespace PursuingBlizzardTuner
             }
         }
 
+        /// <summary>
+        /// [2026-10-07] True when the spell prefab is the Blizzard itself (BlizzardPrefab). The converted tick
+        /// status arrives through BaseSpellLibrary.AddStacksToTarget with the Blizzard prefab as the instance
+        /// (the PyromancerConverter re-dispatches Chill -> Burning on the same instance), so we match by type name.
+        /// </summary>
+        internal static bool IsBlizzardPrefab(BaseSpellLibrary instance)
+        {
+            try
+            {
+                var type = instance.GetIl2CppType();
+                return type != null && type.Name == "BlizzardPrefab";
+            }
+            catch
+            {
+                return false;
+            }
+        }
+
         private static void PatchOrLog(Harmony harmony, Type patchType)
         {
             try
@@ -488,6 +532,59 @@ namespace PursuingBlizzardTuner
             catch (Exception ex)
             {
                 PursuingBlizzardTunerPlugin.Log?.LogError($"[Patch_BlizzardPrefab_Update] {ex}");
+            }
+        }
+    }
+
+    /// <summary>
+    /// [2026-10-07] Prefix on <c>BaseSpellLibrary.AddStacksToTarget</c>. Vanilla Blizzard applies ONE Chill per
+    /// damage tick (its <c>DamageTarget</c> passes amount = 1); PyromancerConverter remaps that Chill to Burning,
+    /// so the pursuit Blizzard burns for 1 stack/tick. We scale only the already-converted <c>Burning</c> coming
+    /// from the Blizzard prefab by <c>BurningMultiplier</c> (default x3 => 3 Burning/tick). We never touch the raw
+    /// <c>Chill</c>: the converter re-dispatches Chill -> Burning as a fresh call, so scaling Chill here would be
+    /// scaled a second time on that re-dispatch (x3 x3). The duration is left at the game default (~5s).
+    /// Note the Shattering Blizzard upgrade makes the game skip AddStacksToTarget entirely, so there is nothing to
+    /// scale in that build (the burn is absent at the source).
+    /// </summary>
+    [HarmonyPatch(typeof(BaseSpellLibrary), nameof(BaseSpellLibrary.AddStacksToTarget))]
+    public static class Patch_BaseSpellLibrary_AddStacksToTarget_Burning
+    {
+        public static void Prefix(BaseSpellLibrary __instance, StackingEffect effect, ref int amount)
+        {
+            try
+            {
+                if (!PursuingBlizzardTunerPlugin.Enabled.Value) return;
+                if (__instance == null || __instance.Pointer == IntPtr.Zero) return;
+                if (effect != StackingEffect.Burning) return; // only the converted burn, never raw Chill
+                if (amount <= 0) return;
+
+                if (!PursuingBlizzardTunerPlugin.IsBlizzardPrefab(__instance)) return;
+
+                // Only the Pursuing Blizzard upgrade is tuned; vanilla Blizzard is left alone.
+                unsafe
+                {
+                    byte* ptr = (byte*)__instance.Pointer;
+                    int pursuing = *(int*)(ptr + PursuingBlizzardTunerPlugin.PursuingBlizzardOffset);
+                    if (pursuing <= 0) return;
+                }
+
+                float mult = PursuingBlizzardTunerPlugin.BurningMultiplier.Value;
+                if (mult <= 0f || mult == 1f) return;
+
+                int newAmount = (int)Math.Round(amount * (double)mult, MidpointRounding.AwayFromZero);
+                if (newAmount < 1) newAmount = 1;
+
+                if (PursuingBlizzardTunerPlugin.DiagnosticLogging.Value)
+                {
+                    PursuingBlizzardTunerPlugin.Log.LogInfo(
+                        $"[BlizzardBurning] {__instance.GetIl2CppType().Name} Burning {amount} -> {newAmount} (x{mult})");
+                }
+
+                amount = newAmount;
+            }
+            catch (Exception ex)
+            {
+                PursuingBlizzardTunerPlugin.Log?.LogError($"[Patch_BaseSpellLibrary_AddStacksToTarget_Burning] {ex}");
             }
         }
     }
