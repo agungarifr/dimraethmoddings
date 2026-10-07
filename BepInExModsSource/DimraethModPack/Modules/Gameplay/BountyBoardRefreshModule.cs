@@ -21,9 +21,11 @@ namespace DimraethModPack.Modules.Gameplay
     /// WeightedRandomSelection up to the board's max) and stores it in activeDeedsPerBoard before firing
     /// the OnBoardRefreshed event the board UI listens to.
     ///
-    /// This module adds a manual trigger: the public ServerRpc DeedManager.RefreshAllBoardsServerRpc().
-    /// As the single-player host the call runs through the game's own server path, so it is exactly the
-    /// same reroll the daily tick performs - no Harmony patch and no per-frame work.
+    /// This module adds a manual trigger. [2026-10-07 10:10] On the host it now calls the private
+    /// DeedManager.RefreshAllBoardsInternal() directly (via reflection) - the very method the daily
+    /// OnTimeChanged tick uses - rather than routing through the generated ServerRpc wrapper, whose
+    /// loopback delivery from the host was not reliably re-entering the game. A remote client still uses
+    /// the public ServerRpc. Either way it is the game's own reroll, with no Harmony patch and no per-frame work.
     /// </summary>
     public class BountyBoardRefreshModule : ModModuleBase
     {
@@ -80,8 +82,16 @@ namespace DimraethModPack.Modules.Gameplay
             return curY - y;
         }
 
-        // Rerolls every board by calling the game's own public refresh ServerRpc. On the host this runs
-        // through DeedManager.RefreshAllBoardsInternal, the exact path the daily OnTimeChanged tick uses.
+        // [2026-10-07 10:10] Cached handle to DeedManager's private RefreshAllBoardsInternal - the exact
+        // method the daily OnTimeChanged tick calls. Invoking it directly on the host is guaranteed to run,
+        // unlike routing through the generated ServerRpc wrapper whose loopback delivery is deferred/uncertain.
+        private static System.Reflection.MethodInfo _refreshAllInternal;
+
+        // Rerolls every board.
+        // [2026-10-07 10:10] Changed: on the host (single-player) we now call RefreshAllBoardsInternal
+        // directly via reflection - the same path the daily reset uses - instead of RefreshAllBoardsServerRpc.
+        // The old ServerRpc call is kept below (commented) per repo rule; it is still used for a remote client,
+        // where only the server may reroll. A per-board active-deed count is logged for verification.
         private static void RefreshAll()
         {
             try
@@ -93,14 +103,59 @@ namespace DimraethModPack.Modules.Gameplay
                     return;
                 }
 
-                mgr.RefreshAllBoardsServerRpc();
-                _lastResult = "<color=#55FF55>Bounty / Deed boards refreshed.</color>";
-                DimraethModPackPlugin.Log?.LogInfo("[BountyBoardRefresh] RefreshAllBoardsServerRpc sent (host runs the daily refresh path).");
+                if (mgr.IsServer || mgr.IsHost)
+                {
+                    if (_refreshAllInternal == null)
+                        _refreshAllInternal = HarmonyLib.AccessTools.Method(typeof(DeedManager), "RefreshAllBoardsInternal");
+
+                    if (_refreshAllInternal == null)
+                    {
+                        _lastResult = "<color=#FF6666>Failed - refresh method not found.</color>";
+                        DimraethModPackPlugin.Log?.LogError("[BountyBoardRefresh] RefreshAllBoardsInternal not found via reflection.");
+                        return;
+                    }
+
+                    _refreshAllInternal.Invoke(mgr, null);
+                    LogBoardCounts(mgr, "after direct internal refresh");
+                    _lastResult = "<color=#55FF55>Bounty / Deed boards refreshed (host path).</color>";
+                }
+                else
+                {
+                    /* [2026-10-07 10:10] Obsolete for the host: routed through the generated ServerRpc, whose
+                       loopback delivery from the host was not reliably re-entering the game. Kept for the
+                       remote-client case, where the client legitimately cannot run the server-side reroll.
+                    mgr.RefreshAllBoardsServerRpc();
+                    _lastResult = "<color=#55FF55>Bounty / Deed boards refreshed.</color>";
+                    DimraethModPackPlugin.Log?.LogInfo("[BountyBoardRefresh] RefreshAllBoardsServerRpc sent (host runs the daily refresh path).");
+                    */
+                    mgr.RefreshAllBoardsServerRpc();
+                    _lastResult = "<color=#55FF55>Refresh requested from server.</color>";
+                    DimraethModPackPlugin.Log?.LogInfo("[BountyBoardRefresh] RefreshAllBoardsServerRpc sent (client asks server to reroll).");
+                }
             }
             catch (Exception ex)
             {
                 _lastResult = "<color=#FF6666>Failed - see log.</color>";
-                DimraethModPackPlugin.Log?.LogError($"[BountyBoardRefresh] RefreshAllBoardsServerRpc failed: {ex}");
+                DimraethModPackPlugin.Log?.LogError($"[BountyBoardRefresh] refresh failed: {ex}");
+            }
+        }
+
+        // Diagnostic: log the active-deed count for every board type so a reroll (or a no-op) is visible
+        // in the BepInEx log without opening the UI. GetActiveDeedsForBoard is the same accessor the UI uses.
+        private static void LogBoardCounts(DeedManager mgr, string label)
+        {
+            try
+            {
+                foreach (DeedBoardType t in Enum.GetValues(typeof(DeedBoardType)))
+                {
+                    var deeds = mgr.GetActiveDeedsForBoard(t);
+                    int n = deeds == null ? 0 : deeds.Count;
+                    DimraethModPackPlugin.Log?.LogInfo($"[BountyBoardRefresh] {label}: {t} = {n} deed(s).");
+                }
+            }
+            catch (Exception ex)
+            {
+                DimraethModPackPlugin.Log?.LogWarning($"[BountyBoardRefresh] LogBoardCounts failed: {ex.Message}");
             }
         }
     }
