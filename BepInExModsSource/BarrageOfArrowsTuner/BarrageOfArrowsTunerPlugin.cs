@@ -128,8 +128,12 @@ namespace BarrageOfArrowsTuner
             DragOnActivate = Config.Bind("BlackHoleDrag", "DragOnActivate", true,
                 "Pull all enemies in range into the barrage centre immediately when the barrage starts. (Default: true)");
 
-            DragOnTick = Config.Bind("BlackHoleDrag", "DragOnTick", true,
-                "Repeat the pull every TickInterval seconds while the barrage is alive. (Default: true)");
+            // [2026-10-07] Default OFF: the drag is meant to happen ONCE, on the initial drop, so the cluster is
+            // pulled onto the first target a single time and then left alone. Turn on only if continuous suction is
+            // wanted (repeats the pull every TickInterval seconds while the barrage is alive).
+            DragOnTick = Config.Bind("BlackHoleDrag", "DragOnTick", false,
+                "Repeat the pull every TickInterval seconds while the barrage is alive. Leave false so the pull " +
+                "happens only once, on the initial drop. (Default: false)");
 
             DragTickInterval = Config.Bind("BlackHoleDrag", "TickInterval", 0.15f,
                 "Seconds between repeated drags (matches the barrage's 0.15s arrow cadence). Lower = stronger, " +
@@ -733,9 +737,10 @@ namespace BarrageOfArrowsTuner
     }
 
     /// <summary>
-    /// [2026-10-07] Postfix on <c>HailOfArrowsPrefab.Update</c>. Repeats the barrage drag every TickInterval
-    /// seconds while a barrage is alive (the barrage prefab lingers ~5s), so enemies are repeatedly yanked onto
-    /// the barrage's first target - the same "on activate + on tick" shape as PursuingBlizzardTuner.
+    /// [2026-10-07] Postfix on <c>HailOfArrowsPrefab.Update</c>. Optionally (DragOnTick, default OFF) repeats the
+    /// barrage drag every TickInterval seconds while a barrage is alive (the barrage prefab lingers ~5s), so enemies
+    /// are repeatedly yanked onto the barrage's first target - the "on activate + on tick" shape of PursuingBlizzardTuner.
+    /// By default the pull happens only once, on the initial drop (see Patch_HailOfArrowsPrefab_OnStart_Drag).
     /// </summary>
     [HarmonyPatch(typeof(HailOfArrowsPrefab), "Update")]
     public static class Patch_HailOfArrowsPrefab_Update_Drag
