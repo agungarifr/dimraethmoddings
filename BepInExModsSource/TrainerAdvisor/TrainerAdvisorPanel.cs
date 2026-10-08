@@ -133,8 +133,33 @@ namespace DimraethTrainerAdvisor
         {
             try
             {
-                AdvisorState state = ReadState();
-                if (state == null) return;
+                // [2026-10-08 23:45] The player-state read used to live in a separate instance
+                // method ReadState() that returned the managed AdvisorState. Il2CppInterop cannot
+                // expose a managed return type on an injected MonoBehaviour and logged
+                // "unsupported return type DimraethTrainerAdvisor.AdvisorState" at load, so the
+                // read is inlined here and the injected type now has no managed-returning instance
+                // method. The old method body is preserved below for reference.
+                if (_player == null) return;
+
+                var attrsVar = _player.Attributes;
+                if (attrsVar == null) return;
+                var attrs = attrsVar.Value;
+                if (attrs == null) return;
+
+                var state = new AdvisorState
+                {
+                    Race = _player.Race.Value,
+                    Class = _player.Class.Value,
+                    Level = _player.Level.Value,
+                    AccumulatedXp = _player.AccumulatedXP.Value,
+                    AllTimeXp = _player.AllTimeXP.Value,
+                    Attributes = new[]
+                    {
+                        attrs.Memory, attrs.Charisma, attrs.Adventure, attrs.Physique,
+                        attrs.Intelligence, attrs.Agility, attrs.Strength, attrs.Energy,
+                    },
+                };
+
                 string key = BuildKey(state);
                 if (!force && key == _lastKey) return;
                 _lastKey = key;
@@ -146,29 +171,32 @@ namespace DimraethTrainerAdvisor
             }
         }
 
-        private AdvisorState ReadState()
-        {
-            if (_player == null) return null;
-
-            var attrsVar = _player.Attributes;
-            if (attrsVar == null) return null;
-            var attrs = attrsVar.Value;
-            if (attrs == null) return null;
-
-            return new AdvisorState
-            {
-                Race = _player.Race.Value,
-                Class = _player.Class.Value,
-                Level = _player.Level.Value,
-                AccumulatedXp = _player.AccumulatedXP.Value,
-                AllTimeXp = _player.AllTimeXP.Value,
-                Attributes = new[]
-                {
-                    attrs.Memory, attrs.Charisma, attrs.Adventure, attrs.Physique,
-                    attrs.Intelligence, attrs.Agility, attrs.Strength, attrs.Energy,
-                },
-            };
-        }
+        // [2026-10-08 23:45] Obsolete: replaced by the inlined read in Refresh() so the injected
+        // MonoBehaviour no longer exposes an instance method with a managed return type. Kept for
+        // reference only.
+        // private AdvisorState ReadState()
+        // {
+        //     if (_player == null) return null;
+        //
+        //     var attrsVar = _player.Attributes;
+        //     if (attrsVar == null) return null;
+        //     var attrs = attrsVar.Value;
+        //     if (attrs == null) return null;
+        //
+        //     return new AdvisorState
+        //     {
+        //         Race = _player.Race.Value,
+        //         Class = _player.Class.Value,
+        //         Level = _player.Level.Value,
+        //         AccumulatedXp = _player.AccumulatedXP.Value,
+        //         AllTimeXp = _player.AllTimeXP.Value,
+        //         Attributes = new[]
+        //         {
+        //             attrs.Memory, attrs.Charisma, attrs.Adventure, attrs.Physique,
+        //             attrs.Intelligence, attrs.Agility, attrs.Strength, attrs.Energy,
+        //         },
+        //     };
+        // }
 
         private static string BuildKey(AdvisorState s)
         {
