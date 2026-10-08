@@ -14,6 +14,9 @@ select,input,button{background:#232833;color:#e9e7e0;border:1px solid #3b4457;bo
 button{cursor:pointer}button:disabled{opacity:.35;cursor:default}
 button:not(:disabled):hover{border-color:#f2c14e}
 #prev b{color:#f2c14e}
+button.on{background:#2e5c3f;border-color:#6fce8f;color:#eafff2}
+tr.opt{background:#16301f}
+tr.opt td{border-bottom-color:#24402d}
 </style></head><body><div class="wrap"><h1>Dimraeth Trainer</h1>
 <div class="grid"><div><div class="panel" id="econ"></div><div class="panel" id="attrs"></div></div>
 <div><div class="panel" id="prev"></div><div class="panel" id="info"></div></div></div>
@@ -39,6 +42,36 @@ function sim(){let a=S.attrs.slice(),xp=S.xp,ac=S.accum,lv=S.level;
  for(const i of S.pending){if(lv>=LCAP)break;if(a[i]>=CAP)continue;const c=cost(i,a,lv);if(xp<c)continue;
   xp-=c;ac+=c;a[i]++;while(lv<LCAP&&ac>=xpReq(lv)){ac-=xpReq(lv);lv++;}}
  return {attrs:a,xp,accum:ac,level:lv};}
+let F="patk";
+const COEF={patk:[0,0,0.5,0,0,0.5,1,0],matk:[0,0.5,0.5,0,1,0,0,0],hybrid:[0,0.5,1,0,1,0.5,1,0]};
+// Exact optimal deltas (points above start) per race+class, order=[Mem,Cha,Adv,Phy,Int,Agi,Str,Ene]
+const OPTBUILD={
+"Human Magician":{patk:[0,0,8,0,0,2,34,0],matk:[0,3,3,0,41,0,0,0],hybrid:[0,0,19,0,22,0,14,0]},
+"Human Brawler":{patk:[0,0,3,0,0,3,41,0],matk:[0,2,8,0,34,0,0,0],hybrid:[0,0,19,0,15,0,21,0]},
+"Human Shadow":{patk:[0,0,6,0,0,5,35,0],matk:[0,6,7,0,35,0,0,0],hybrid:[0,1,20,0,19,3,13,0]},
+"Elf Magician":{patk:[0,0,9,0,0,9,30,0],matk:[0,0,5,0,43,0,0,0],hybrid:[0,0,19,0,26,1,10,0]},
+"Elf Brawler":{patk:[0,0,5,0,0,7,37,0],matk:[0,3,7,0,35,0,0,0],hybrid:[0,1,21,0,16,2,16,0]},
+"Elf Shadow":{patk:[0,0,4,0,0,8,34,0],matk:[0,2,5,0,39,0,0,0],hybrid:[0,1,21,0,19,2,13,0]},
+"Minotaur Magician":{patk:[0,0,6,0,0,2,37,0],matk:[0,3,3,0,41,0,0,0],hybrid:[0,1,21,0,21,0,13,0]},
+"Minotaur Brawler":{patk:[0,0,3,0,0,0,46,0],matk:[0,2,8,0,34,0,0,0],hybrid:[0,0,21,0,17,0,18,0]},
+"Minotaur Shadow":{patk:[0,0,5,0,0,2,39,0],matk:[0,2,6,0,37,0,0,0],hybrid:[0,1,20,0,17,1,17,0]}
+};
+
+/* [2026-10-08 22:10] SUPERSEDED: the greedy CP/xp-ratio optimizer below did not reproduce the
+   exact report builds (e.g. Elf Magician PATK 47.0 vs the report's 49.5), so it is replaced by the
+   precomputed OPTBUILD table derived from docs/Dimraeth_Optimal_Attribute_Builds.md (exhaustive
+   search under the level-25 / 122,409-XP economy). Kept commented-out for reference only.
+function optimalAlloc(coef){
+ let a=S.start.slice(),lv=1,ac=0,xp=Math.max(0,+el("xp").value||0),bought=new Array(8).fill(0),g=0;
+ while(g++<400){
+  let best=-1,bs=0;
+  for(let i=0;i<8;i++){if(coef[i]<=0||a[i]>=CAP)continue;const c=cost(i,a,lv);if(xp<c)continue;const s=coef[i]/c;if(s>bs){bs=s;best=i;}}
+  if(best<0)break;
+  const c=cost(best,a,lv);xp-=c;ac+=c;a[best]++;bought[best]++;while(lv<LCAP&&ac>=xpReq(lv)){ac-=xpReq(lv);lv++;}
+ }
+ return {bought,a,lv};
+}
+*/
 function pdmg(a){return a[6]+0.5*(a[5]+a[2]);}
 function mdmg(a){return a[4]+0.5*(a[1]+a[2]);}
 const el=id=>document.getElementById(id);
@@ -53,19 +86,23 @@ function renderEcon(m){
  <div>XP pool (spendable): <b>${m.xp}</b></div>`;
 }
 function renderAttrs(m){
- let h=`<h2>Attributes</h2><table><tr><th>Stat</th><th>Now</th><th>Pending</th><th>Next cost (XP)</th><th></th></tr>`;
+ const opt={bought:(OPTBUILD[S.race+" "+S.cls]||{})[F]||new Array(8).fill(0)};
+ const fb=["patk","matk","hybrid"].map(f=>`<button data-f="${f}" class="${F===f?"on":""}">${f.toUpperCase()}</button>`).join(" ");
+ let h=`<h2>Attributes</h2><div style="margin:-2px 0 8px;color:#8b93a7;font-size:12px">Optimal: ${fb}</div><table><tr><th>Stat</th><th>Now</th><th>Pending</th><th>Next cost (XP)</th><th></th></tr>`;
  for(let i=0;i<8;i++){
   const pend=S.pending.filter(x=>x===i).length;
   const c=cost(i,m.attrs,m.level);
   const can=m.level<LCAP&&m.attrs[i]<CAP&&m.xp>=c;
-  h+=`<tr><td title="${ATTR[i]}">${ABBR[i]}</td><td><b>${m.attrs[i]}</b></td><td style="color:#6fce8f">${pend?"+"+pend:""}</td><td>${m.attrs[i]>=CAP?"MAX":c}</td>`;
-  h+=`<td style="text-align:right;white-space:nowrap"><button data-r="${i}" ${pend?"":"disabled"}>-</button> <button data-a="${i}" ${can?"":"disabled"}>+</button> <button data-m="${i}" ${can?"":"disabled"}>max</button></td></tr>`;
+  const ob=opt.bought[i];
+  h+=`<tr class="${ob?"opt":""}"><td title="${ATTR[i]}">${ABBR[i]}</td><td><b>${m.attrs[i]}</b></td><td style="color:#6fce8f">${pend?"+"+pend:""}</td><td>${m.attrs[i]>=CAP?"MAX":c}</td>`;
+  h+=`<td style="text-align:right;white-space:nowrap"><button data-r="${i}" ${pend?"":"disabled"}>-</button> <button data-a="${i}" ${can?"":"disabled"}>+</button> <button data-m="${i}" ${can?"":"disabled"}>max</button>${ob?` <span title="optimal +${ob}" style="color:#6fce8f;font-weight:700;margin-left:3px">&#9650;${ob}</span>`:""}</td></tr>`;
  }
  h+=`</table>`;
  el("attrs").innerHTML=h;
  el("attrs").querySelectorAll("button[data-a]").forEach(b=>b.onclick=()=>{addPt(+b.dataset.a);});
  el("attrs").querySelectorAll("button[data-r]").forEach(b=>b.onclick=()=>{refundPt(+b.dataset.r);});
  el("attrs").querySelectorAll("button[data-m]").forEach(b=>b.onclick=()=>{maxPt(+b.dataset.m);});
+ el("attrs").querySelectorAll("button[data-f]").forEach(b=>b.onclick=()=>{F=b.dataset.f;render();});
 }
 function addPt(i){const m=sim();if(m.level>=LCAP||m.attrs[i]>=CAP)return;if(m.xp<cost(i,m.attrs,m.level))return;S.pending.push(i);render();}
 function refundPt(i){const k=S.pending.lastIndexOf(i);if(k<0)return;S.pending.splice(k,1);render();}
