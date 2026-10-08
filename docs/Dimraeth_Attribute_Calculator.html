@@ -166,11 +166,9 @@
       <summary>Combat power</summary>
       <div class="formula">Physical CP = STR + 0.5·(AGI + ADV)
 Magic CP    = INT + 0.5·(CHA + ADV)</div>
-      <p class="note">Race/class passives override some coefficients:</p>
-      <div class="formula">Human Magician    → ADV magic   = 0.75
-Human Brawler     → ADV physical= 0.75
-Minotaur Magician → STR magic   = 0.50
-Elf Magician      → AGI magic   = 1.00</div>
+      <p class="note">These coefficients are <strong>universal</strong> — no race or class changes them.
+Race/class only set the <em>starting attributes</em> and the <em>per-point cost</em> below.
+(An earlier revision wrongly listed four "archetype passives"; they do not exist in the game.)</p>
     </details>
     <details>
       <summary>Starting attributes &amp; per-point cost</summary>
@@ -222,25 +220,16 @@ function baseCost(race, cls, i){
   const cv = CLASSES[cls].cost[i] > 0 ? CLASSES[cls].cost[i] : 200;
   return Math.round(0.5 * (rv + cv));
 }
+// Combat-power coefficients are UNIVERSAL: no race/class changes them.
+// (Race/class only set starting attributes and per-point costs.)
 function candidateOrder(race, cls, type){
   const names = type === "physical" ? ["Str","Agi","Adv"] : ["Int","Cha","Adv"];
-  const key = race + " " + cls;
-  if (type === "magic"){
-    if (key === "Minotaur Magician") names.push("Str");
-    if (key === "Elf Magician") names.push("Agi");
-  }
   return names.map(n => ATTRS.indexOf(n));
 }
 function coeffArray(race, cls, type){
   const a = new Array(8).fill(0);
-  const key = race + " " + cls;
-  if (type === "physical"){ a[6]=1.0; a[5]=0.5; a[2]=0.5;
-    if (key==="Human Brawler") a[2]=0.75;
-  } else { a[4]=1.0; a[1]=0.5; a[2]=0.5;
-    if (key==="Human Magician") a[2]=0.75;
-    if (key==="Minotaur Magician") a[6]=0.5;
-    if (key==="Elf Magician") a[5]=1.0;
-  }
+  if (type === "physical"){ a[6]=1.0; a[5]=0.5; a[2]=0.5; }   // STR 1.0, AGI 0.5, ADV 0.5
+  else                    { a[4]=1.0; a[1]=0.5; a[2]=0.5; }   // INT 1.0, CHA 0.5, ADV 0.5
   return a;
 }
 // Precompute per-point ATTRIBUTE costs (without the level*100 term) for each attribute.

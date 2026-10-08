@@ -37,7 +37,9 @@ Mem, Cha, Adv, Phy, Int, Agi, Str, Ene
 Only 6 of the 8 attributes affect damage:
 - **Physical Combat Power** = `STR + 0.5·(AGI + ADV)`
 - **Magic Combat Power**    = `INT + 0.5·(CHA + ADV)`
-plus archetype "passive" bonuses that add a per-point coefficient to a specific attribute (below).
+
+These coefficients are **universal** — no race or class changes them. Race/class only set the
+**starting attributes** and the **per-point costs** (below).
 
 The calculator must **maximize Physical OR Magic combat power** (the user picks one) and never
 mix the two damage types — every recommended build is *polarized* (only stats that feed the chosen
@@ -71,24 +73,19 @@ Attributes order for every array: `["Mem","Cha","Adv","Phy","Int","Agi","Str","E
 
 ## PER-POINT DAMAGE COEFFICIENTS
 
-Start from these defaults, then apply the archetype passives:
+The coefficients are fixed constants, identical for every archetype:
 
 ```
-physical default: { Str: 1.0, Agi: 0.5, Adv: 0.5 }
-magic    default: { Int: 1.0, Cha: 0.5, Adv: 0.5 }
+physical: { Str: 1.0, Agi: 0.5, Adv: 0.5 }
+magic:    { Int: 1.0, Cha: 0.5, Adv: 0.5 }
 ```
 
-Passive overrides (keyed by `"<Race> <Class>"`):
+There are **no archetype overrides**. Do not add a per-race/class coefficient table.
+(Such "passives" do not exist in the game; `ClassDefinition`/`RaceDefinition` carry only
+`AttributeBonus` and `AttributeBaseCosts`, and `ArchetypeEntry` carries only display data.)
 
-| Archetype | Damage type | Attribute | New coefficient |
-|---|---|---|---|
-| Human Magician    | magic    | Adv | 0.75  (default 0.5 + 0.25) |
-| Human Brawler     | physical | Adv | 0.75  (default 0.5 + 0.25) |
-| Minotaur Magician | magic    | Str | 0.5   (default 0.0 + 0.5)  |
-| Elf Magician      | magic    | Agi | 1.0   (default 0.5 + 0.5)  |
-
-All other archetypes have no damage-affecting passive (their passives affect attack-speed or
-endurance only — **ignore those for this calculator**).
+All other attributes are worth **0.0** to both damage types (they only feed attack-speed,
+endurance, etc. — **ignore them for this calculator**).
 
 ## UPGRADE COST FORMULA (exact)
 
@@ -215,7 +212,7 @@ Show, for the selected race/class/focus:
 
 **4. Formula reference**
 A collapsible section that prints the exact formulas used (combat power, point cost, XP curve,
-level-up rule, caps, passive table) so the tool is self-documenting.
+level-up rule, caps) so the tool is self-documenting.
 
 **5. Extras**
 - A "Copy results as Markdown" button that copies the current optimize table.
@@ -232,19 +229,19 @@ CP tolerance ±0.05.
 | Race · Class | Focus | Optimal points added | Expected CP |
 |---|---|---|---|
 | Human · Magician    | Physical | Str 34, Adv 8, Agi 2                        | 48.5 |
-| Human · Magician    | Magic    | Int 34, Adv 16, Cha 1                       | 62.5 |
-| Human · Brawler     | Physical | Str 34, Adv 16, Agi 1                       | 62.0 |
+| Human · Magician    | Magic    | Int 41, Cha 3, Adv 3                        | 58.5 |
+| Human · Brawler     | Physical | Str 41, Adv 3, Agi 3                        | 58.0 |
 | Human · Brawler     | Magic    | Int 34, Adv 8, Cha 2                        | 48.5 |
 | Human · Shadow      | Physical | Str 35, Adv 6, Agi 5                        | 53.5 |
 | Human · Shadow      | Magic    | Int 35, Adv 7, Cha 6                        | 53.5 |
 | Elf · Magician      | Physical | Str 30, Adv 9, Agi 9                        | 49.5 |
-| Elf · Magician      | Magic    | Int 26, Agi 26, Cha 1, Adv 1                | 74.5 |
+| Elf · Magician      | Magic    | Int 43, Adv 5                               | 60.0 |
 | Elf · Brawler       | Physical | Str 37, Adv 5, Agi 7                        | 58.0 |
 | Elf · Brawler       | Magic    | Int 35, Adv 7, Cha 3                        | 49.5 |
 | Elf · Shadow        | Physical | Str 34, Adv 4, Agi 8                        | 54.0 |
 | Elf · Shadow        | Magic    | Int 39, Adv 5, Cha 2                        | 54.5 |
 | Minotaur · Magician | Physical | Str 37, Adv 6, Agi 2                        | 52.5 |
-| Minotaur · Magician | Magic    | Int 38, Adv 4, Cha 3, Str 6                 | 59.5 |
+| Minotaur · Magician | Magic    | Int 41, Cha 3, Adv 3                        | 56.0 |
 | Minotaur · Brawler  | Physical | Str 46, Adv 3                               | 63.5 |
 | Minotaur · Brawler  | Magic    | Int 34, Adv 8, Cha 2                        | 46.0 |
 | Minotaur · Shadow   | Physical | Str 39, Adv 5, Agi 2                        | 57.5 |
@@ -252,8 +249,8 @@ CP tolerance ±0.05.
 
 Also assert:
 - `xpForLevel(1) = 250`, `xpForLevel(24) = 11908`, and `Σ xpForLevel(1..24) = 122409`.
-- Elf · Magician magic must be ≈ **evenly split INT/AGI** (its passive makes AGI a full 1.0 magic
-  stat). If your calculator returns a pure-INT Elf mage, the passive is not being applied — bug.
+- Elf · Magician magic is **INT-primary** (CP 60.0), topping up with ADV only. AGI is worth **0.5**
+  to magic (and is not a magic stat), so an evenly-split INT/AGI mage is a bug — do not do it.
 
 If your algorithm produces a different CP than the table, it is a bug — fix the algorithm, do not
 change the table.
@@ -272,12 +269,13 @@ change the table.
 ## EXAMPLE OF EXPECTED BEHAVIOR (worked)
 
 Select **Elf / Magician / Magic**. Expected output:
-- Candidate stats & coefficients: `Int×1.0, Agi×1.0, Cha×0.5, Adv×0.5`.
-- Optimal points: `Int +26, Agi +26, Cha +1, Adv +1`.
-- Final attributes: `Int 34, Agi 33, Cha 8, Adv 7` (plus unchanged others).
-- Total points: 54; total XP ≈ 126,561; level 25.
-- **Magic CP = 74.5** — the highest magic CP of all 9 archetypes.
-- Strict single-stat: all-INT → CP 65.5.
+- Candidate stats & coefficients: `Int×1.0, Cha×0.5, Adv×0.5` (AGI is worth 0.0 to magic — not a
+  magic stat).
+- Optimal points: `Int +43, Adv +5`.
+- Final attributes: `Int 51, Adv 11` (plus unchanged others).
+- Total points: 48; level 25.
+- **Magic CP = 60.0** — the highest magic CP of all 9 archetypes.
+- Strict single-stat: all-INT → CP 58.5.
 
 ---
 
