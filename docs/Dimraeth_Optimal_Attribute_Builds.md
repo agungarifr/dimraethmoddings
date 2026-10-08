@@ -11,6 +11,12 @@ routines) plus the serialized `RaceDefinition` / `ClassDefinition` assets in
 produced by an exhaustive search over every point distribution under the real cost curve and the
 level-25 cap.
 
+> **Interactive calculator:** `Dimraeth_Attribute_Calculator.html` (same folder) implements these
+> exact formulas as a single-file web app — pick race/class/focus and it optimizes on the fly, with a
+> manual sandbox and a purchase-order breakdown. Its engine is verified to reproduce every build in
+> this document (all 18 combos). The natural-language prompt to regenerate/build it in AI Studio is
+> in `AI_Studio_Dimraeth_Calculator_Prompt.md`.
+
 ---
 
 ## 1. The formulas that matter
