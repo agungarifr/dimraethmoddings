@@ -38,8 +38,15 @@ namespace DimraethModPack.Modules.Gameplay
         public static UnlockAllModule Instance { get; private set; }
 
         public override string Category => "Gameplay";
-        public override string Name => "Unlock All (Recipes & Spells)";
-        public override string Description => "One button: unlock every crafting recipe and learn every spell.";
+        public override string Name => "Unlock All (Recipes, Spells & Pets)";
+        public override string Description => "Unlock every crafting recipe, every spellbook spell, and every pet.";
+
+        // [2026-10-08] Every pet in the game (PetType enum, minus None). Order mirrors the enum.
+        private static readonly PetType[] AllPetTypes =
+        {
+            PetType.Hound, PetType.Monkey, PetType.CarrionParrot, PetType.EmberHound, PetType.FangraCub,
+            PetType.FrostOwl, PetType.BlightCrow, PetType.MoonCat, PetType.WarCat, PetType.SilverCat
+        };
 
         // [2026-10-07 10:20] NOTE: `Enabled` lives on ModModuleBase (protected set) — assign the
         // base property in BindConfig instead of declaring a shadowing field (was CS0108).
@@ -65,7 +72,7 @@ namespace DimraethModPack.Modules.Gameplay
         {
             float curY = y;
             GUI.Label(new Rect(x, curY, width, 24f),
-                "One button: unlock every crafting recipe and learn every spell (all spellbooks).", labelStyle);
+                "Unlock every crafting recipe, learn every spellbook spell, and add every pet.", labelStyle);
             curY += 28f;
 
             if (GUI.Button(new Rect(x, curY, Math.Min(320f, width), 30f), "Unlock All Recipes & Spellbooks", btnStyle))
@@ -81,12 +88,26 @@ namespace DimraethModPack.Modules.Gameplay
             }
             curY += 36f;
 
-            // [2026-10-08 12:30] Repair for saves damaged by the OLD Unlock All (which dumped the
-            // whole spell catalog, including skill-tree + quest spells, into Player.UnlockedSpells).
-            // Backs the list up first, then removes the leaked tree/quest copies so the game's own
-            // sources can re-grant them. Spellbook-taught spells are never removed.
+            // [2026-10-08] Unlock every pet into the character's collection (persists via PetData).
+            if (GUI.Button(new Rect(x, curY, Math.Min(320f, width), 30f), "Unlock All Pets", btnStyle))
+            {
+                if (!IsEnabled)
+                {
+                    _status = "<color=#FF6666>Enable this module first.</color>";
+                }
+                else
+                {
+                    UnlockAllPets(out _status);
+                }
+            }
+            curY += 36f;
+
+            // [2026-10-08] Repair for saves damaged by the OLD Unlock All (which dumped the whole
+            // spell catalog, including skill-tree/quest spells and consumable "spells" like BurnSalve,
+            // into Player.UnlockedSpells). Backs the list up first, then keeps only spells from the
+            // legitimate sources (spellbook / class-race starting / structural).
             GUI.Label(new Rect(x, curY, width, 24f),
-                "Old Unlock All leaked skill-tree/quest spells into this character. Repair removes them.", labelStyle);
+                "Old Unlock All leaked non-learnable spells (e.g. Burn Salve). Repair removes them.", labelStyle);
             curY += 28f;
             if (GUI.Button(new Rect(x, curY, Math.Min(320f, width), 30f), "Repair Learned Spells", btnStyle))
             {
@@ -210,22 +231,20 @@ namespace DimraethModPack.Modules.Gameplay
         }
 
         /// <summary>
-        /// [2026-10-08 12:30] Repairs a character damaged by the OLD Unlock All. That version dumped
-        /// every entry of <c>SpellManager.AllSpellsInGame</c> (the full sprite/prefab catalog) into
-        /// <c>Player.UnlockedSpells</c>, which wrongly included skill-tree spells
-        /// (<c>SkillTreeNode.UnlockSpell</c>/<c>AssociatedSpell</c>) and NPC/quest gift spells
-        /// (<c>NPCEventDefinition.SpellToGrantToPlayer</c>). Those belong to their own sources, and an
-        /// already-present spell makes the game's <c>UnlockSpellClientRpc</c> short-circuit, which is
-        /// what broke main-quest progression.
+        /// [2026-10-08] Repairs a character damaged by the OLD Unlock All. That version dumped every
+        /// entry of <c>SpellManager.AllSpellsInGame</c> (the entire sprite/prefab catalog) into
+        /// <c>Player.UnlockedSpells</c>. Besides skill-tree spells (<c>SkillTreeNode.UnlockSpell</c>/
+        /// <c>AssociatedSpell</c>) and NPC/quest gift spells (<c>NPCEventDefinition.SpellToGrantToPlayer</c>),
+        /// that catalog also contains consumable "spells" (e.g. <c>Spell.BurnSalve</c>, the hotbar entry
+        /// for a salve), monster/NPC-only abilities, etc. - none of which belong in the player's learn
+        /// list (which is why things like Burn Salve showed up in the spell catalogue).
         ///
-        /// This method:
-        ///   1. Backs up the current spell list to <c>BepInEx/config/DimraethModPack/</c> (reversible).
-        ///   2. Builds the "spellbook spells" set from <c>Item.SpellUnlock</c> - never removed.
-        ///   3. Builds the "leaked" set from all loaded <c>SkillTreeNode</c> and <c>NPCEventDefinition</c>
-        ///      assets (Resources.FindObjectsOfTypeAll).
-        ///   4. Removes any leaked spell that is NOT spellbook-taught.
-        /// Starting, structural and spellbook-taught spells are all preserved. The game re-grants tree
-        /// spells on load and quest spells when their event fires again.
+        /// Rather than removing only specific leaks, this rebuilds the list from the LEGITIMATE sources:
+        ///   - spellbook-taught spells        (Item.SpellUnlock != Spell.None)
+        ///   - class / race starting spells   (ClassDefinition / RaceDefinition .StartingSpells)
+        ///   - the game's own structural list (DataStorage.Singleton.SkillTree.BuildStructuralSpellList)
+        /// plus a small verified structural fallback. Anything on the player that is NOT in that keep-set
+        /// is removed. The list is backed up first, so the operation is reversible.
         /// </summary>
         public static bool RepairLearnedSpells(out string message)
         {
@@ -249,41 +268,49 @@ namespace DimraethModPack.Modules.Gameplay
                 // 1) Back up first - the repair is destructive but reversible from this file.
                 string backupPath = WriteSpellBackup(player, unlockedSpells);
 
-                // 2) Spells taught by a spellbook item: always legitimate, never remove.
-                var spellbookSpells = new HashSet<Spell>();
+                // 2) Build the keep-set from every legitimate source.
+                var keep = new HashSet<Spell>();
+
                 var itemManager = ItemManager.Singleton;
                 if (itemManager != null && itemManager.Items != null)
                 {
                     foreach (Item item in itemManager.Items)
                     {
                         if (item == null) continue;
-                        if (item.SpellUnlock != Spell.None) spellbookSpells.Add(item.SpellUnlock);
+                        if (item.SpellUnlock != Spell.None) keep.Add(item.SpellUnlock);
                     }
                 }
 
-                // 3) The two sources the old Unlock All wrongly copied from.
-                var leaked = new HashSet<Spell>();
-                foreach (SkillTreeNode node in Resources.FindObjectsOfTypeAll<SkillTreeNode>())
-                {
-                    if (node == null) continue;
-                    if (node.UnlockSpell != Spell.None) leaked.Add(node.UnlockSpell);
-                    if (node.AssociatedSpell != Spell.None) leaked.Add(node.AssociatedSpell);
-                }
-                foreach (NPCEventDefinition ev in Resources.FindObjectsOfTypeAll<NPCEventDefinition>())
-                {
-                    if (ev == null) continue;
-                    if (ev.SpellToGrantToPlayer != Spell.None) leaked.Add(ev.SpellToGrantToPlayer);
-                }
+                foreach (ClassDefinition cd in Resources.FindObjectsOfTypeAll<ClassDefinition>())
+                    AddAll(keep, cd != null ? cd.StartingSpells : null);
+                foreach (RaceDefinition rd in Resources.FindObjectsOfTypeAll<RaceDefinition>())
+                    AddAll(keep, rd != null ? rd.StartingSpells : null);
 
-                // 4) Remove leaked, non-spellbook spells (snapshot first, then mutate).
+                // The game's own "spells available without any node/slot" list (private method -> reflect).
+                try
+                {
+                    var skillTree = DataStorage.Singleton != null ? DataStorage.Singleton.SkillTree : null;
+                    if (skillTree != null)
+                    {
+                        var mi = AccessTools.Method(skillTree.GetType(), "BuildStructuralSpellList");
+                        var list = mi?.Invoke(skillTree, null) as Il2CppSystem.Collections.Generic.List<Spell>;
+                        AddAll(keep, list);
+                    }
+                }
+                catch (Exception ex)
+                {
+                    DimraethModPackPlugin.Log?.LogWarning($"[UnlockAll] BuildStructuralSpellList failed: {ex.Message}");
+                }
+                foreach (Spell s in StructuralSpellFallback) keep.Add(s);
+                keep.Remove(Spell.None);
+
+                // 3) Remove everything on the player that no legitimate source accounts for.
                 var toRemove = new List<Spell>();
                 for (int i = 0; i < unlockedSpells.Count; i++)
                 {
                     Spell s = unlockedSpells[i];
                     if (s == Spell.None) continue;
-                    if (!leaked.Contains(s)) continue;
-                    if (spellbookSpells.Contains(s)) continue; // legit spellbook spell - keep
-                    toRemove.Add(s);
+                    if (!keep.Contains(s)) toRemove.Add(s);
                 }
 
                 var removedNames = new List<string>();
@@ -300,7 +327,7 @@ namespace DimraethModPack.Modules.Gameplay
                     }
                 }
 
-                message = $"<color=#55FF55>Repair: removed {removedNames.Count} leaked tree/quest spell(s); " +
+                message = $"<color=#55FF55>Repair: removed {removedNames.Count} leaked spell(s); " +
                           $"{unlockedSpells.Count} remain. Backup saved.</color>";
                 DimraethModPackPlugin.Log?.LogInfo(
                     $"[UnlockAll] Repair removed {removedNames.Count} spell(s): {string.Join(", ", removedNames)} | backup={backupPath}");
@@ -313,6 +340,22 @@ namespace DimraethModPack.Modules.Gameplay
                 return false;
             }
         }
+
+        // [2026-10-08] Add a game List<Spell> into the keep-set, tolerating null.
+        private static void AddAll(HashSet<Spell> set, Il2CppSystem.Collections.Generic.List<Spell> list)
+        {
+            if (set == null || list == null) return;
+            for (int i = 0; i < list.Count; i++) set.Add(list[i]);
+        }
+
+        // [2026-10-08] Verified structural/always-on spells (Spell enum values) used as a fallback when
+        // the game's private BuildStructuralSpellList is unavailable. Keeping a few extras is harmless;
+        // removing a needed structural spell would not be.
+        private static readonly Spell[] StructuralSpellFallback =
+        {
+            Spell.Swap, Spell.Sprinting, Spell.AutoAttack, Spell.StackingEffect, Spell.Casting,
+            Spell.WeaponSwap, Spell.AttackSwap, Spell.PlayerDash, Spell.FrostGlide
+        };
 
         // [2026-10-08 12:30] Writes the current unlocked-spell list to a timestamped file so the
         // repair is reversible. Never throws: a backup failure must not block the repair.
@@ -337,6 +380,101 @@ namespace DimraethModPack.Modules.Gameplay
                 DimraethModPackPlugin.Log?.LogWarning($"[UnlockAll] Spell backup failed: {ex.Message}");
                 return "(backup failed)";
             }
+        }
+
+        /// <summary>
+        /// [2026-10-08] Adds every pet type to the character's collection via the game's own
+        /// <c>Inventory.AddPetToInventory</c> path (the same call the pet shop and world pickups use),
+        /// so ownership lands in <c>PlayerPetData.AllPets</c> and persists through PetData on save.
+        /// Each pet is a fresh <c>LocalPetData</c> with a new UUID (mirrors CheatMenu's SpawnPet).
+        /// Already-owned types are skipped (ownership is matched by PetType here, since the game matches
+        /// by UUID and would otherwise add duplicates). Pets have no typed quest reward field
+        /// (no NPCEventDefinition pet grant), so this cannot shadow a story grant the way the spell bug
+        /// did. In co-op the host should run it.
+        /// </summary>
+        public static bool UnlockAllPets(out string message)
+        {
+            message = "";
+            try
+            {
+                Player player = ResolveLocalPlayer();
+                if (player == null)
+                {
+                    message = "<color=#FFAA55>No local player in a loaded world.</color>";
+                    return false;
+                }
+
+                var inventory = DataStorage.Singleton != null ? DataStorage.Singleton.Inventory : null;
+                var petManager = PetManager.Singleton;
+                var itemManager = ItemManager.Singleton;
+                if (inventory == null || petManager == null || itemManager == null)
+                {
+                    message = "<color=#FF5555>Pet system not ready.</color>";
+                    return false;
+                }
+
+                PlayerPetData petData = null;
+                try { petData = player.GetComponent<PlayerPetData>(); } catch { }
+
+                int added = 0;
+                var names = new List<string>();
+                bool slotsFull = false;
+
+                foreach (PetType type in AllPetTypes)
+                {
+                    if (type == PetType.None) continue;
+                    if (IsPetOwned(petData, type)) continue;
+                    if (itemManager.GetItemForPet(type) == null) continue;
+
+                    if (inventory.FindIndexOfFirstEmptyInventorySlot() < 0)
+                    {
+                        slotsFull = true;
+                        break;
+                    }
+
+                    var pet = new LocalPetData
+                    {
+                        Name = petManager.GetRandomPetName(),
+                        PetID = BuildUtility.GenerateUUID(),
+                        PetOwner = player.Hash.Value,
+                        PetOwnerName = player.Name.Value,
+                        PetType = type,
+                        Level = 1,
+                        XP = 0,
+                        CharacterCreationDate = Il2CppSystem.DateTimeOffset.UtcNow
+                    };
+
+                    inventory.AddPetToInventory(pet);
+                    added++;
+                    if (names.Count < 20) names.Add(type.ToString());
+                }
+
+                string tail = slotsFull ? " (inventory full - free a slot and press again)" : "";
+                message = $"<color=#55FF55>Unlocked {added} pet(s): {string.Join(", ", names)}{tail}</color>";
+                DimraethModPackPlugin.Log?.LogInfo($"[UnlockAllPets] +{added} pets: {string.Join(", ", names)}{tail}");
+                return true;
+            }
+            catch (Exception ex)
+            {
+                message = $"<color=#FF5555>Pet unlock failed: {ex.Message}</color>";
+                DimraethModPackPlugin.Log?.LogWarning($"[UnlockAllPets] failed: {ex.Message}");
+                return false;
+            }
+        }
+
+        private static bool IsPetOwned(PlayerPetData petData, PetType type)
+        {
+            try
+            {
+                var all = petData != null ? petData.AllPets : null;
+                if (all == null) return false;
+                for (int i = 0; i < all.Count; i++)
+                {
+                    if (all[i] != null && all[i].PetType == type) return true;
+                }
+            }
+            catch { }
+            return false;
         }
 
         private static Player ResolveLocalPlayer()

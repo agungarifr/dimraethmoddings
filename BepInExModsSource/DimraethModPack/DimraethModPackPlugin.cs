@@ -97,6 +97,8 @@ namespace DimraethModPack
             // skill-tree + quest spells and broke main-quest progression); spellbooks only now.
             // [2026-10-08 12:30] Added a "Repair Learned Spells" button that strips the tree/quest
             // spell copies the old version leaked into existing saves (backs the list up first).
+            // [2026-10-08 13:10] Added an "Unlock All Pets" button (Inventory.AddPetToInventory for
+            // all 10 PetType values; persists via PetData). Module renamed to "(Recipes, Spells & Pets)".
             // No Harmony patches, no per-frame work; lists persist via PlayerData on save.
             // Config: Gameplay.UnlockAll.
             Modules.Add(new UnlockAllModule());
