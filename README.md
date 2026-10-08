@@ -131,4 +131,5 @@ All under `modding\BepInExModsSource\`:
 - **NavMeshFixMod** — fixes monster movement/navmesh glitches.
 - ~~**PlagueShardsHoming** — makes Plague Shards home in on enemies.~~ **broken**
 - **PursuingBlizzardTuner** — tunes the Pursuing Blizzard spell.
+- **TrainerAdvisor** — injects a display-only optimal attribute-build panel (physical / magic / hybrid) into the vanilla trainer window.
 - **TwisterTuner** — tunes the Twister (Vortex) upgrade; optional black-hole pull.
