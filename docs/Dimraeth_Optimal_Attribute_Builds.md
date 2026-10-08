@@ -137,7 +137,67 @@ small (0.5–3.0 CP) because the primary stat is worth double.
 
 ---
 
-## 4. Key takeaways
+## 4. Hybrid builds (physical **and** magic together)
+
+A hybrid spend is a build that raises both damage types. There are two sensible "best" definitions:
+
+- **Hybrid — max total**: maximise `patk + matk` (best if you genuinely use both damage types).
+  Since `patk + matk = STR + INT + ADV + 0.5·(CHA + AGI)`, the best hybrid stats are **ADV (worth
+  1.0 combined), then the cheapest of STR / INT**, with AGI / CHA as cheap 0.5 filler.
+- **Hybrid — balanced**: maximise the *weaker* of the two (`min(patk, matk)`) so both attacks stay
+  usable. Because ADV feeds both sides equally it is the balance lever, so balanced hybrids cluster
+  around **~39 / 39**.
+
+Both use the same level-25 cap / 122,409-XP budget as the polarised builds.
+
+### Hybrid — max total
+
+| Race · Class | Delta | patk | matk | Total |
+|---|---|---:|---:|---:|
+| Human Magician | STR +14, INT +22, ADV +19 | 33.0 | 46.0 | 79.0 |
+| Human Brawler | STR +21, INT +15, ADV +19 | 44.5 | 34.0 | 78.5 |
+| Human Shadow | STR +13, INT +19, CHA +1, AGI +3, ADV +20 | 37.5 | 41.5 | 79.0 |
+| Elf Magician | STR +10, INT +26, AGI +1, ADV +19 | 30.5 | 50.0 | **80.5** |
+| Elf Brawler | STR +16, INT +16, CHA +1, AGI +2, ADV +21 | 42.5 | 36.5 | 79.0 |
+| Elf Shadow | STR +13, INT +19, CHA +1, AGI +2, ADV +21 | 38.5 | 42.0 | **80.5** |
+| Minotaur Magician | STR +13, INT +21, CHA +1, ADV +21 | 35.0 | 44.0 | 79.0 |
+| Minotaur Brawler | STR +18, INT +17, ADV +21 | 44.5 | 34.5 | 79.0 |
+| Minotaur Shadow | STR +17, INT +17, CHA +1, AGI +1, ADV +20 | 42.5 | 37.0 | 79.5 |
+
+The max-total ceiling is almost flat (~79–80.5 for every combo) — the hybrid cap is set by the
+budget, not the archetype. Elf Magician / Elf Shadow edge it with 80.5.
+
+### Hybrid — balanced (equal-ish patk / matk)
+
+| Race · Class | Delta | patk | matk | Total |
+|---|---|---:|---:|---:|
+| Human Magician | STR +18, INT +14, CHA +1, AGI +3, ADV +20 | 39.0 | 39.0 | 78.0 |
+| Human Brawler | STR +14, INT +17, CHA +2, ADV +22 | 39.0 | 38.5 | 77.5 |
+| Human Shadow | STR +15, INT +16, CHA +2, AGI +2, ADV +21 | 39.5 | 39.5 | 79.0 |
+| Elf Magician | STR +19, INT +16, AGI +1, ADV +19 | 39.5 | 40.0 | 79.5 |
+| Elf Brawler | STR +13, INT +18, CHA +1, AGI +1, ADV +22 | 39.5 | 39.0 | 78.5 |
+| Elf Shadow | STR +13, INT +16, CHA +1, AGI +3, ADV +23 | 40.0 | 40.0 | **80.0** |
+| Minotaur Magician | STR +17, INT +17, AGI +1, ADV +21 | 39.5 | 39.5 | 79.0 |
+| Minotaur Brawler | STR +13, INT +21, CHA +1, ADV +20 | 39.0 | 38.5 | 77.5 |
+| Minotaur Shadow | STR +13, INT +19, CHA +1, AGI +2, ADV +21 | 39.5 | 39.5 | 79.0 |
+
+### Per-combo comparison
+
+| Race · Class | Best Physical | Best Magic | Hybrid max total | Balanced |
+|---|---|---|---|---|
+| Human Magician | patk 48.5 | matk 58.5 | 33 / 46 (79.0) | 39 / 39 (78.0) |
+| Human Brawler | patk 58.0 | matk 48.5 | 44.5 / 34 (78.5) | 39 / 38.5 (77.5) |
+| Human Shadow | patk 53.5 | matk 53.5 | 37.5 / 41.5 (79.0) | 39.5 / 39.5 (79.0) |
+| Elf Magician | patk 49.5 | matk 60.0 | 30.5 / 50 (80.5) | 39.5 / 40 (79.5) |
+| Elf Brawler | patk 58.0 | matk 49.5 | 42.5 / 36.5 (79.0) | 39.5 / 39 (78.5) |
+| Elf Shadow | patk 54.0 | matk 54.5 | 38.5 / 42 (80.5) | 40 / 40 (80.0) |
+| Minotaur Magician | patk 52.5 | matk 56.0 | 35 / 44 (79.0) | 39.5 / 39.5 (79.0) |
+| Minotaur Brawler | patk 63.5 | matk 46.0 | 44.5 / 34.5 (79.0) | 39 / 38.5 (77.5) |
+| Minotaur Shadow | patk 57.5 | matk 50.5 | 42.5 / 37 (79.5) | 39.5 / 39.5 (79.0) |
+
+---
+
+## 5. Key takeaways
 
 1. **Physical = STR for all 9 combos** (1.0 value beats everything), then top up with whichever of
    ADV / AGI is cheaper to buy. No passive biases either one.
@@ -156,6 +216,11 @@ small (0.5–3.0 CP) because the primary stat is worth double.
    levelled (no STR on a magic caster, no INT on a bruiser).
 7. **Splitting barely beats mono-stat** (0.5–3.0 CP). If you want simplicity, dumping everything
    into STR or INT loses very little; the Elf Magician mono-INT loss is only 1.5 CP.
+8. **Hybrids are dominated by budget, not archetype.** Every combo reaches a max-total hybrid of
+   ~79–80.5 combined, and every combo reaches a balanced ~39/39. If you want to use both damage
+   types, ADV is the star stat (1.0 combined) — pump your cheap of STR/INT, then pour the rest into
+   ADV. *But* a hybrid's best single-side number (~39–50) is far below a polarised specialist
+   (48.5–63.5); hybrid only pays off if you truly attack with both.
 
 ---
 
