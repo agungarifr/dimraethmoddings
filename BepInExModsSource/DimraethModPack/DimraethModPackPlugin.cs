@@ -91,8 +91,12 @@ namespace DimraethModPack
             // through the game's own deposit path. Config section kept as Gameplay.FastProduction.
             Modules.Add(new FastProductionModule());
             // [2026-10-07 10:15] New: "Unlock All (Recipes & Spells)" manual button — unlocks every
-            // crafting recipe (recipe.UUID into Player.UnlockedRecipes) and learns every spell
-            // (SpellManager.AllSpellsInGame into Player.UnlockedSpells = the effect of all spellbooks).
+            // crafting recipe (recipe.UUID into Player.UnlockedRecipes) and learns every spellbook
+            // spell (Item.SpellUnlock into Player.UnlockedSpells).
+            // [2026-10-08 12:00] FIX: no longer uses SpellManager.AllSpellsInGame (that included
+            // skill-tree + quest spells and broke main-quest progression); spellbooks only now.
+            // [2026-10-08 12:30] Added a "Repair Learned Spells" button that strips the tree/quest
+            // spell copies the old version leaked into existing saves (backs the list up first).
             // No Harmony patches, no per-frame work; lists persist via PlayerData on save.
             // Config: Gameplay.UnlockAll.
             Modules.Add(new UnlockAllModule());
