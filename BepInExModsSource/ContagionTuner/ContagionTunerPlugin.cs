@@ -17,16 +17,23 @@ namespace ContagionTuner
     ///     vs vanilla 6 ticks over 6s at 1.0s).
     ///   * Damage: Each tick deals half damage (DamagePerTickMultiplier 0.5), so the 12 ticks total
     ///     exactly 1x the vanilla total damage.
-    ///   * Black Hole Suction: Drags all surrounding enemies into the infected target host using the game's
-    ///     own <c>BaseSpellLibrary.DashTargetToPosition</c> (the exact primitive Black Hole uses) on cast and
-    ///     on every tick - a 2-per-second, full-distance yank. The infected host itself is never pulled.
+    ///   * Poison: Each tick applies PoisonStackMultiplier x the vanilla 1 stack/tick (default 2 = 2/tick).
+    ///     Implemented as a Prefix on BaseSpellLibrary.AddStacksToTarget gated to Contagion's zone tick so the
+    ///     initial cast poison and the Vector Transfer / copied poison are NOT scaled.
+    ///   * Black Hole Suction: Drags all surrounding enemies into the spell/zone center
+    ///     (<c>cp.transform.position</c>) using the game's own <c>BaseSpellLibrary.DashTargetToPosition</c>
+    ///     (the exact primitive Black Hole / Pursuing Blizzard uses) on cast and on every tick - a
+    ///     2-per-second, full-distance yank.
+    ///     [2026-10-09] Re-anchored from the infected host to the spell/zone center to match Pursuing Blizzard
+    ///     exactly (same modifier values: RadiusMultiplier 1.0, DashTime 0.2, DistanceMultiplier 1.0). The old
+    ///     host-centered anchor is preserved (commented) inside ApplySuction.
     /// </summary>
     [BepInPlugin(GUID, NAME, VERSION)]
     public class ContagionTunerPlugin : BasePlugin
     {
         public const string GUID = "com.custom.contagiontuner";
         public const string NAME = "Contagion Tuner";
-        public const string VERSION = "1.1.0";
+        public const string VERSION = "1.2.0";
 
         internal static new ManualLogSource Log;
         internal static ContagionTunerPlugin Instance;
@@ -36,8 +43,14 @@ namespace ContagionTuner
         public static ConfigEntry<float> TickCountMultiplier;
         public static ConfigEntry<float> TickInterval;
         public static ConfigEntry<float> DamagePerTickMultiplier;
+        public static ConfigEntry<float> PoisonStackMultiplier;
         public static ConfigEntry<float> LifetimeSafetyBuffer;
         public static ConfigEntry<bool> DiagnosticLogging;
+
+        // [2026-10-09] True only while ContagionPrefab._ZoneRoutine_d__51.MoveNext is running, so the
+        // AddStacksToTarget poison patch scales the PER-TICK poison and not the initial cast poison (5) or the
+        // Vector Transfer / copied poison, which are applied from other methods (Activate, ApplyVectorTransfer).
+        internal static bool InZoneTick;
 
         // Black Hole spellbook suction configuration
         public static ConfigEntry<bool> SuctionEnabled;
@@ -85,7 +98,14 @@ namespace ContagionTuner
             DamagePerTickMultiplier = Config.Bind("Contagion", "DamagePerTickMultiplier", 0.5f,
                 "Multiplier applied to Contagion's per-tick damage (_damageMult). 0.5 = each of the 12 ticks " +
                 "deals half damage, so the total tick damage equals 1x the vanilla total. " +
-                "Does NOT scale poison stacks (those stay 1 per tick). (Default: 0.5)");
+                "Does NOT scale poison stacks (see PoisonStackMultiplier). (Default: 0.5)");
+
+            // [2026-10-09] Double the poison applied per tick, isolated to the zone tick so the initial cast
+            // poison and the Vector Transfer / copied poison are left at vanilla.
+            PoisonStackMultiplier = Config.Bind("Contagion", "PoisonStackMultiplier", 2.0f,
+                "Multiplier for the Poison stacks Contagion applies on each damage tick (vanilla = 1 stack/tick). " +
+                "2.0 = double the poison every tick. Only the per-tick Poison is scaled; the initial cast poison, " +
+                "the Vector Transfer poison and copied/converted poison are untouched. (Default: 2.0)");
 
             LifetimeSafetyBuffer = Config.Bind("Contagion", "LifetimeSafetyBuffer", 0.35f,
                 "Safety buffer in seconds added to MaxTimeAlive to ensure the final tick and zone ending complete cleanly before despawn. (Default: 0.35)");
@@ -94,15 +114,15 @@ namespace ContagionTuner
             // (the primitive TwisterTuner uses). The 2026-10-04 "glitchy" verdict applied to the old
             // NavMeshAgent.Move implementation, not to the game's own knockback dash.
             SuctionEnabled = Config.Bind("BlackHoleSuction", "Enabled", true,
-                "If true, Contagion drags surrounding enemies into the infected host using the game's own " +
-                "BaseSpellLibrary.DashTargetToPosition (the exact Black Hole primitive). (Default: true)");
+                "If true, Contagion drags surrounding enemies into the spell/zone center using the game's own " +
+                "BaseSpellLibrary.DashTargetToPosition (the exact Black Hole / Pursuing Blizzard primitive). (Default: true)");
 
             SuctionOnActivate = Config.Bind("BlackHoleSuction", "SuctionOnActivate", true,
-                "Pull all nearby enemies into the infected host immediately when Contagion opens/casts. (Default: true)");
+                "Pull all nearby enemies into the spell/zone center immediately when Contagion opens/casts. (Default: true)");
 
             SuctionOnTick = Config.Bind("BlackHoleSuction", "SuctionOnTick", true,
-                "Pull all nearby enemies into the infected host on every damage/poison tick. At the default " +
-                "0.5s tick interval this is a 2-per-second suction, stronger than Black Hole's 1-per-second. (Default: true)");
+                "Pull all nearby enemies into the spell/zone center on every damage/poison tick. At the default " +
+                "0.667s tick interval this is roughly 1.5-per-second suction, stronger than Black Hole's 1-per-second. (Default: true)");
 
             SuctionRadiusMultiplier = Config.Bind("BlackHoleSuction", "RadiusMultiplier", 1.0f,
                 "Multiplier on Contagion's (already +50%) zone radius for how far enemies are grabbed. " +
@@ -113,7 +133,7 @@ namespace ContagionTuner
 
             SuctionDistanceMultiplier = Config.Bind("BlackHoleSuction", "DistanceMultiplier", 1.0f,
                 "Multiplier on the drag distance passed to DashTargetToPosition. 1.0 = pull the enemy exactly " +
-                "onto the host; >1 pulls it past the host center for a stronger yank (clamped by walls). (Default: 1.0)");
+                "onto the spell center; >1 pulls it past the center for a stronger yank (clamped by walls). (Default: 1.0)");
 
             DiagnosticLogging = Config.Bind("Diagnostics", "DiagnosticLogging", false,
                 "Log Contagion radius, visual scale, and tick events to the BepInEx console. (Default: false)");
@@ -124,6 +144,8 @@ namespace ContagionTuner
             PatchOrLog(harmony, typeof(Patch_ContagionPrefab_Activate));
             PatchOrLog(harmony, typeof(Patch_ContagionPrefab_ZoneRoutine));
             PatchOrLog(harmony, typeof(Patch_ContagionPrefab_ZoneRoutine_MoveNext));
+            // [2026-10-09] Scale the per-tick Poison applied via BaseSpellLibrary.AddStacksToTarget (x2 default).
+            PatchOrLog(harmony, typeof(Patch_BaseSpellLibrary_AddStacksToTarget_Poison));
             // [2026-10-04 15:33] Disabled Patch_ContagionPrefab_Update per user request.
             // PatchOrLog(harmony, typeof(Patch_ContagionPrefab_Update));
 
@@ -134,6 +156,7 @@ namespace ContagionTuner
             Log.LogInfo($"TickCountMultiplier: {TickCountMultiplier.Value} ({TickCountMultiplier.Value * 6f:F0} ticks total)");
             Log.LogInfo($"TickInterval: {TickInterval.Value}s ({TickInterval.Value * TickCountMultiplier.Value * 6f:F2}s wall-clock)");
             Log.LogInfo($"DamagePerTickMultiplier: {DamagePerTickMultiplier.Value} (per-tick damage)");
+            Log.LogInfo($"PoisonStackMultiplier: {PoisonStackMultiplier.Value} (per-tick Poison stacks, vanilla 1)");
             Log.LogInfo($"BlackHoleSuction: {SuctionEnabled.Value} (activate={SuctionOnActivate.Value}, tick={SuctionOnTick.Value}, radiusX{SuctionRadiusMultiplier.Value}, distX{SuctionDistanceMultiplier.Value}, dashTime={SuctionDashTime.Value}s)");
             Log.LogInfo("=================================================");
         }
@@ -240,6 +263,24 @@ namespace ContagionTuner
         }
 
         /// <summary>
+        /// [2026-10-09] True when the spell prefab instance is the Contagion itself. The per-tick Poison arrives
+        /// through <c>BaseSpellLibrary.AddStacksToTarget</c> with the ContagionPrefab as the instance, so we match
+        /// by runtime type name (mirrors PursuingBlizzardTunerPlugin.IsBlizzardPrefab).
+        /// </summary>
+        internal static bool IsContagionPrefab(BaseSpellLibrary instance)
+        {
+            try
+            {
+                var type = instance.GetIl2CppType();
+                return type != null && type.Name == "ContagionPrefab";
+            }
+            catch
+            {
+                return false;
+            }
+        }
+
+        /// <summary>
         /// Resolves the epicenter of Contagion. Since Contagion is cast on an infected enemy,
         /// the center is strictly that enemy's current position so surrounding enemies get sucked
         /// into the host. If host is missing/dead, falls back to _center or cp.transform.
@@ -267,15 +308,20 @@ namespace ContagionTuner
         }
 
         /// <summary>
-        /// Black Hole style suction for Contagion: drag every live enemy inside the zone toward the infected
-        /// host using the game's own <c>BaseSpellLibrary.DashTargetToPosition</c> - the exact primitive
-        /// <c>BlackholePrefab.AreaOfEffectStrike</c> uses (docs/BlackHole_Dragging_Mechanism.md). Unlike the
-        /// old NavMeshAgent.Move pull (which fought monster pathfinding), this reuses the game's knockback
-        /// coroutine, which disables the NavMeshAgent during the lerp and restores it afterward, raycasts
-        /// walls, and honours <c>ObjectsCommon.Immune</c> / <c>MonsterBehaviourLibrary.DisplaceExempt</c> /
-        /// authority. The infected host itself is never pulled.
-        /// <c>distance</c> is the enemy's current distance to the host (times DistanceMultiplier), so each
-        /// call slides it onto (or, if &gt;1, past) the host - Black Hole's whole "suction" trick.
+        /// Black Hole style suction for Contagion: drag every live enemy inside the zone toward the
+        /// spell/zone center (<c>cp.transform.position</c>) using the game's own
+        /// <c>BaseSpellLibrary.DashTargetToPosition</c> - the exact primitive
+        /// <c>BlackholePrefab.AreaOfEffectStrike</c> / Pursuing Blizzard uses
+        /// (docs/BlackHole_Dragging_Mechanism.md). Unlike the old NavMeshAgent.Move pull (which fought monster
+        /// pathfinding), this reuses the game's knockback coroutine, which disables the NavMeshAgent during the
+        /// lerp and restores it afterward, raycasts walls, and honours <c>ObjectsCommon.Immune</c> /
+        /// <c>MonsterBehaviourLibrary.DisplaceExempt</c> / authority.
+        /// <c>distance</c> is the enemy's current distance to the center (times DistanceMultiplier), so each
+        /// call slides it onto (or, if &gt;1, past) the center - Black Hole's whole "suction" trick.
+        /// [2026-10-09] Re-anchored from the infected host (_infectedTarget) to cp.transform.position so the
+        /// drag pull behaves exactly like PursuingBlizzardTuner.ApplySuction with the same modifier values.
+        /// ContagionPrefab.Update keeps the spell transform on the infected host (unless Pandemic), so this is
+        /// equivalent in normal play while matching Blizzard's code path.
         /// </summary>
         public static unsafe void ApplySuction(ContagionPrefab cp)
         {
@@ -287,8 +333,14 @@ namespace ContagionTuner
 
             try
             {
-                ObjectsCommon host = GetInfectedTarget(cp);
-                Vector2 center = GetCenter(cp, host);
+                // [2026-10-09] Anchor on the spell/zone center, exactly like Pursuing Blizzard.
+                // Old host-centered anchor kept for reference:
+                // ObjectsCommon host = GetInfectedTarget(cp);
+                // Vector2 center = GetCenter(cp, host);
+                Transform t = cp.transform;
+                if (t == null) return;
+                Vector3 p = t.position;
+                Vector2 center = new Vector2(p.x, p.y);
                 if (center == Vector2.zero) return;
 
                 float radius = *(float*)(ptr + RadiusOffset) * SuctionRadiusMultiplier.Value;
@@ -307,8 +359,10 @@ namespace ContagionTuner
                     if (enemy == null || enemy.Pointer == IntPtr.Zero) continue;
                     if (enemy.IsDead()) continue;
 
-                    // Never drag the infected host into itself.
-                    if (host != null && enemy.Pointer == host.Pointer) continue;
+                    // [2026-10-09] Host exclusion removed: the pull is no longer anchored on the infected host,
+                    // so (exactly like Pursuing Blizzard) every live enemy in range is dragged toward the spell
+                    // center. Old host-centered guard kept for reference:
+                    // if (host != null && enemy.Pointer == host.Pointer) continue;
 
                     Vector3 ep3 = enemy.transform.position;
                     float dist = Vector2.Distance(new Vector2(ep3.x, ep3.y), center);
@@ -322,7 +376,7 @@ namespace ContagionTuner
 
                 if (DiagnosticLogging.Value && pulled > 0)
                 {
-                    Log.LogInfo($"[Suction] DashTargetToPosition dragged {pulled} enemies toward host ({center.x:F1}, {center.y:F1}), radius {radius:F1}, distX{distMult:F2}, time {dashTime:F2}s");
+                    Log.LogInfo($"[Suction] DashTargetToPosition dragged {pulled} enemies toward spell center ({center.x:F1}, {center.y:F1}), radius {radius:F1}, distX{distMult:F2}, time {dashTime:F2}s");
                 }
             }
             catch (Exception ex)
@@ -673,10 +727,20 @@ namespace ContagionTuner
     [HarmonyPatch(typeof(ContagionPrefab._ZoneRoutine_d__51), "MoveNext")]
     public static class Patch_ContagionPrefab_ZoneRoutine_MoveNext
     {
+        // [2026-10-09] Flag the duration of this coroutine step so the AddStacksToTarget poison patch only scales
+        // the per-tick Poison (applied inside this MoveNext), never the initial/copied/Vector-Transfer poison.
+        public static void Prefix()
+        {
+            ContagionTunerPlugin.InZoneTick = true;
+        }
+
         public static void Postfix(ContagionPrefab._ZoneRoutine_d__51 __instance, ref bool __result)
         {
             try
             {
+                // [2026-10-09] Clear the tick flag first, before any early return, so it cannot leak into other
+                // Contagion poison applications.
+                ContagionTunerPlugin.InZoneTick = false;
                 if (!ContagionTunerPlugin.Enabled.Value) return;
                 if (!__result) return;
                 if (__instance == null || __instance.Pointer == IntPtr.Zero) return;
@@ -699,6 +763,51 @@ namespace ContagionTuner
             catch (Exception ex)
             {
                 ContagionTunerPlugin.Log?.LogError($"[Patch_ContagionPrefab_ZoneRoutine_MoveNext] {ex}");
+            }
+        }
+    }
+
+    /// <summary>
+    /// [2026-10-09] Prefix on <c>BaseSpellLibrary.AddStacksToTarget</c>. Contagion's zone tick applies ONE
+    /// Poison per tick (<c>StackingEffect.Poison</c>, effect id 3, amount = 1, or 2 with the Envenoming upgrade);
+    /// we multiply that amount by <c>PoisonStackMultiplier</c> (default x2) so each tick applies double poison.
+    /// Gated to the zone tick (<c>InZoneTick</c>) so the initial cast poison (5) and the Vector Transfer / copied
+    /// poison - applied from Activate / ApplyVectorTransfer / ConvertCopiedPoison - keep their vanilla values.
+    /// Mirrors PursuingBlizzardTuner's Burning scaling on the same method.
+    /// </summary>
+    [HarmonyPatch(typeof(BaseSpellLibrary), nameof(BaseSpellLibrary.AddStacksToTarget))]
+    public static class Patch_BaseSpellLibrary_AddStacksToTarget_Poison
+    {
+        public static void Prefix(BaseSpellLibrary __instance, StackingEffect effect, ref int amount)
+        {
+            try
+            {
+                if (!ContagionTunerPlugin.Enabled.Value) return;
+                if (__instance == null || __instance.Pointer == IntPtr.Zero) return;
+                if (effect != StackingEffect.Poison) return; // only Poison, never Bleeding/other effects
+                if (amount <= 0) return;
+
+                // Only the per-tick Poison that Contagion's ZoneRoutine applies; skip initial/copied poison.
+                if (!ContagionTunerPlugin.InZoneTick) return;
+                if (!ContagionTunerPlugin.IsContagionPrefab(__instance)) return;
+
+                float mult = ContagionTunerPlugin.PoisonStackMultiplier.Value;
+                if (mult <= 0f || mult == 1f) return;
+
+                int newAmount = (int)Math.Round(amount * (double)mult, MidpointRounding.AwayFromZero);
+                if (newAmount < 1) newAmount = 1;
+
+                if (ContagionTunerPlugin.DiagnosticLogging.Value)
+                {
+                    ContagionTunerPlugin.Log.LogInfo(
+                        $"[ContagionPoison] {__instance.GetIl2CppType().Name} per-tick Poison {amount} -> {newAmount} (x{mult})");
+                }
+
+                amount = newAmount;
+            }
+            catch (Exception ex)
+            {
+                ContagionTunerPlugin.Log?.LogError($"[Patch_BaseSpellLibrary_AddStacksToTarget_Poison] {ex}");
             }
         }
     }
