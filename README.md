@@ -126,7 +126,7 @@ All under `modding\BepInExModsSource\`:
 - **DimraethMapActionsShopPatch** — patches the DimraethMapActions mod's shop button.
 - **DimraethModPack** — 13-mod QoL/progression pack with an in-game menu (Backquote / F8).
 - **DimraethSanctumChests** — adds Sanctum Chest buttons to the map quick-actions.
-- **EchoRiftTuner** — tunes the Echo Rift spell (default 2x temporal-burst AoE, optional black-hole pull like Barrage of Arrows).
+- **EchoRiftTuner** — tunes the Echo Rift spell (default 2x temporal-burst AoE, optional black-hole pull like Barrage of Arrows, 2x Temporal Echo stack debuff).
 - **EquipmentStatEditor** — in-game (F8) editor for equipped gear stats.
 - **FireballTuner** — tunes the Fireball spell.
 - **NavMeshFixMod** — fixes monster movement/navmesh glitches.

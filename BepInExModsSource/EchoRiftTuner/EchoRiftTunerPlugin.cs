@@ -20,6 +20,11 @@ namespace EchoRiftTuner
     ///     toward the rift centre using the game's own <c>BaseSpellLibrary.DashTargetToPosition</c> - the exact
     ///     primitive Black Hole / Barrage of Arrows / Pursuing Blizzard use. The pull fires on cast and on every
     ///     burst pulse. The default radius, dash time and distance multiplier match the Barrage of Arrows Tuner.
+    ///   * [2026-10-09] Doubles the "Temporal Echo" stack debuff Echo Rift applies. Every Temporal Echo stack the
+    ///     rift applies flows through <c>BaseSpellLibrary.AddStacksToTarget</c> with
+    ///     <c>StackingEffect.TemporalEcho</c> (effect 11), so we scale that amount by
+    ///     <c>TemporalEcho.StacksMultiplier</c> (default 2.0) for EchoRiftPrefab instances only. That doubles both
+    ///     the slow and the extra damage the consumed stacks fuel, up to the game's max-stacks cap.
     ///
     /// Co-op: the drag reuses the game's own knockback primitive (which honours authority / Immune / DisplaceExempt),
     /// so run the SAME config on host and client.
@@ -29,7 +34,7 @@ namespace EchoRiftTuner
     {
         public const string GUID = "com.custom.echorifttuner";
         public const string NAME = "Echo Rift Tuner";
-        public const string VERSION = "1.0.0";
+        public const string VERSION = "1.1.0";
 
         internal static new ManualLogSource Log;
         internal static EchoRiftTunerPlugin Instance;
@@ -38,6 +43,10 @@ namespace EchoRiftTuner
 
         // [2026-10-09] Temporal burst AoE scaling (base Echo Rift only - EchoRiftPrefab instances).
         public static ConfigEntry<float> AoeRadiusMultiplier;
+
+        // [2026-10-09] Temporal Echo stack-debuff scaling (base Echo Rift only - EchoRiftPrefab instances).
+        public static ConfigEntry<bool> TemporalEchoEnabled;
+        public static ConfigEntry<float> TemporalEchoStacksMultiplier;
 
         // [2026-10-09] Echo Rift enemy drag (mirrors BarrageOfArrowsTuner's Black Hole drag).
         public static ConfigEntry<bool> DragEnabled;
@@ -65,6 +74,14 @@ namespace EchoRiftTuner
                 "hit area). Applied by scaling the burst trigger collider's own geometry (AreaOfEffect._aoeCollider), " +
                 "the same technique BarrageOfArrowsTuner/TwisterTuner use, so it widens the trigger in world space " +
                 "regardless of whether the collider follows its transform. 1.0 disables. (Default: 2.0)");
+
+            TemporalEchoEnabled = Config.Bind("TemporalEcho", "Enabled", true,
+                "If true Echo Rift applies extra Temporal Echo stacks (its stack debuff). (Default: true)");
+
+            TemporalEchoStacksMultiplier = Config.Bind("TemporalEcho", "StacksMultiplier", 2.0f,
+                "Multiplier on the number of Temporal Echo stacks Echo Rift applies per hit. 2.0 = double the " +
+                "vanilla stacks, doubling the slow and the extra damage those stacks fuel when consumed (capped by " +
+                "the game's max Temporal Echo stacks). 1.0 disables. (Default: 2.0)");
 
             DragEnabled = Config.Bind("BlackHoleDrag", "Enabled", true,
                 "If true Echo Rift drags surrounding enemies toward its centre using the game's own " +
@@ -96,6 +113,7 @@ namespace EchoRiftTuner
 
             var harmony = new Harmony(GUID);
             PatchOrLog(harmony, typeof(Patch_AreaOfEffect_Start_Aoe));
+            PatchOrLog(harmony, typeof(Patch_BaseSpellLibrary_AddStacksToTarget_TemporalEcho));
             PatchOrLog(harmony, typeof(Patch_EchoRiftPrefab_OnStart_Drag));
             PatchOrLog(harmony, typeof(Patch_EchoRiftPrefab_FirePulse_Drag));
 
@@ -103,6 +121,7 @@ namespace EchoRiftTuner
             Log.LogInfo($"{NAME} v{VERSION} loaded.");
             Log.LogInfo($"Enabled: {Enabled.Value}");
             Log.LogInfo($"AreaOfEffect.RadiusMultiplier: {AoeRadiusMultiplier.Value}");
+            Log.LogInfo($"TemporalEcho: {TemporalEchoEnabled.Value} (stacksMultiplier={TemporalEchoStacksMultiplier.Value})");
             Log.LogInfo($"BlackHoleDrag: {DragEnabled.Value} (activate={DragOnActivate.Value}, pulse={DragOnPulse.Value}, radius={DragRadius.Value}, distX={DragDistanceMultiplier.Value}, dashTime={DragDashTime.Value}s)");
             Log.LogInfo($"DiagnosticLogging: {DiagnosticLogging.Value}");
             Log.LogInfo("=================================================");
@@ -286,6 +305,48 @@ namespace EchoRiftTuner
             catch (Exception ex)
             {
                 EchoRiftTunerPlugin.Log?.LogError($"[Patch_AreaOfEffect_Start_Aoe] {ex}");
+            }
+        }
+    }
+
+    /// <summary>
+    /// [2026-10-09] Prefix on <c>BaseSpellLibrary.AddStacksToTarget</c>. Echo Rift applies its Temporal Echo stack
+    /// debuff (<c>StackingEffect.TemporalEcho</c>, effect 11) to every enemy it strikes through this method, so
+    /// scaling the amount here doubles the debuff. Gated to EchoRiftPrefab instances so no other spell's Temporal
+    /// Echo - or any other stack effect - is touched. Mirrors FireballTuner/PursuingBlizzardTuner's
+    /// AddStacksToTarget prefixes.
+    /// </summary>
+    [HarmonyPatch(typeof(BaseSpellLibrary), nameof(BaseSpellLibrary.AddStacksToTarget))]
+    public static class Patch_BaseSpellLibrary_AddStacksToTarget_TemporalEcho
+    {
+        public static void Prefix(BaseSpellLibrary __instance, StackingEffect effect, ref int amount)
+        {
+            try
+            {
+                if (!EchoRiftTunerPlugin.Enabled.Value) return;
+                if (!EchoRiftTunerPlugin.TemporalEchoEnabled.Value) return;
+                if (__instance == null) return;
+                if (effect != StackingEffect.TemporalEcho) return;
+                if (amount <= 0) return;
+                if (!EchoRiftTunerPlugin.IsSpellInstance<EchoRiftPrefab>(__instance)) return;
+
+                float mult = EchoRiftTunerPlugin.TemporalEchoStacksMultiplier.Value;
+                if (mult <= 0f || Math.Abs(mult - 1f) < 0.0001f) return;
+
+                int newAmount = (int)Math.Round(amount * (double)mult, MidpointRounding.AwayFromZero);
+                if (newAmount < 1) newAmount = 1;
+
+                if (EchoRiftTunerPlugin.DiagnosticLogging.Value)
+                {
+                    EchoRiftTunerPlugin.Log.LogInfo(
+                        $"[AddStacksToTarget] {__instance.GetIl2CppType().Name} TemporalEcho {amount} -> {newAmount}");
+                }
+
+                amount = newAmount;
+            }
+            catch (Exception ex)
+            {
+                EchoRiftTunerPlugin.Log?.LogError($"[Patch_BaseSpellLibrary_AddStacksToTarget_TemporalEcho] {ex}");
             }
         }
     }
