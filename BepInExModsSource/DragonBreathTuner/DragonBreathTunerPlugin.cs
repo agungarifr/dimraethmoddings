@@ -8,6 +8,7 @@ using BepInEx.Unity.IL2CPP;
 using HarmonyLib;
 using Il2CppInterop.Runtime;
 using Il2CppInterop.Runtime.InteropTypes;
+using UnityEngine;
 
 namespace DragonBreathTuner
 {
@@ -43,6 +44,10 @@ namespace DragonBreathTuner
 
         public static ConfigEntry<bool> Enabled;
         public static ConfigEntry<bool> MoveWhileChanneling;
+        // [2026-10-09 22:55] New: keep the breath prefab (and therefore its projectile spawn point) on the
+        // caster while the channel is active, so the breath follows the player once MoveWhileChanneling
+        // un-roots them.
+        public static ConfigEntry<bool> FollowPlayerWhileChanneling;
         public static ConfigEntry<float> BurningMultiplier;
         public static ConfigEntry<float> RangeMultiplier;
         public static ConfigEntry<bool> ShowTunedStatsInTooltip;
@@ -72,6 +77,14 @@ namespace DragonBreathTuner
             MoveWhileChanneling = Config.Bind("Channel", "MoveWhileChanneling", true,
                 "If true the local player can walk while channeling the Channelled Dragon breath (vanilla roots them). (Default: true)");
 
+            // [2026-10-09 22:55] New: vanilla roots the caster, so the breath prefab is spawned once at the
+            // caster's position and never moves; SpawnProjectilesChannelled spawns every projectile at that
+            // prefab's transform, so once movement is enabled the breath would keep firing from where the
+            // channel began. This keeps the prefab on the caster so the breath follows the player.
+            FollowPlayerWhileChanneling = Config.Bind("Channel", "FollowPlayerWhileChanneling", true,
+                "If true the Channelled Dragon breath stays on the caster and follows them while they move " +
+                "(needs MoveWhileChanneling, since vanilla roots the caster so the breath never had to follow). (Default: true)");
+
             // [2026-10-09 22:37] BepInEx rejects ' in section/key names ("Cannot use any of the following
             // characters in section and key names: = \n \t \ " ' [ ]"), so the plugin failed to load with
             // section "Dragon's Breath". Renamed the section to "DragonBreath" (no apostrophe).
@@ -99,6 +112,7 @@ namespace DragonBreathTuner
             PatchOrLog(harmony, typeof(Patch_DragonsBreathPrefab_SetControllerChannelRange));
             PatchOrLog(harmony, typeof(Patch_DragonsBreathPrefab_OnActivateRelease));
             PatchOrLog(harmony, typeof(Patch_DragonsBreathPrefab_HandleBeforeSpellDestroyed));
+            PatchOrLog(harmony, typeof(Patch_DragonsBreathPrefab_Update_FollowPlayer));
             PatchOrLog(harmony, typeof(Patch_WASD_CannotUseMovement));
             PatchOrLog(harmony, typeof(Patch_Movement_CanEnablePlayerMovement));
             PatchOrLog(harmony, typeof(Patch_Movement_PlayerMovementNotValid));
@@ -108,6 +122,7 @@ namespace DragonBreathTuner
             Log.LogInfo($"{NAME} v{VERSION} loaded.");
             Log.LogInfo($"Enabled: {Enabled.Value}");
             Log.LogInfo($"MoveWhileChanneling: {MoveWhileChanneling.Value}");
+            Log.LogInfo($"FollowPlayerWhileChanneling: {FollowPlayerWhileChanneling.Value}");
             Log.LogInfo($"BurningMultiplier: {BurningMultiplier.Value}");
             Log.LogInfo($"RangeMultiplier: {RangeMultiplier.Value}");
             Log.LogInfo($"ShowTunedStatsInTooltip: {ShowTunedStatsInTooltip.Value}");
@@ -200,7 +215,8 @@ namespace DragonBreathTuner
             if (!ShowTunedStatsInTooltip.Value) return null;
 
             var parts = new List<string>();
-            if (MoveWhileChanneling.Value) parts.Add("move while channeling");
+            if (MoveWhileChanneling.Value)
+                parts.Add(FollowPlayerWhileChanneling.Value ? "move while channeling (breath follows you)" : "move while channeling");
             if (BurningMultiplier.Value > 0f && BurningMultiplier.Value != 1f)
                 parts.Add($"burning x{FormatMultiplier(BurningMultiplier.Value)}");
             if (RangeMultiplier.Value > 0f && RangeMultiplier.Value != 1f)
@@ -374,6 +390,50 @@ namespace DragonBreathTuner
             catch (Exception ex)
             {
                 DragonBreathTunerPlugin.Log?.LogError($"[Patch_DragonsBreathPrefab_HandleBeforeSpellDestroyed] {ex}");
+            }
+        }
+    }
+
+    /// <summary>
+    /// [2026-10-09 22:55] Postfix on <c>DragonsBreathPrefab.Update</c>. Vanilla roots the caster for the whole
+    /// Channelled Dragon breath, so the prefab is spawned once at the caster
+    /// (<c>BaseSpellLibrary.SpawnSpellAtCasterPosition</c>) and never moved again. The channel coroutine
+    /// <c>SpawnProjectilesChannelled</c> spawns every projectile at THIS prefab's own transform position, so
+    /// once <see cref="DragonBreathTunerPlugin.MoveWhileChanneling"/> lets the player walk, the breath (and its
+    /// projectiles) kept firing from where the channel began. We keep the prefab on the caster so the breath
+    /// follows the player. The projectiles are target-homing (<c>Targeting.TravelToTarget</c>), so only the
+    /// spawn point moves - the aim is unchanged. Only casters already registered as an active channel (see
+    /// <see cref="Patch_DragonsBreathPrefab_SetControllerChannelRange"/>) are moved.
+    /// </summary>
+    [HarmonyPatch(typeof(DragonsBreathPrefab), "Update")]
+    public static class Patch_DragonsBreathPrefab_Update_FollowPlayer
+    {
+        public static void Postfix(DragonsBreathPrefab __instance)
+        {
+            try
+            {
+                if (!DragonBreathTunerPlugin.Enabled.Value) return;
+                if (!DragonBreathTunerPlugin.MoveWhileChanneling.Value) return;
+                if (!DragonBreathTunerPlugin.FollowPlayerWhileChanneling.Value) return;
+                if (__instance == null) return;
+
+                IntPtr ownerPtr = DragonBreathTunerPlugin.ReadPtr(DragonBreathTunerPlugin.OwnerOffset, __instance);
+                if (ownerPtr == IntPtr.Zero) return;
+                if (!DragonBreathTunerPlugin.IsChannelOwner(ownerPtr)) return;
+
+                var owner = new ObjectsCommon(ownerPtr);
+                var ownerTransform = owner.transform;
+                var prefabTransform = __instance.transform;
+                if (ownerTransform == null || prefabTransform == null) return;
+
+                Vector3 ownerPos = ownerTransform.position;
+                Vector3 prefabPos = prefabTransform.position;
+                // Keep the prefab's z so the breath stays on the same plane; only x/y follow the caster.
+                prefabTransform.position = new Vector3(ownerPos.x, ownerPos.y, prefabPos.z);
+            }
+            catch (Exception ex)
+            {
+                DragonBreathTunerPlugin.Log?.LogError($"[Patch_DragonsBreathPrefab_Update_FollowPlayer] {ex}");
             }
         }
     }
