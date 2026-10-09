@@ -72,10 +72,18 @@ namespace DragonBreathTuner
             MoveWhileChanneling = Config.Bind("Channel", "MoveWhileChanneling", true,
                 "If true the local player can walk while channeling the Channelled Dragon breath (vanilla roots them). (Default: true)");
 
-            BurningMultiplier = Config.Bind("Dragon's Breath", "BurningMultiplier", 3f,
+            // [2026-10-09 22:37] BepInEx rejects ' in section/key names ("Cannot use any of the following
+            // characters in section and key names: = \n \t \ " ' [ ]"), so the plugin failed to load with
+            // section "Dragon's Breath". Renamed the section to "DragonBreath" (no apostrophe).
+            // Old (invalid) lines kept for reference:
+            // BurningMultiplier = Config.Bind("Dragon's Breath", "BurningMultiplier", 3f,
+            //     "Multiplier for the number of Burning stacks the Dragon's Breath applies. 1 = vanilla. (Default: 3)");
+            // RangeMultiplier = Config.Bind("Dragon's Breath", "RangeMultiplier", 1.5f,
+            //     "Multiplier for the Dragon's Breath range (cast/targeting radius). 1 = vanilla, 1.5 = +50%. (Default: 1.5)");
+            BurningMultiplier = Config.Bind("DragonBreath", "BurningMultiplier", 3f,
                 "Multiplier for the number of Burning stacks the Dragon's Breath applies. 1 = vanilla. (Default: 3)");
 
-            RangeMultiplier = Config.Bind("Dragon's Breath", "RangeMultiplier", 1.5f,
+            RangeMultiplier = Config.Bind("DragonBreath", "RangeMultiplier", 1.5f,
                 "Multiplier for the Dragon's Breath range (cast/targeting radius). 1 = vanilla, 1.5 = +50%. (Default: 1.5)");
 
             ShowTunedStatsInTooltip = Config.Bind("Tooltip", "ShowTunedStats", true,
