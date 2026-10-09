@@ -89,6 +89,8 @@ namespace DimraethModPack
             // [2026-10-06 13:20] Revamped: "Instant Production" (was "Fast Production") — no longer a
             // per-frame CraftingBench.Update postfix; it is a manual button that finishes current crafts
             // through the game's own deposit path. Config section kept as Gameplay.FastProduction.
+            // [2026-10-09 09:07] Now covers campfire & woodfire-stove cooking too: the station filter uses
+            // the game's own StorageContainerRules.IsCraftingStation instead of a workbench/alchemy-only list.
             Modules.Add(new FastProductionModule());
             // [2026-10-07 10:15] New: "Unlock All (Recipes & Spells)" manual button — unlocks every
             // crafting recipe (recipe.UUID into Player.UnlockedRecipes) and learns every spellbook

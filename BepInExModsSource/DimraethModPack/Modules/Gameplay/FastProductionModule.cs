@@ -11,7 +11,7 @@ namespace DimraethModPack.Modules.Gameplay
     // own system and use a BUTTON, like the revamped Instant Crops module, "so it doesnt burden the game".
     //
     // Implementation: a manual button ("Finish All Current Crafts Now"). When pressed it caches the
-    // workbench/alchemy CraftingBench instances ONCE and arms a short drain that finishes every
+    // crafting-station CraftingBench instances ONCE and arms a short drain that finishes every
     // current/queued craft using the game's OWN completion path:
     //   - For each cached bench with an active job we write _currentProgress to Recipe.CraftingTime.
     //     Vanilla Update then sees progress >= CraftingTime, calls DepositIntoOutput(...) and resets progress.
@@ -36,7 +36,7 @@ namespace DimraethModPack.Modules.Gameplay
 
         public override string Category => "Gameplay";
         public override string Name => "Instant Production";
-        public override string Description => "One button that finishes all current/queued workbench & alchemy crafts using the game's own deposit path";
+        public override string Description => "One button that finishes all current/queued workbench, alchemy, campfire & woodfire-stove crafts using the game's own deposit path";
 
         // [2026-10-06 13:30] Obsolete: the speed multiplier is no longer used - production is now a
         // one-shot finish button, not a per-frame rate modifier.
@@ -87,7 +87,7 @@ namespace DimraethModPack.Modules.Gameplay
         {
             float curY = y;
             GUI.Label(new Rect(x, curY, width, 24f),
-                "Finishes every current/queued workbench & alchemy craft via the game's own deposit path. A large stack completes in a second or two.", labelStyle);
+                "Finishes every current/queued workbench, alchemy, campfire & woodfire-stove craft via the game's own deposit path. A large stack completes in a second or two.", labelStyle);
             curY += 28f;
 
             if (GUI.Button(new Rect(x, curY, Math.Min(320f, width), 30f), "Finish All Current Crafts Now", btnStyle))
@@ -196,13 +196,25 @@ namespace DimraethModPack.Modules.Gameplay
             }
         }
 
-        // Workbench + Alchemy Table only (placed and player-built spellings).
+        // [2026-10-09 09:07] FIX (user request: "instant production must affect campfire too"): the
+        // station filter now asks the game itself instead of keeping a hardcoded whitelist. The old list
+        // only covered workbench/alchemy, so campfire and woodfire-stove cooking crafts were ignored.
+        // StorageContainerRules.IsCraftingStation is the game's own predicate (Traits bit CraftingStation):
+        // verified against the shipped Traits jump table it is true for WorkBench, AlchemyTable,
+        // WoodfireStove, Campfire and their Build* variants, while NPC crafting services (Myrll/Tamsin/
+        // Rahaner = NPCService), chests (Chest) and loot (Corpse) are false — so this widens coverage to
+        // every real crafting station without accidentally finishing NPC-service or chest crafts.
         private static bool IsFastStation(StorageContainers container)
         {
+            /* [2026-10-09 09:07] Obsolete: hardcoded workbench/alchemy whitelist. It omitted the campfire
+               and woodfire-stove cooking stations (user report). Superseded by the game's own
+               StorageContainerRules.IsCraftingStation above; kept commented per repo rule.
             return container == StorageContainers.WorkBench
                 || container == StorageContainers.AlchemyTable
                 || container == StorageContainers.BuildWorkBench
                 || container == StorageContainers.BuildAlchemyTable;
+            */
+            return StorageContainerRules.IsCraftingStation(container);
         }
 
         /* [2026-10-06 13:30] ===== OBSOLETE (pre-revamp per-frame speed multiplier), kept per repo rule. =====
