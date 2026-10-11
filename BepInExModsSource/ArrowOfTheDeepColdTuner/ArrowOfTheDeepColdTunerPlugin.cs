@@ -53,6 +53,12 @@ namespace ArrowOfTheDeepColdTuner
         public const string NAME = "Arrow of the Deep Cold Tuner";
         public const string VERSION = "1.0.0";
 
+        // [2026-10-11] Victim matching tolerances. The branch forwards victim.transform.position verbatim,
+        // so a tight radius suffices; the search radius is only used to recover the enemy from the position
+        // if the captured victim cannot be trusted (see ResolveVictim).
+        internal const float VictimMatchRadius = 1.0f;
+        internal const float VictimSearchRadius = 1.5f;
+
         internal static new ManualLogSource Log;
         internal static ArrowOfTheDeepColdTunerPlugin Instance;
 
@@ -157,6 +163,49 @@ namespace ArrowOfTheDeepColdTuner
         }
 
         /// <summary>
+        /// [2026-10-11] Resolves the enemy the Arrow branch is shooting at. Prefers the victim captured from
+        /// <c>Damages.PassiveChecks</c>, but only when it is actually at <paramref name="position"/> (the
+        /// position the branch passed through). Otherwise falls back to the game's own
+        /// <c>Passives.FindRandomEnemyNear</c> so a stale/re-entrant capture can never scale off the wrong
+        /// enemy. Returns null when no victim can be resolved (the vanilla single arrow then runs).
+        /// </summary>
+        internal static ObjectsCommon ResolveVictim(Passives passives, Vector3 position)
+        {
+            try
+            {
+                var captured = CapturedVictim;
+                if (captured != null && captured.Pointer != IntPtr.Zero && PositionMatches(captured, position))
+                    return captured;
+
+                if (passives == null || passives.Pointer == IntPtr.Zero) return null;
+                return passives.FindRandomEnemyNear(new Vector2(position.x, position.y), VictimSearchRadius, null);
+            }
+            catch (Exception ex)
+            {
+                Log?.LogError($"[ResolveVictim] {ex}");
+                return null;
+            }
+        }
+
+        /// <summary>[2026-10-11] True when the enemy's current position is within <see cref="VictimMatchRadius"/>
+        /// of the spawn position (the branch forwards victim.transform.position verbatim, so this is exact).</summary>
+        private static bool PositionMatches(ObjectsCommon enemy, Vector3 position)
+        {
+            try
+            {
+                if (enemy.transform == null) return false;
+                Vector3 ep = enemy.transform.position;
+                float dx = ep.x - position.x;
+                float dy = ep.y - position.y;
+                return (dx * dx + dy * dy) <= (VictimMatchRadius * VictimMatchRadius);
+            }
+            catch
+            {
+                return false;
+            }
+        }
+
+        /// <summary>
         /// [2026-10-11] Appends the tuned-behaviour note to the Arrow of the Deep Cold description so the
         /// in-game text reflects what this mod changes (the authored string never changes on its own).
         /// </summary>
@@ -187,8 +236,12 @@ namespace ArrowOfTheDeepColdTuner
                 if (!IsActive) return true;
                 if (passives == null || passives.Pointer == IntPtr.Zero) return true;
 
-                var victim = CapturedVictim;
-                if (victim == null || victim.Pointer == IntPtr.Zero) return true;
+                // The Arrow branch of Damages.PassiveChecks passes victim.transform.position straight
+                // through, so the captured victim must sit at this position. If it does not (e.g. a nested
+                // PassiveChecks overwrote the capture), fall back to the enemy actually at this position so
+                // we never scale off the wrong target.
+                var victim = ResolveVictim(passives, position);
+                if (victim == null) return true;
 
                 int chillStacks = GetChillStacks(victim);
                 if (chillStacks <= 0) return true; // vanilla trigger would not fire anyway
