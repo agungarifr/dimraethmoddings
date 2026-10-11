@@ -76,7 +76,7 @@ namespace ArrowOfTheDeepColdTuner
     {
         public const string GUID = "com.custom.arrowofthedeepcoldtuner";
         public const string NAME = "Arrow of the Deep Cold Tuner";
-        public const string VERSION = "1.2.0";
+        public const string VERSION = "1.3.0";
 
         // [2026-10-11] Victim matching tolerances. The branch forwards victim.transform.position verbatim,
         // so a tight radius suffices; the search radius is only used to recover the enemy from the position
@@ -111,6 +111,11 @@ namespace ArrowOfTheDeepColdTuner
 
         public static ConfigEntry<bool> ShowTunedStatsInTooltip;
         public static ConfigEntry<bool> DiagnosticLogging;
+
+        // [2026-10-11] Mute the "appear" SFX of the giant ice arrows. The arrow prefab's SpellSound plays
+        // its _startingAudio (field offset 0x20) in SpellSound.Start(); we skip that Start for the arrow so
+        // the projectile appears silently. The impact SFX (SpellSound.PlayOnHitAudio) is left intact.
+        public static ConfigEntry<bool> MuteSpawnSound;
 
         // [2026-10-11] Per-damage context captured from the Damages.PassiveChecks prefix. The Arrow branch
         // consumes it synchronously (single call site), so this cannot leak across unrelated spawns.
@@ -164,6 +169,11 @@ namespace ArrowOfTheDeepColdTuner
             DiagnosticLogging = Config.Bind("Diagnostics", "DiagnosticLogging", false,
                 "Log each Arrow of the Deep Cold sequence (Chill stacks -> arrow count) to the BepInEx console. (Default: false)");
 
+            MuteSpawnSound = Config.Bind("Sound", "MuteSpawnSound", true,
+                "If true the giant ice arrow spawns silently: the arrow prefab's SpellSound._startingAudio (its " +
+                "\"appear\" SFX, played in SpellSound.Start) is skipped. The impact sound when the arrow hits is " +
+                "left intact. (Default: true)");
+
             // [2026-10-11] Frame-driven sequence driver. ClassInjector is required to host a managed
             // MonoBehaviour inside IL2CPP; DontDestroyOnLoad keeps it alive across scene changes.
             ClassInjector.RegisterTypeInIl2Cpp<ArrowSequenceDriver>();
@@ -175,6 +185,7 @@ namespace ArrowOfTheDeepColdTuner
             var harmony = new Harmony(GUID);
             PatchOrLog(harmony, typeof(Patch_Damages_PassiveChecks));
             PatchOrLog(harmony, typeof(Patch_Passives_SpawnArrowOfTheDeepCold));
+            PatchOrLog(harmony, typeof(Patch_SpellSound_Start));
             PatchOrLog(harmony, typeof(Patch_SpellTooltipDatabase_GetLocalizedDescription));
             PatchOrLog(harmony, typeof(Patch_SkillTreeNode_GetLocalizedDescription));
 
@@ -185,6 +196,7 @@ namespace ArrowOfTheDeepColdTuner
             Log.LogInfo($"Arrows: max={MaxArrows.Value}, sequence delay={FormatMultiplier(SequenceDelay.Value)}s");
             Log.LogInfo($"ShowTunedStatsInTooltip: {ShowTunedStatsInTooltip.Value}");
             Log.LogInfo($"DiagnosticLogging: {DiagnosticLogging.Value}");
+            Log.LogInfo($"MuteSpawnSound: {MuteSpawnSound.Value}");
             Log.LogInfo("=================================================");
         }
 
@@ -320,6 +332,36 @@ namespace ArrowOfTheDeepColdTuner
         internal static string FormatMultiplier(float value)
         {
             return value.ToString("0.##", CultureInfo.InvariantCulture);
+        }
+
+        /// <summary>
+        /// [2026-10-11] True when a <see cref="SpellSound"/> belongs to the Arrow of the Deep Cold projectile
+        /// prefab, so its spawn ("appear") SFX can be skipped. Matched by the owning prefab component first,
+        /// with a GameObject-name fallback.
+        /// </summary>
+        internal static bool IsArrowOfTheDeepColdSound(SpellSound sound)
+        {
+            if (sound == null || sound.Pointer == IntPtr.Zero) return false;
+
+            try
+            {
+                if (sound.GetComponentInParent<ArrowOfTheDeepColdPrefab>() != null) return true;
+            }
+            catch (Exception ex)
+            {
+                Log?.LogError($"[IsArrowOfTheDeepColdSound] component check: {ex}");
+            }
+
+            try
+            {
+                var go = sound.gameObject;
+                string n = go != null ? go.name : null;
+                return !string.IsNullOrEmpty(n) && n.Contains("ArrowOfTheDeepCold");
+            }
+            catch
+            {
+                return false;
+            }
         }
 
         // [2026-10-11] Re-entrancy guard around the driver's own SpawnArrowOfTheDeepCold calls.
@@ -565,6 +607,35 @@ namespace ArrowOfTheDeepColdTuner
             catch (Exception ex)
             {
                 ArrowOfTheDeepColdTunerPlugin.Log?.LogError($"[Patch_Passives_SpawnArrowOfTheDeepCold] {ex}");
+                return true;
+            }
+        }
+    }
+
+    /// <summary>
+    /// [2026-10-11] Prefix on <c>SpellSound.Start()</c>. The game plays a spell prefab's "appear" SFX here:
+    /// <c>_startingAudio</c> (field offset 0x20) is instantiated via FMOD and started at the transform
+    /// position. For the Arrow of the Deep Cold projectile we skip that Start entirely, so the giant ice
+    /// arrow spawns silently. <c>SpellSound.Update</c> and <c>OnDestroy</c> both guard on the (now
+    /// never-created) <c>_startingAudioInstance</c>, so skipping Start has no other effect. The impact SFX
+    /// (<c>SpellSound.PlayOnHitAudio</c>) is left intact.
+    /// </summary>
+    [HarmonyPatch(typeof(SpellSound), "Start")]
+    public static class Patch_SpellSound_Start
+    {
+        public static bool Prefix(SpellSound __instance)
+        {
+            try
+            {
+                if (!ArrowOfTheDeepColdTunerPlugin.IsActive) return true;
+                if (!ArrowOfTheDeepColdTunerPlugin.MuteSpawnSound.Value) return true;
+                if (!ArrowOfTheDeepColdTunerPlugin.IsArrowOfTheDeepColdSound(__instance)) return true;
+
+                return false; // skip SpellSound.Start -> no _startingAudio for this arrow
+            }
+            catch (Exception ex)
+            {
+                ArrowOfTheDeepColdTunerPlugin.Log?.LogError($"[Patch_SpellSound_Start] {ex}");
                 return true;
             }
         }

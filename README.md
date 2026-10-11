@@ -119,7 +119,7 @@ All under `modding\BepInExModsSource\`:
 
 - **AimedShotChargeTuner** — shortens the Aimed Shot charge/draw time (default: half) and extends its effective range (default x1.5), with a tuned-stats tooltip.
 - **AntiCheatBypassMod** — disables the game's anti-cheat checks.
-- **ArrowOfTheDeepColdTuner** — makes the Elemental Ranger "Arrow of the Deep Cold" keystone fire one giant piercing ice arrow per Chill stack on the hit enemy (up to 10), like Ember Cascade, and trigger it on every ranged hit against a Chilled enemy instead of only the vanilla third ranged attack. The arrows are emitted as a **sequence** (one arrow every 0.2s, matching Ember Cascade's fireball cadence) rather than a same-frame fan; the cadence is configurable via `Arrows/SequenceDelay`.
+- **ArrowOfTheDeepColdTuner** — makes the Elemental Ranger "Arrow of the Deep Cold" keystone fire one giant piercing ice arrow per Chill stack on the hit enemy (up to 10), like Ember Cascade, and trigger it on every ranged hit against a Chilled enemy instead of only the vanilla third ranged attack. The arrows are emitted as a **sequence** (one arrow every 0.2s, matching Ember Cascade's fireball cadence) rather than a same-frame fan; the cadence is configurable via `Arrows/SequenceDelay`. The arrows also spawn **silently** (the prefab's "appear" SFX is skipped; the impact sound is kept) via `Sound/MuteSpawnSound`.
 - **BarrageOfArrowsTuner** — tunes the Barrage of Arrows spell.
 - **ContagionTuner** — tunes the Contagion poison spell (ticks, duration, damage).
 - **DamageNumberTuner** — controls floating damage numbers (hotkey cycles modes).
