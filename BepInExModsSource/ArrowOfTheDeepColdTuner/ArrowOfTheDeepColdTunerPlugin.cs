@@ -24,14 +24,28 @@ namespace ArrowOfTheDeepColdTuner
     /// of Ember Cascade, which spawns <c>min(burningStacks, EmberCascadeMaxFireballs)</c> fireballs
     /// (<c>Passives.EmberCascadeCheck</c> -&gt; <c>CastFireballsAtTarget</c>).
     ///
-    /// The trigger condition is deliberately UNCHANGED: the third ranged attack, target must be Chilled.
-    /// We only change HOW MANY arrows the existing trigger spawns.
+    /// <!-- [2026-10-11] SUPERSEDED: "The trigger condition is deliberately UNCHANGED: the third ranged
+    ///      attack, target must be Chilled. We only change HOW MANY arrows the existing trigger spawns."
+    ///      The user later chose to ALSO widen the trigger to every ranged auto-attack against a Chilled
+    ///      enemy, so the original "single third-attack trigger" wording no longer describes this mod.
+    ///      The old wording is kept (commented) for history; the new behaviour is below. -->
+    ///
+    /// [2026-10-11] Trigger widened (config <c>Trigger/EveryRangedHit</c>, default true): the passive now
+    /// fires on EVERY ranged auto-attack against a Chilled enemy instead of only the vanilla third attack of
+    /// a combo. The vanilla gate is <c>Damage.FinalAttack</c> (field offset 0x44), which the game sets true
+    /// only when the combo shot index equals 3 (see <c>RangedAutoAttack</c>). Inside
+    /// <c>Damages.PassiveChecks</c> that flag is read in exactly one place - the Arrow branch - so we simply
+    /// arm it for the duration of the call when the hit is a ranged auto-attack against a Chilled enemy, and
+    /// restore it in the postfix. This keeps the vanilla spawn path (and therefore the arrow's own
+    /// damage/effects) intact and cannot double-spawn: on the genuine third hit the flag is already true, so
+    /// we leave it alone and the branch fires exactly once.
     ///
     /// Implementation:
-    ///   * Prefix on <c>Damages.PassiveChecks(Damage, ObjectsCommon victim, ObjectsCommon source)</c> to
-    ///     capture the exact victim the branch is about to shoot at. The branch calls
+    ///   * Prefix/Postfix on <c>Damages.PassiveChecks(Damage, ObjectsCommon victim, ObjectsCommon source)</c>.
+    ///     The prefix captures the exact victim the branch is about to shoot at (the branch calls
     ///     <c>SpawnArrowOfTheDeepCold</c> synchronously inside the same invocation, so a static capture is
-    ///     valid and cannot go stale (there is only one call site).
+    ///     valid and cannot go stale - there is only one call site) and, when the trigger widening applies,
+    ///     arms <c>Damage.FinalAttack</c> so the branch runs on every hit. The postfix restores it.
     ///   * Prefix on <c>Passives.SpawnArrowOfTheDeepCold(Vector3)</c>. It reads the captured victim's Chill
     ///     stacks, and if more than one arrow is due it fans <c>N</c> calls to the SAME method (which then
     ///     run the vanilla single-arrow body) and returns false so the original single arrow is skipped.
@@ -51,7 +65,7 @@ namespace ArrowOfTheDeepColdTuner
     {
         public const string GUID = "com.custom.arrowofthedeepcoldtuner";
         public const string NAME = "Arrow of the Deep Cold Tuner";
-        public const string VERSION = "1.0.0";
+        public const string VERSION = "1.1.0";
 
         // [2026-10-11] Victim matching tolerances. The branch forwards victim.transform.position verbatim,
         // so a tight radius suffices; the search radius is only used to recover the enemy from the position
@@ -63,6 +77,11 @@ namespace ArrowOfTheDeepColdTuner
         internal static ArrowOfTheDeepColdTunerPlugin Instance;
 
         public static ConfigEntry<bool> Enabled;
+
+        // [2026-10-11] Trigger widening. Vanilla fires the passive only on the third ranged attack of a
+        // combo (Damage.FinalAttack). When true we arm that flag on every ranged auto-attack against a
+        // Chilled enemy so the passive fires on each hit instead.
+        public static ConfigEntry<bool> EveryRangedHit;
 
         // [2026-10-11] Arrow count scaling. Vanilla always spawns exactly one arrow; we spawn one per Chill
         // stack, capped here (Ember Cascade caps at Passives.EmberCascadeMaxFireballs == 10).
@@ -90,6 +109,11 @@ namespace ArrowOfTheDeepColdTuner
 
             Enabled = Config.Bind("General", "Enabled", true,
                 "Master switch. When false Arrow of the Deep Cold spawns its vanilla single arrow. (Default: true)");
+
+            EveryRangedHit = Config.Bind("Trigger", "EveryRangedHit", true,
+                "If true Arrow of the Deep Cold fires on EVERY ranged auto-attack against a Chilled enemy, " +
+                "instead of only the vanilla third ranged attack of a combo. If false the vanilla third-attack " +
+                "trigger is kept and only the arrow count scaling applies. (Default: true)");
 
             MaxArrows = Config.Bind("Arrows", "MaxArrows", 10,
                 "Maximum number of giant piercing ice arrows fired, one per Chill stack on the hit enemy. " +
@@ -121,6 +145,7 @@ namespace ArrowOfTheDeepColdTuner
             Log.LogInfo("=================================================");
             Log.LogInfo($"{NAME} v{VERSION} loaded.");
             Log.LogInfo($"Enabled: {Enabled.Value}");
+            Log.LogInfo($"EveryRangedHit: {EveryRangedHit.Value}");
             Log.LogInfo($"Arrows: max={MaxArrows.Value}, fan={FanEnabled.Value} (spread={FormatMultiplier(FanSpreadDegrees.Value)} deg)");
             Log.LogInfo($"ShowTunedStatsInTooltip: {ShowTunedStatsInTooltip.Value}");
             Log.LogInfo($"DiagnosticLogging: {DiagnosticLogging.Value}");
@@ -160,6 +185,35 @@ namespace ArrowOfTheDeepColdTuner
                 Log?.LogError($"[GetChillStacks] {ex}");
                 return 0;
             }
+        }
+
+        /// <summary>
+        /// [2026-10-11] Widens the vanilla trigger: arms <c>Damage.FinalAttack</c> so the Arrow branch of
+        /// <c>Damages.PassiveChecks</c> runs on every ranged auto-attack against a Chilled enemy, not just
+        /// the third attack of a combo. Returns true when the flag was armed and must be restored by the
+        /// caller (the <c>PassiveChecks</c> postfix).
+        ///
+        /// Safety: inside <c>Damages.PassiveChecks</c> <c>FinalAttack</c> is read only by the Arrow branch,
+        /// and the flag is restored the moment the method returns, so no other damage logic observes the
+        /// temporary value. On the genuine third hit the flag is already true, so we leave it untouched and
+        /// the branch fires exactly once (no double spawn).
+        /// </summary>
+        internal static bool ArmEveryRangedHit(Damage damage, ObjectsCommon victim)
+        {
+            if (!IsActive || !EveryRangedHit.Value) return false;
+            if (damage == null || damage.Pointer == IntPtr.Zero) return false;
+
+            // Arrow only ever procs from auto attacks: the vanilla branch sits inside an IsFromAuto block.
+            if (!damage.IsFromAuto) return false;
+
+            // The genuine third ranged attack already has FinalAttack set; the branch will fire as-is.
+            if (damage.FinalAttack) return false;
+
+            // Only widen when the target is actually Chilled (the branch requires Chill > 0 anyway).
+            if (GetChillStacks(victim) <= 0) return false;
+
+            damage.FinalAttack = true;
+            return true;
         }
 
         /// <summary>
@@ -214,7 +268,16 @@ namespace ArrowOfTheDeepColdTuner
             if (!ShowTunedStatsInTooltip.Value) return null;
 
             int max = Math.Max(1, MaxArrows.Value);
-            return "\n\n[Deep Cold Tuner] On hitting a Chilled enemy with a ranged attack, fires one giant " +
+
+            // [2026-10-11] Superseded wording (kept for history): it only described the Chill-stack scaling
+            // and left the trigger implicit. The trigger is now widened to every ranged hit, so the note
+            // below states both. Old text:
+            // return "\n\n[Deep Cold Tuner] On hitting a Chilled enemy with a ranged attack, fires one giant " +
+            //        $"piercing ice arrow per Chill stack, up to {max}.";
+            string trigger = EveryRangedHit != null && EveryRangedHit.Value
+                ? "Every ranged hit"
+                : "The third ranged attack";
+            return $"\n\n[Deep Cold Tuner] {trigger} against a Chilled enemy fires one giant " +
                    $"piercing ice arrow per Chill stack, up to {max}.";
         }
 
@@ -298,19 +361,50 @@ namespace ArrowOfTheDeepColdTuner
     }
 
     /// <summary>
-    /// [2026-10-11] Prefix on the private <c>Damages.PassiveChecks(Damage damage, ObjectsCommon victim,
-    /// ObjectsCommon source)</c>. Captures the victim so the Arrow of the Deep Cold branch's synchronous
-    /// <c>SpawnArrowOfTheDeepCold</c> call can read that enemy's Chill stacks. The Arrow branch is the only
-    /// caller of <c>SpawnArrowOfTheDeepCold</c>, so the capture cannot be consumed by an unrelated spawn.
+    /// [2026-10-11] Prefix/Postfix on the private <c>Damages.PassiveChecks(Damage damage, ObjectsCommon victim,
+    /// ObjectsCommon source)</c>.
+    ///
+    /// The prefix captures the victim so the Arrow of the Deep Cold branch's synchronous
+    /// <c>SpawnArrowOfTheDeepCold</c> call can read that enemy's Chill stacks (the Arrow branch is the only
+    /// caller of <c>SpawnArrowOfTheDeepCold</c>, so the capture cannot be consumed by an unrelated spawn).
+    /// It also widens the trigger: when <c>Trigger/EveryRangedHit</c> is enabled and this call is a ranged
+    /// auto-attack against a Chilled enemy, it arms <c>Damage.FinalAttack</c> so the branch fires on every
+    /// hit rather than only the vanilla third attack. The postfix restores the flag.
     /// </summary>
     [HarmonyPatch(typeof(Damages), "PassiveChecks")]
     public static class Patch_Damages_PassiveChecks
     {
         // Positional binding: __0 = Damage, __1 = victim, __2 = source. We bind by index rather than
         // by name because this is a private method and interop parameter names are not guaranteed.
-        public static void Prefix(ObjectsCommon __1)
+        public static void Prefix(Damage __0, ObjectsCommon __1, out bool __state)
         {
+            __state = false;
             ArrowOfTheDeepColdTunerPlugin.CapturedVictim = __1;
+
+            try
+            {
+                __state = ArrowOfTheDeepColdTunerPlugin.ArmEveryRangedHit(__0, __1);
+            }
+            catch (Exception ex)
+            {
+                ArrowOfTheDeepColdTunerPlugin.Log?.LogError($"[Patch_Damages_PassiveChecks.Prefix] {ex}");
+            }
+        }
+
+        // Restores the vanilla FinalAttack value we temporarily armed so no code outside PassiveChecks
+        // ever observes the widened trigger.
+        public static void Postfix(Damage __0, bool __state)
+        {
+            if (!__state || __0 == null) return;
+
+            try
+            {
+                __0.FinalAttack = false;
+            }
+            catch (Exception ex)
+            {
+                ArrowOfTheDeepColdTunerPlugin.Log?.LogError($"[Patch_Damages_PassiveChecks.Postfix] {ex}");
+            }
         }
     }
 

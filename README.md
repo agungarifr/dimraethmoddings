@@ -119,7 +119,7 @@ All under `modding\BepInExModsSource\`:
 
 - **AimedShotChargeTuner** — shortens the Aimed Shot charge/draw time (default: half) and extends its effective range (default x1.5), with a tuned-stats tooltip.
 - **AntiCheatBypassMod** — disables the game's anti-cheat checks.
-- **ArrowOfTheDeepColdTuner** — makes the Elemental Ranger "Arrow of the Deep Cold" keystone fire one giant piercing ice arrow per Chill stack on the hit enemy (up to 10), like Ember Cascade.
+- **ArrowOfTheDeepColdTuner** — makes the Elemental Ranger "Arrow of the Deep Cold" keystone fire one giant piercing ice arrow per Chill stack on the hit enemy (up to 10), like Ember Cascade, and trigger it on every ranged hit against a Chilled enemy instead of only the vanilla third ranged attack.
 - **BarrageOfArrowsTuner** — tunes the Barrage of Arrows spell.
 - **ContagionTuner** — tunes the Contagion poison spell (ticks, duration, damage).
 - **DamageNumberTuner** — controls floating damage numbers (hotkey cycles modes).
