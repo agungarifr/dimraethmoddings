@@ -1,10 +1,12 @@
 using System;
+using System.Collections.Generic;
 using System.Globalization;
 using BepInEx;
 using BepInEx.Configuration;
 using BepInEx.Logging;
 using BepInEx.Unity.IL2CPP;
 using HarmonyLib;
+using Il2CppInterop.Runtime.Injection;
 using UnityEngine;
 
 namespace ArrowOfTheDeepColdTuner
@@ -23,6 +25,21 @@ namespace ArrowOfTheDeepColdTuner
     /// victim instead of a single arrow, capped at <c>Arrows.MaxArrows</c> (default 10) - the exact shape
     /// of Ember Cascade, which spawns <c>min(burningStacks, EmberCascadeMaxFireballs)</c> fireballs
     /// (<c>Passives.EmberCascadeCheck</c> -&gt; <c>CastFireballsAtTarget</c>).
+    ///
+    /// [2026-10-11] SEQUENCED, not fanned. v1.1.0 spawned all N arrows in the same frame in a shotgun
+    /// fan; that is NOT what Ember Cascade does. Ember Cascade runs a coroutine
+    /// (<c>Passives+&lt;CastFireballsAtTarget&gt;d__192</c>) that yields <c>new WaitForSeconds(0.2f)</c>
+    /// between spawns (constant <c>0x184678CEC = 0.2f</c>, resolved from the current GameAssembly.dll),
+    /// so its projectiles come out ONE AT A TIME, 0.2s apart, each re-targeted at the live victim object.
+    /// We now reproduce that cadence with a frame-driven driver (<see cref="ArrowSequenceDriver"/>):
+    /// one arrow every <c>Arrows.SequenceDelay</c> seconds (default 0.2, matching Ember Cascade), each
+    /// spawned at the victim's current position via the vanilla <c>SpawnArrowOfTheDeepCold</c>.
+    ///
+    /// <!-- [2026-10-11] SUPERSEDED: v1.1.0 fanned the arrows in the same frame. Kept for history:
+    ///      "Geometry: ... Offsetting each spawn position perpendicular to the caster->victim line
+    ///      therefore fans the arrows into a shotgun spread around the victim." The user pointed out
+    ///      Ember Cascade sequences its projectiles, so the fan was replaced by the sequenced driver
+    ///      below; the fan config keys are preserved (commented) further down. -->
     ///
     /// <!-- [2026-10-11] SUPERSEDED: "The trigger condition is deliberately UNCHANGED: the third ranged
     ///      attack, target must be Chilled. We only change HOW MANY arrows the existing trigger spawns."
@@ -47,16 +64,10 @@ namespace ArrowOfTheDeepColdTuner
     ///     valid and cannot go stale - there is only one call site) and, when the trigger widening applies,
     ///     arms <c>Damage.FinalAttack</c> so the branch runs on every hit. The postfix restores it.
     ///   * Prefix on <c>Passives.SpawnArrowOfTheDeepCold(Vector3)</c>. It reads the captured victim's Chill
-    ///     stacks, and if more than one arrow is due it fans <c>N</c> calls to the SAME method (which then
-    ///     run the vanilla single-arrow body) and returns false so the original single arrow is skipped.
-    ///     A re-entrancy guard makes the nested calls take the vanilla path.
-    ///
-    /// Geometry: the arrow prefab erupts AT the target location and travels outward, away from the caster
-    /// (<c>ArrowOfTheDeepColdPrefab.OnStart</c> sets <c>_targetPosition = self + normalize(self - _owner) * d</c>).
-    /// Offsetting each spawn position perpendicular to the caster-&gt;victim line therefore fans the arrows
-    /// into a shotgun spread around the victim; the caster position is the Passives component's own
-    /// transform (Passives lives on the player GameObject - <c>Damages.PassiveChecks</c> obtains it via
-    /// <c>source.GetComponent&lt;Passives&gt;()</c>).
+    ///     stacks, and if more than one arrow is due it hands the spawn to <see cref="ArrowSequenceDriver"/>
+    ///     (which spawns one arrow every <c>SequenceDelay</c> seconds) and returns false so the original
+    ///     single arrow is skipped. A re-entrancy guard makes the driver's own nested calls take the vanilla
+    ///     path.
     ///
     /// Co-op: spawning happens through the game's own spell path, so run the SAME config on host and client.
     /// </summary>
@@ -65,7 +76,7 @@ namespace ArrowOfTheDeepColdTuner
     {
         public const string GUID = "com.custom.arrowofthedeepcoldtuner";
         public const string NAME = "Arrow of the Deep Cold Tuner";
-        public const string VERSION = "1.1.0";
+        public const string VERSION = "1.2.0";
 
         // [2026-10-11] Victim matching tolerances. The branch forwards victim.transform.position verbatim,
         // so a tight radius suffices; the search radius is only used to recover the enemy from the position
@@ -87,9 +98,16 @@ namespace ArrowOfTheDeepColdTuner
         // stack, capped here (Ember Cascade caps at Passives.EmberCascadeMaxFireballs == 10).
         public static ConfigEntry<int> MaxArrows;
 
-        // [2026-10-11] Fan geometry for the extra arrows.
-        public static ConfigEntry<bool> FanEnabled;
-        public static ConfigEntry<float> FanSpreadDegrees;
+        // [2026-10-11] Sequenced-spawn cadence. Ember Cascade yields WaitForSeconds(0.2f) between fireballs;
+        // we match that with a per-arrow delay (default 0.2s).
+        public static ConfigEntry<float> SequenceDelay;
+
+        // <!-- [2026-10-11] SUPERSEDED by the sequenced driver: v1.1.0 exposed a same-frame fan geometry.
+        //      Ember Cascade does not fan - it sequences - so these keys are obsolete. Kept (commented) so
+        //      the history and the reason for the change are preserved; they are no longer bound or read.
+        // public static ConfigEntry<bool> FanEnabled;
+        // public static ConfigEntry<float> FanSpreadDegrees;
+        // -->
 
         public static ConfigEntry<bool> ShowTunedStatsInTooltip;
         public static ConfigEntry<bool> DiagnosticLogging;
@@ -98,9 +116,11 @@ namespace ArrowOfTheDeepColdTuner
         // consumes it synchronously (single call site), so this cannot leak across unrelated spawns.
         internal static ObjectsCommon CapturedVictim;
 
-        // [2026-10-11] Re-entrancy guard: true while we are fanning out the N nested SpawnArrowOfTheDeepCold
-        // calls, so those nested calls fall through to the vanilla single-arrow body instead of fanning again.
-        private static bool _fanningOut;
+        // [2026-10-11] Re-entrancy guard: >0 while the sequenced driver is making its own
+        // SpawnArrowOfTheDeepCold calls, so those calls fall through to the vanilla single-arrow body
+        // instead of enqueueing another sequence. The call is synchronous on the Unity main thread, so a
+        // genuine proc (from Damages.PassiveChecks) can never observe this depth mid-flight.
+        private static int _sequenceSpawnDepth;
 
         public override void Load()
         {
@@ -120,21 +140,37 @@ namespace ArrowOfTheDeepColdTuner
                 "Matches Ember Cascade's cap of 10 (Passives.EmberCascadeMaxFireballs). Values below 1 are " +
                 "treated as 1. (Default: 10)");
 
-            FanEnabled = Config.Bind("Arrows", "FanEnabled", true,
-                "If true the extra arrows are fanned out around the victim (perpendicular to the caster-to-victim " +
-                "line) so the count is visible and they pierce a wider area. If false all arrows spawn at the " +
-                "victim's exact position and overlap. (Default: true)");
+            // [2026-10-11] Replaces the obsolete same-frame fan. Ember Cascade sequences its projectiles
+            // (WaitForSeconds(0.2f) between each), so the arrows are now emitted one at a time on this delay.
+            SequenceDelay = Config.Bind("Arrows", "SequenceDelay", 0.2f,
+                "Seconds between each arrow of the sequence (Ember Cascade yields WaitForSeconds(0.2f) between " +
+                "fireballs, so 0.2 matches it). Larger = a slower, more spread-out volley. (Default: 0.2)");
 
-            FanSpreadDegrees = Config.Bind("Arrows", "FanSpreadDegrees", 40.0f,
-                "Total angular spread (degrees) of the fan, centred on the caster-to-victim direction. " +
-                "Larger = wider shotgun spread. Only used when FanEnabled is true. (Default: 40)");
+            // <!-- [2026-10-11] SUPERSEDED: the same-frame fan config. Replaced by Arrows/SequenceDelay
+            //      because Ember Cascade sequences rather than fans.
+            // FanEnabled = Config.Bind("Arrows", "FanEnabled", true,
+            //     "If true the extra arrows are fanned out around the victim (perpendicular to the caster-to-victim " +
+            //     "line) so the count is visible and they pierce a wider area. If false all arrows spawn at the " +
+            //     "victim's exact position and overlap. (Default: true)");
+            // FanSpreadDegrees = Config.Bind("Arrows", "FanSpreadDegrees", 40.0f,
+            //     "Total angular spread (degrees) of the fan, centred on the caster-to-victim direction. " +
+            //     "Larger = wider shotgun spread. Only used when FanEnabled is true. (Default: 40)");
+            // -->
 
             ShowTunedStatsInTooltip = Config.Bind("Tooltip", "ShowTunedStats", true,
                 "Append a short note describing the Chill-stack arrow scaling to the Arrow of the Deep Cold spell " +
                 "description and skill-tree node text. (Default: true)");
 
             DiagnosticLogging = Config.Bind("Diagnostics", "DiagnosticLogging", false,
-                "Log each Arrow of the Deep Cold spawn (Chill stacks -> arrow count) to the BepInEx console. (Default: false)");
+                "Log each Arrow of the Deep Cold sequence (Chill stacks -> arrow count) to the BepInEx console. (Default: false)");
+
+            // [2026-10-11] Frame-driven sequence driver. ClassInjector is required to host a managed
+            // MonoBehaviour inside IL2CPP; DontDestroyOnLoad keeps it alive across scene changes.
+            ClassInjector.RegisterTypeInIl2Cpp<ArrowSequenceDriver>();
+            var go = new GameObject("ArrowOfTheDeepColdTuner");
+            go.hideFlags = HideFlags.HideAndDontSave;
+            UnityEngine.Object.DontDestroyOnLoad(go);
+            go.AddComponent<ArrowSequenceDriver>();
 
             var harmony = new Harmony(GUID);
             PatchOrLog(harmony, typeof(Patch_Damages_PassiveChecks));
@@ -146,7 +182,7 @@ namespace ArrowOfTheDeepColdTuner
             Log.LogInfo($"{NAME} v{VERSION} loaded.");
             Log.LogInfo($"Enabled: {Enabled.Value}");
             Log.LogInfo($"EveryRangedHit: {EveryRangedHit.Value}");
-            Log.LogInfo($"Arrows: max={MaxArrows.Value}, fan={FanEnabled.Value} (spread={FormatMultiplier(FanSpreadDegrees.Value)} deg)");
+            Log.LogInfo($"Arrows: max={MaxArrows.Value}, sequence delay={FormatMultiplier(SequenceDelay.Value)}s");
             Log.LogInfo($"ShowTunedStatsInTooltip: {ShowTunedStatsInTooltip.Value}");
             Log.LogInfo($"DiagnosticLogging: {DiagnosticLogging.Value}");
             Log.LogInfo("=================================================");
@@ -278,7 +314,7 @@ namespace ArrowOfTheDeepColdTuner
                 ? "Every ranged hit"
                 : "The third ranged attack";
             return $"\n\n[Deep Cold Tuner] {trigger} against a Chilled enemy fires one giant " +
-                   $"piercing ice arrow per Chill stack, up to {max}.";
+                   $"piercing ice arrow per Chill stack, in sequence, up to {max}.";
         }
 
         internal static string FormatMultiplier(float value)
@@ -286,13 +322,28 @@ namespace ArrowOfTheDeepColdTuner
             return value.ToString("0.##", CultureInfo.InvariantCulture);
         }
 
+        // [2026-10-11] Re-entrancy guard around the driver's own SpawnArrowOfTheDeepCold calls.
+        internal static void BeginSequenceSpawn()
+        {
+            _sequenceSpawnDepth++;
+        }
+
+        internal static void EndSequenceSpawn()
+        {
+            if (_sequenceSpawnDepth > 0) _sequenceSpawnDepth--;
+        }
+
+        internal static bool IsSequenceSpawn => _sequenceSpawnDepth > 0;
+
         /// <summary>
-        /// [2026-10-11] Fans out the Arrow of the Deep Cold spawn: instead of the vanilla single arrow we call
-        /// <c>SpawnArrowOfTheDeepCold</c> once per Chill stack (capped) with positions spread perpendicular to
-        /// the caster-to-victim line. Called from the SpawnArrowOfTheDeepCold prefix. Returns true when the
-        /// vanilla single arrow should still run (not enabled / not scaling / on error).
+        /// [2026-10-11] Queues a sequenced volley instead of the vanilla single arrow. Called from the
+        /// SpawnArrowOfTheDeepCold prefix. Returns true when the vanilla single arrow should still run
+        /// (not enabled / not scaling / on error / driver not ready).
+        ///
+        /// The sequence itself is driven frame-by-frame by <see cref="ArrowSequenceDriver"/> so the arrows
+        /// come out one at a time (like Ember Cascade), rather than all in the same frame.
         /// </summary>
-        internal static bool TrySpawnFannedArrows(Passives passives, Vector3 position)
+        internal static bool TryStartArrowSequence(Passives passives, Vector3 position)
         {
             try
             {
@@ -312,52 +363,136 @@ namespace ArrowOfTheDeepColdTuner
                 int count = Math.Min(chillStacks, Math.Max(1, MaxArrows.Value));
                 if (count <= 1) return true; // one arrow == vanilla; let the original run
 
-                // Caster position: Passives is a component on the player GameObject, so its own transform is
-                // the caster. (Damages.PassiveChecks reaches it with source.GetComponent<Passives>().)
-                Vector3 origin = passives.transform != null ? passives.transform.position : position;
-                Vector2 toVictim = new Vector2(position.x - origin.x, position.y - origin.y);
-                Vector2 dir = toVictim.sqrMagnitude > 0.0001f ? toVictim.normalized : Vector2.right;
-                Vector2 perp = new Vector2(-dir.y, dir.x);
+                var driver = ArrowSequenceDriver.Instance;
+                if (driver == null) return true; // driver not ready yet; fall back to the vanilla single arrow
 
-                float spreadRad = (FanEnabled.Value ? FanSpreadDegrees.Value : 0f) * Mathf.Deg2Rad;
-                float halfWidth = (float)Math.Tan(spreadRad * 0.5) * Math.Max(toVictim.magnitude, 1f);
-
-                _fanningOut = true;
-                try
-                {
-                    for (int i = 0; i < count; i++)
-                    {
-                        // -0.5 .. +0.5 across the fan, symmetric around the victim.
-                        float t = count > 1 ? (i / (float)(count - 1)) - 0.5f : 0f;
-                        Vector2 off = perp * (t * 2f * halfWidth);
-                        Vector3 p = new Vector3(position.x + off.x, position.y + off.y, position.z);
-
-                        // Re-enters this prefix; the guard makes it run the vanilla single-arrow body.
-                        passives.SpawnArrowOfTheDeepCold(p);
-                    }
-                }
-                finally
-                {
-                    _fanningOut = false;
-                }
+                float delay = Math.Max(0.01f, SequenceDelay.Value);
+                driver.Enqueue(passives, victim, position, count, delay);
 
                 if (DiagnosticLogging.Value)
                 {
-                    Log.LogInfo($"[ArrowOfTheDeepCold] chill={chillStacks} -> {count} arrows " +
-                                $"(spread={FormatMultiplier(FanSpreadDegrees.Value)} deg, fan={FanEnabled.Value})");
+                    Log.LogInfo($"[ArrowOfTheDeepCold] chill={chillStacks} -> {count} arrows, " +
+                                $"one every {FormatMultiplier(delay)}s (sequenced)");
                 }
 
-                return false; // skip the vanilla single arrow; we already spawned the fan
+                return false; // skip the vanilla single arrow; the driver will emit the sequence
             }
             catch (Exception ex)
             {
-                _fanningOut = false;
-                Log?.LogError($"[TrySpawnFannedArrows] {ex}");
+                Log?.LogError($"[TryStartArrowSequence] {ex}");
                 return true;
             }
         }
+    }
 
-        internal static bool IsFanningOut => _fanningOut;
+    /// <summary>
+    /// [2026-10-11] Frame-driven spawn driver. Ember Cascade sequences its fireballs with
+    /// <c>WaitForSeconds(0.2f)</c> inside a coroutine; rather than risk managed-IEnumerator/coroutine
+    /// interop we tick the same cadence here in <c>Update()</c>. Each queued sequence emits one arrow every
+    /// <c>SequenceDelay</c> seconds at the victim's current position, until its count is exhausted - the
+    /// same shape as <c>Passives+&lt;CastFireballsAtTarget&gt;d__192</c>.
+    /// </summary>
+    public sealed class ArrowSequenceDriver : MonoBehaviour
+    {
+        // Required so Il2CppInterop can construct the injected type.
+        public ArrowSequenceDriver(IntPtr ptr) : base(ptr) { }
+
+        internal static ArrowSequenceDriver Instance;
+
+        private sealed class Sequence
+        {
+            public Passives Passives;
+            public ObjectsCommon Victim;
+            public Vector3 LastPosition;
+            public int Remaining;
+            public float Timer;
+        }
+
+        private readonly List<Sequence> _sequences = new List<Sequence>();
+
+        private void Awake()
+        {
+            Instance = this;
+        }
+
+        /// <summary>[2026-10-11] Queues a volley. Timer starts at <paramref name="delay"/> so the first
+        /// arrow is emitted one delay after the proc, matching Ember Cascade (which waits before its first
+        /// fireball).</summary>
+        internal void Enqueue(Passives passives, ObjectsCommon victim, Vector3 position, int count, float delay)
+        {
+            // Safety cap: never let a pathological chain of procs grow this without bound.
+            if (_sequences.Count >= 64) _sequences.RemoveAt(0);
+
+            _sequences.Add(new Sequence
+            {
+                Passives = passives,
+                Victim = victim,
+                LastPosition = position,
+                Remaining = count,
+                Timer = delay,
+            });
+        }
+
+        private void Update()
+        {
+            if (_sequences.Count == 0) return;
+
+            float dt = Time.deltaTime;
+
+            for (int i = _sequences.Count - 1; i >= 0; i--)
+            {
+                Sequence seq = _sequences[i];
+                seq.Timer -= dt;
+                if (seq.Timer > 0f) continue;
+
+                // Re-target the live victim each tick (Ember Cascade passes the target object, so its
+                // fireballs track it). If the victim is gone we keep firing at the last known position so
+                // the remaining piercing arrows still land where it died.
+                try
+                {
+                    if (seq.Victim != null && seq.Victim.Pointer != IntPtr.Zero)
+                    {
+                        var tr = seq.Victim.transform;
+                        if (tr != null) seq.LastPosition = tr.position;
+                    }
+                }
+                catch
+                {
+                    // Victim transform vanished mid-sequence; fall through and use the last position.
+                }
+
+                SpawnOne(seq.Passives, seq.LastPosition);
+
+                seq.Remaining--;
+                if (seq.Remaining <= 0)
+                {
+                    _sequences.RemoveAt(i);
+                    continue;
+                }
+
+                seq.Timer = Math.Max(0.01f, ArrowOfTheDeepColdTunerPlugin.SequenceDelay.Value);
+            }
+        }
+
+        private static void SpawnOne(Passives passives, Vector3 position)
+        {
+            if (passives == null || passives.Pointer == IntPtr.Zero) return;
+
+            ArrowOfTheDeepColdTunerPlugin.BeginSequenceSpawn();
+            try
+            {
+                // Re-enters the patched method; the guard makes it run the vanilla single-arrow body.
+                passives.SpawnArrowOfTheDeepCold(position);
+            }
+            catch (Exception ex)
+            {
+                ArrowOfTheDeepColdTunerPlugin.Log?.LogError($"[ArrowSequenceDriver.SpawnOne] {ex}");
+            }
+            finally
+            {
+                ArrowOfTheDeepColdTunerPlugin.EndSequenceSpawn();
+            }
+        }
     }
 
     /// <summary>
@@ -411,8 +546,8 @@ namespace ArrowOfTheDeepColdTuner
     /// <summary>
     /// [2026-10-11] Prefix on <c>Passives.SpawnArrowOfTheDeepCold(Vector3 position)</c> - the single point
     /// that spawns the Arrow of the Deep Cold projectile. When the captured victim has multiple Chill stacks
-    /// we spawn one arrow per stack (fanned) and skip the vanilla single arrow; otherwise the vanilla body
-    /// runs unchanged.
+    /// we queue a sequenced volley (one arrow per stack, one at a time) and skip the vanilla single arrow;
+    /// otherwise the vanilla body runs unchanged.
     /// </summary>
     [HarmonyPatch(typeof(Passives), "SpawnArrowOfTheDeepCold")]
     public static class Patch_Passives_SpawnArrowOfTheDeepCold
@@ -420,12 +555,12 @@ namespace ArrowOfTheDeepColdTuner
         // Positional binding: __0 = Vector3 position.
         public static bool Prefix(Passives __instance, Vector3 __0)
         {
-            // Nested calls made while fanning out must run the vanilla single-arrow body.
-            if (ArrowOfTheDeepColdTunerPlugin.IsFanningOut) return true;
+            // Calls made by the sequenced driver must run the vanilla single-arrow body.
+            if (ArrowOfTheDeepColdTunerPlugin.IsSequenceSpawn) return true;
 
             try
             {
-                return ArrowOfTheDeepColdTunerPlugin.TrySpawnFannedArrows(__instance, __0);
+                return ArrowOfTheDeepColdTunerPlugin.TryStartArrowSequence(__instance, __0);
             }
             catch (Exception ex)
             {
