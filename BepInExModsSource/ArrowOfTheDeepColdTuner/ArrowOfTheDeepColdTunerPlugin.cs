@@ -253,9 +253,11 @@ namespace ArrowOfTheDeepColdTuner
     [HarmonyPatch(typeof(Damages), "PassiveChecks")]
     public static class Patch_Damages_PassiveChecks
     {
-        public static void Prefix(ObjectsCommon victim)
+        // Positional binding: __0 = Damage, __1 = victim, __2 = source. We bind by index rather than
+        // by name because this is a private method and interop parameter names are not guaranteed.
+        public static void Prefix(ObjectsCommon __1)
         {
-            ArrowOfTheDeepColdTunerPlugin.CapturedVictim = victim;
+            ArrowOfTheDeepColdTunerPlugin.CapturedVictim = __1;
         }
     }
 
@@ -268,14 +270,15 @@ namespace ArrowOfTheDeepColdTuner
     [HarmonyPatch(typeof(Passives), "SpawnArrowOfTheDeepCold")]
     public static class Patch_Passives_SpawnArrowOfTheDeepCold
     {
-        public static bool Prefix(Passives __instance, Vector3 position)
+        // Positional binding: __0 = Vector3 position.
+        public static bool Prefix(Passives __instance, Vector3 __0)
         {
             // Nested calls made while fanning out must run the vanilla single-arrow body.
             if (ArrowOfTheDeepColdTunerPlugin.IsFanningOut) return true;
 
             try
             {
-                return ArrowOfTheDeepColdTunerPlugin.TrySpawnFannedArrows(__instance, position);
+                return ArrowOfTheDeepColdTunerPlugin.TrySpawnFannedArrows(__instance, __0);
             }
             catch (Exception ex)
             {
@@ -293,12 +296,13 @@ namespace ArrowOfTheDeepColdTuner
     [HarmonyPatch(typeof(SpellTooltipDatabase), "GetLocalizedDescription")]
     public static class Patch_SpellTooltipDatabase_GetLocalizedDescription
     {
-        public static void Postfix(Spell spell, ref string __result)
+        // Positional binding: __0 = Spell spell.
+        public static void Postfix(Spell __0, ref string __result)
         {
             try
             {
                 if (!ArrowOfTheDeepColdTunerPlugin.IsActive) return;
-                if (spell != Spell.ArrowOfTheDeepCold) return;
+                if (__0 != Spell.ArrowOfTheDeepCold) return;
 
                 string suffix = ArrowOfTheDeepColdTunerPlugin.BuildTooltipSuffix();
                 if (string.IsNullOrEmpty(suffix)) return;
