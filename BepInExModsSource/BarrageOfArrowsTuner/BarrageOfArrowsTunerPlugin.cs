@@ -1,10 +1,12 @@
 using System;
 using System.Globalization;
+using System.Reflection;
 using BepInEx;
 using BepInEx.Configuration;
 using BepInEx.Logging;
 using BepInEx.Unity.IL2CPP;
 using HarmonyLib;
+using Il2CppInterop.Runtime;
 using Il2CppInterop.Runtime.InteropTypes;
 using UnityEngine;
 using Il2CppGenerics = Il2CppSystem.Collections.Generic;
@@ -41,7 +43,7 @@ namespace BarrageOfArrowsTuner
     {
         public const string GUID = "com.custom.barrageofarrowstuner";
         public const string NAME = "Barrage of Arrows Tuner";
-        public const string VERSION = "1.1.0";
+        public const string VERSION = "1.2.0";
 
         internal static new ManualLogSource Log;
         internal static BarrageOfArrowsTunerPlugin Instance;
@@ -67,7 +69,8 @@ namespace BarrageOfArrowsTuner
         public static ConfigEntry<float> DragDashTime;
         public static ConfigEntry<float> DragDistanceMultiplier;
 
-        // [2026-10-07] Field offsets verified against this build's decompiled metadata.
+        // [2026-10-14] Field offsets resolved at runtime via IL2CPP metadata (fallbacks from 10/7/2026 dump).
+        // Game update shifted class layouts - hardcoded 0x2F4/0x288 were stale.
         internal static int BarrageOfArrowsOffset = 0x2F4; // HailOfArrowsPrefab._barrageOfArrows (bool)
         internal static int AoeColliderOffset = 0x288;      // AreaOfEffect._aoeCollider (Collider2D)
         internal static float LastDragTime = float.NegativeInfinity;
@@ -83,6 +86,9 @@ namespace BarrageOfArrowsTuner
         {
             Instance = this;
             Log = base.Log;
+
+            // Resolve field offsets from current build's IL2CPP metadata before installing patches.
+            ResolveOffsets();
 
             Enabled = Config.Bind("General", "Enabled", true,
                 "Master switch. When false no Barrage of Arrows behaviour is modified. (Default: true)");
@@ -106,8 +112,8 @@ namespace BarrageOfArrowsTuner
             ShowTunedStatsInTooltip = Config.Bind("Tooltip", "ShowTunedStats", true,
                 "Append a tuned-stats line to the 'Barrage of Arrows' upgrade text (spell tooltip modifier row and codex entry) so the in-game description matches what this mod changes. (Default: true)");
 
-            DiagnosticLogging = Config.Bind("Diagnostics", "LogBarrageValues", false,
-                "Log barrage point selection and poison pool decisions to the BepInEx console. (Default: false)");
+            DiagnosticLogging = Config.Bind("Diagnostics", "LogBarrageValues", true,
+                "Log barrage point selection and poison pool decisions to the BepInEx console. (Default: true)");
 
             // [2026-10-07] Base Hail of Arrows impact-AoE scaling. The base (channeled) spell drops
             // HailOfArrowsArrowPrefab arrows; each arrow's AreaOfEffect trigger collider is the actual hit area
@@ -192,6 +198,66 @@ namespace BarrageOfArrowsTuner
         }
 
         /// <summary>
+        /// Resolves field offsets from the current build's IL2CPP metadata. Fallback to verified
+        /// offsets from the 10/7/2026 dump if resolution fails. Called once in Load() before
+        /// patch registration.
+        /// </summary>
+        private static void ResolveOffsets()
+        {
+            try
+            {
+                var barrageClass = Il2CppClassPointerStore<HailOfArrowsPrefab>.NativeClassPtr;
+                if (barrageClass != IntPtr.Zero)
+                {
+                    int barrageFlag = GetFieldOffset(barrageClass, "_barrageOfArrows", 0x2F4);
+                    BarrageOfArrowsOffset = barrageFlag;
+                    Log.LogInfo($"[ResolveOffsets] _barrageOfArrows offset: 0x{BarrageOfArrowsOffset:X}");
+                }
+                else
+                {
+                    Log.LogWarning("[ResolveOffsets] HailOfArrowsPrefab class pointer is null, using fallback offset 0x2F4");
+                }
+
+                var aoeClass = Il2CppClassPointerStore<AreaOfEffect>.NativeClassPtr;
+                if (aoeClass != IntPtr.Zero)
+                {
+                    int aoeCollider = GetFieldOffset(aoeClass, "_aoeCollider", 0x288);
+                    AoeColliderOffset = aoeCollider;
+                    Log.LogInfo($"[ResolveOffsets] _aoeCollider offset: 0x{AoeColliderOffset:X}");
+                }
+                else
+                {
+                    Log.LogWarning("[ResolveOffsets] AreaOfEffect class pointer is null, using fallback offset 0x288");
+                }
+            }
+            catch (Exception ex)
+            {
+                Log.LogWarning($"[ResolveOffsets] Exception resolving offsets, using verified fallbacks: {ex.Message}");
+            }
+        }
+
+        private static int GetFieldOffset(IntPtr classPtr, string fieldName, int fallbackOffset)
+        {
+            try
+            {
+                if (classPtr != IntPtr.Zero)
+                {
+                    var field = IL2CPP.il2cpp_class_get_field_from_name(classPtr, fieldName);
+                    if (field != IntPtr.Zero)
+                    {
+                        int offset = (int)IL2CPP.il2cpp_field_get_offset(field);
+                        if (offset > 0) return offset;
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                Log?.LogWarning($"Failed to resolve field {fieldName}: {ex.Message}. Using fallback 0x{fallbackOffset:X}");
+            }
+            return fallbackOffset;
+        }
+
+        /// <summary>
         /// Robust IL2CPP instance-type test for patch call sites.
         /// </summary>
         /// <remarks>
@@ -239,7 +305,7 @@ namespace BarrageOfArrowsTuner
 
         /// <summary>
         /// [2026-10-07] True when the HailOfArrowsPrefab instance resolved the "Barrage of Arrows" upgrade
-        /// (_barrageOfArrows, offset 0x2F4), so the drag only touches the barrage cast, never the base spell.
+        /// (_barrageOfArrows, offset resolved at runtime), so the drag only touches the barrage cast, never the base spell.
         /// </summary>
         internal static unsafe bool IsBarrage(HailOfArrowsPrefab hp)
         {

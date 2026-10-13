@@ -1,10 +1,12 @@
 using System;
+using System.Reflection;
 using BepInEx;
 using BepInEx.Configuration;
 using BepInEx.Logging;
 using BepInEx.Unity.IL2CPP;
 using HarmonyLib;
 using Il2CppInterop.Runtime;
+using Il2CppInterop.Runtime.InteropTypes;
 using UnityEngine;
 using Il2CppGenerics = Il2CppSystem.Collections.Generic;
 
@@ -41,7 +43,7 @@ namespace ScatterTrapTuner
     {
         public const string GUID = "com.custom.scattertraptuner";
         public const string NAME = "Scatter Trap Tuner";
-        public const string VERSION = "1.1.0";
+        public const string VERSION = "1.2.0";
 
         internal static new ManualLogSource Log;
         internal static ScatterTrapTunerPlugin Instance;
@@ -67,8 +69,8 @@ namespace ScatterTrapTuner
 
         public static ConfigEntry<bool> DiagnosticLogging;
 
-        // Field offset verified against this build's decompiled metadata
-        // (HuntersTrapPrefab._scatterTrap, field offset 0x342).
+        // Field offsets resolved at runtime via IL2CPP metadata (fallbacks from 10/7/2026 dump).
+        // [2026-10-14] Game update shifted class layouts - hardcoded 0x342 was stale.
         internal static int ScatterTrapOffset = 0x342;
 
         // The HuntersTrapPrefab whose arrival is currently being handled, captured in a HandleArrival Prefix
@@ -91,6 +93,9 @@ namespace ScatterTrapTuner
         {
             Instance = this;
             Log = base.Log;
+
+            // Resolve field offsets from current build's IL2CPP metadata before installing patches.
+            ResolveOffsets();
 
             Enabled = Config.Bind("General", "Enabled", true,
                 "Master switch. When false the Scatter Trap behaves exactly like vanilla. (Default: true)");
@@ -189,8 +194,56 @@ namespace ScatterTrapTuner
         }
 
         /// <summary>
+        /// Resolves field offsets from the current build's IL2CPP metadata. Fallback to verified
+        /// offsets from the 10/7/2026 dump if resolution fails. Called once in Load() before
+        /// patch registration.
+        /// </summary>
+        private static void ResolveOffsets()
+        {
+            try
+            {
+                var trapClass = Il2CppClassPointerStore<HuntersTrapPrefab>.NativeClassPtr;
+                if (trapClass != IntPtr.Zero)
+                {
+                    int scatterTrap = GetFieldOffset(trapClass, "_scatterTrap", 0x342);
+                    ScatterTrapOffset = scatterTrap;
+                    Log.LogInfo($"[ResolveOffsets] _scatterTrap offset: 0x{ScatterTrapOffset:X}");
+                }
+                else
+                {
+                    Log.LogWarning("[ResolveOffsets] HuntersTrapPrefab class pointer is null, using fallback offset 0x342");
+                }
+            }
+            catch (Exception ex)
+            {
+                Log.LogWarning($"[ResolveOffsets] Exception resolving offsets, using verified fallbacks: {ex.Message}");
+            }
+        }
+
+        private static int GetFieldOffset(IntPtr classPtr, string fieldName, int fallbackOffset)
+        {
+            try
+            {
+                if (classPtr != IntPtr.Zero)
+                {
+                    var field = IL2CPP.il2cpp_class_get_field_from_name(classPtr, fieldName);
+                    if (field != IntPtr.Zero)
+                    {
+                        int offset = (int)IL2CPP.il2cpp_field_get_offset(field);
+                        if (offset > 0) return offset;
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                Log?.LogWarning($"Failed to resolve field {fieldName}: {ex.Message}. Using fallback 0x{fallbackOffset:X}");
+            }
+            return fallbackOffset;
+        }
+
+        /// <summary>
         /// True when the HuntersTrapPrefab instance resolved the "Scatter Trap" upgrade
-        /// (_scatterTrap, offset 0x342), so we only touch scatter casts.
+        /// (_scatterTrap, offset resolved at runtime), so we only touch scatter casts.
         /// </summary>
         internal static unsafe bool IsScatterTrap(HuntersTrapPrefab trap)
         {
