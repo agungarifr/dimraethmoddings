@@ -215,7 +215,7 @@ namespace ScatterTrapTuner
     /// nearby enemies. A non-scatter arrival clears the capture.
     ///
     /// MUST be a Prefix: HandleArrival starts the ScatterSetup coroutine synchronously, and ScatterSetup
-    /// calls ComputeScatterPoints (its ILIS 164) BEFORE its first yield (WaitForSeconds, ILIS 419). A Postfix
+    /// calls ComputeScatterPoints (ISIL 164) BEFORE its first yield (WaitForSeconds, ISIL 419). A Postfix
     /// would therefore run after ComputeScatterPoints had already executed and captured too late.
     /// </summary>
     [HarmonyPatch(typeof(HuntersTrapPrefab), "HandleArrival")]
