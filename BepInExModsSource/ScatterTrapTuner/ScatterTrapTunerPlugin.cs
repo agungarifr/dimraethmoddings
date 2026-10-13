@@ -143,8 +143,8 @@ namespace ScatterTrapTuner
                 "Seconds between repeated suction pulls (SuctionOnTick). 0.5 matches Pursuing Blizzard's default " +
                 "2-per-second tick. (Default: 0.5)");
 
-            DiagnosticLogging = Config.Bind("Diagnostics", "LogValues", false,
-                "Log target selection and drag decisions to the BepInEx console. (Default: false)");
+            DiagnosticLogging = Config.Bind("Diagnostics", "LogValues", true,
+                "Log target selection and drag decisions to the BepInEx console. (Default: true)");
 
             // Cache the sub-trap class pointer for the tick hook's allocation-free type gate.
             try
@@ -243,7 +243,7 @@ namespace ScatterTrapTuner
 
                 if (DiagnosticLogging.Value && pulled > 0)
                 {
-                    Log.LogInfo($"[ScatterTrapSuction] dragged {pulled} enemies toward cluster centre ({center.x:F1}, {center.y:F1}), radius {radius:F1}, distX{distMult:F2}, time {dashTime:F2}s");
+                    Log?.LogInfo($"[ScatterTrapSuction] dragged {pulled} enemies toward cluster centre ({center.x:F1}, {center.y:F1}), radius {radius:F1}, distX{distMult:F2}, time {dashTime:F2}s");
                 }
             }
             catch (Exception ex)
@@ -280,7 +280,7 @@ namespace ScatterTrapTuner
 
                     if (ScatterTrapTunerPlugin.DiagnosticLogging.Value)
                     {
-                        ScatterTrapTunerPlugin.Log.LogInfo("[HandleArrival] scatter trap captured");
+                        ScatterTrapTunerPlugin.Log?.LogInfo("[HandleArrival] scatter trap captured");
                     }
                 }
                 else
@@ -363,7 +363,7 @@ namespace ScatterTrapTuner
                     ScatterTrapTunerPlugin.SuctionCenterValid = false;
                     if (ScatterTrapTunerPlugin.DiagnosticLogging.Value)
                     {
-                        ScatterTrapTunerPlugin.Log.LogInfo("[ComputeScatterPoints] no enemy in range, using vanilla scatter");
+                        ScatterTrapTunerPlugin.Log?.LogInfo("[ComputeScatterPoints] no enemy in range, using vanilla scatter");
                     }
                     return true;
                 }
@@ -396,7 +396,7 @@ namespace ScatterTrapTuner
 
                 if (ScatterTrapTunerPlugin.DiagnosticLogging.Value)
                 {
-                    ScatterTrapTunerPlugin.Log.LogInfo(
+                    ScatterTrapTunerPlugin.Log?.LogInfo(
                         $"[ComputeScatterPoints] landing {centerXY}, centre ({anchor.x:F1}, {anchor.y:F1}), " +
                         $"search {search}, scatter {scatter}, points {count}");
                 }
@@ -432,7 +432,7 @@ namespace ScatterTrapTuner
 
                 if (ScatterTrapTunerPlugin.DiagnosticLogging.Value)
                 {
-                    ScatterTrapTunerPlugin.Log.LogInfo("[InstantActivation] SubTrapActivationDelay set to 0");
+                    ScatterTrapTunerPlugin.Log?.LogInfo("[InstantActivation] SubTrapActivationDelay set to 0");
                 }
             }
             catch (Exception ex)
