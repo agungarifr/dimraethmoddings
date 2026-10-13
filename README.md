@@ -134,5 +134,6 @@ All under `modding\BepInExModsSource\`:
 - **NavMeshFixMod** — fixes monster movement/navmesh glitches.
 - ~~**PlagueShardsHoming** — makes Plague Shards home in on enemies.~~ **broken**
 - **PursuingBlizzardTuner** — tunes the Pursuing Blizzard spell.
+- **ScatterTrapTuner** — reworks the Shadow skill-tree "Scatter Trap" upgrade (Hunter's Trap scatter node): the five sub-traps cluster on the nearest enemy instead of scattering randomly, arm instantly (no 1s delay), and drag nearby enemies onto the cluster centre like Barrage of Arrows.
 - **TrainerAdvisor** — injects a display-only optimal attribute-build panel (physical / magic / hybrid) into the vanilla trainer window.
 - **TwisterTuner** — tunes the Twister (Vortex) upgrade; optional black-hole pull.
