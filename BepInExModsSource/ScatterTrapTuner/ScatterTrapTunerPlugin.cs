@@ -209,15 +209,19 @@ namespace ScatterTrapTuner
     }
 
     /// <summary>
-    /// Postfix on <c>HuntersTrapPrefab.HandleArrival</c>. This is the arrival hook that chooses between the
+    /// Prefix on <c>HuntersTrapPrefab.HandleArrival</c>. This is the arrival hook that chooses between the
     /// normal (DelayedActivation) and the scatter (ScatterSetup) path. We capture the instance only when the
     /// scatter flag is set, so the later ComputeScatterPoints call knows which trap instance to ask for the
     /// nearby enemies. A non-scatter arrival clears the capture.
+    ///
+    /// MUST be a Prefix: HandleArrival starts the ScatterSetup coroutine synchronously, and ScatterSetup
+    /// calls ComputeScatterPoints (its ILIS 164) BEFORE its first yield (WaitForSeconds, ILIS 419). A Postfix
+    /// would therefore run after ComputeScatterPoints had already executed and captured too late.
     /// </summary>
     [HarmonyPatch(typeof(HuntersTrapPrefab), "HandleArrival")]
     public static class Patch_HuntersTrapPrefab_HandleArrival
     {
-        public static void Postfix(HuntersTrapPrefab __instance)
+        public static void Prefix(HuntersTrapPrefab __instance)
         {
             try
             {
