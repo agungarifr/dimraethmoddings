@@ -27,13 +27,16 @@ namespace ContagionTuner
     ///     [2026-10-09] Re-anchored from the infected host to the spell/zone center to match Pursuing Blizzard
     ///     exactly (same modifier values: RadiusMultiplier 1.0, DashTime 0.2, DistanceMultiplier 1.0). The old
     ///     host-centered anchor is preserved (commented) inside ApplySuction.
+    ///   * Cast Range: Extended targeting range so Contagion auto-targets the nearest enemy at longer distances
+    ///     (CastRangeMultiplier, default 3.0x). Works like Pursuing Blizzard / Barrage of Arrows.
+    ///     [2026-10-13] Added CastRangeMultiplier + Auto-target nearest enemy via GetAllEnemiesInRangeOfPosition patch.
     /// </summary>
     [BepInPlugin(GUID, NAME, VERSION)]
     public class ContagionTunerPlugin : BasePlugin
     {
         public const string GUID = "com.custom.contagiontuner";
         public const string NAME = "Contagion Tuner";
-        public const string VERSION = "1.2.0";
+        public const string VERSION = "1.3.0";
 
         internal static new ManualLogSource Log;
         internal static ContagionTunerPlugin Instance;
@@ -46,6 +49,10 @@ namespace ContagionTuner
         public static ConfigEntry<float> PoisonStackMultiplier;
         public static ConfigEntry<float> LifetimeSafetyBuffer;
         public static ConfigEntry<bool> DiagnosticLogging;
+
+        // [2026-10-13] Cast Range & Auto-Target configuration (mirrors BarrageOfArrowsTuner/PursuingBlizzardTuner).
+        public static ConfigEntry<float> CastRangeMultiplier;
+        public static ConfigEntry<bool> AutoTargetNearestEnemy;
 
         // [2026-10-09] True only while ContagionPrefab._ZoneRoutine_d__51.MoveNext is running, so the
         // AddStacksToTarget poison patch scales the PER-TICK poison and not the initial cast poison (5) or the
@@ -135,8 +142,19 @@ namespace ContagionTuner
                 "Multiplier on the drag distance passed to DashTargetToPosition. 1.0 = pull the enemy exactly " +
                 "onto the spell center; >1 pulls it past the center for a stronger yank (clamped by walls). (Default: 1.0)");
 
+            // [2026-10-13] Cast Range & Auto-Target (mirrors BarrageOfArrowsTuner/PursuingBlizzardTuner).
+            CastRangeMultiplier = Config.Bind("CastRange", "CastRangeMultiplier", 3.0f,
+                "Multiplier on Contagion's targeting range for finding the nearest enemy to infect. " +
+                "Vanilla range is ~10 units; 3.0 = 30 units. Values <= 1 disable the multiplier. " +
+                "Works by patching BaseSpellLibrary.GetAllEnemiesInRangeOfPosition when called from ContagionPrefab. (Default: 3.0)");
+
+            AutoTargetNearestEnemy = Config.Bind("CastRange", "AutoTargetNearestEnemy", true,
+                "If true, Contagion automatically targets the nearest enemy within the extended cast range. " +
+                "This is the default Contagion behavior (AcquireInfectedTarget finds nearest), but with the extended range. " +
+                "If false, Contagion uses vanilla targeting logic. (Default: true)");
+
             DiagnosticLogging = Config.Bind("Diagnostics", "DiagnosticLogging", false,
-                "Log Contagion radius, visual scale, and tick events to the BepInEx console. (Default: false)");
+                "Log Contagion radius, visual scale, tick events, and cast range targeting to the BepInEx console. (Default: false)");
 
             ResolveOffsets();
 
@@ -144,6 +162,8 @@ namespace ContagionTuner
             PatchOrLog(harmony, typeof(Patch_ContagionPrefab_Activate));
             PatchOrLog(harmony, typeof(Patch_ContagionPrefab_ZoneRoutine));
             PatchOrLog(harmony, typeof(Patch_ContagionPrefab_ZoneRoutine_MoveNext));
+            // [2026-10-13] Extended cast range for auto-targeting nearest enemy (mirrors BarrageOfArrowsTuner).
+            PatchOrLog(harmony, typeof(Patch_BaseSpellLibrary_GetAllEnemiesInRangeOfPosition));
             // [2026-10-09] Scale the per-tick Poison applied via BaseSpellLibrary.AddStacksToTarget (x2 default).
             PatchOrLog(harmony, typeof(Patch_BaseSpellLibrary_AddStacksToTarget_Poison));
             // [2026-10-04 15:33] Disabled Patch_ContagionPrefab_Update per user request.
@@ -157,6 +177,8 @@ namespace ContagionTuner
             Log.LogInfo($"TickInterval: {TickInterval.Value}s ({TickInterval.Value * TickCountMultiplier.Value * 6f:F2}s wall-clock)");
             Log.LogInfo($"DamagePerTickMultiplier: {DamagePerTickMultiplier.Value} (per-tick damage)");
             Log.LogInfo($"PoisonStackMultiplier: {PoisonStackMultiplier.Value} (per-tick Poison stacks, vanilla 1)");
+            Log.LogInfo($"CastRangeMultiplier: {CastRangeMultiplier.Value} (targeting range x{CastRangeMultiplier.Value}, vanilla ~10u)");
+            Log.LogInfo($"AutoTargetNearestEnemy: {AutoTargetNearestEnemy.Value}");
             Log.LogInfo($"BlackHoleSuction: {SuctionEnabled.Value} (activate={SuctionOnActivate.Value}, tick={SuctionOnTick.Value}, radiusX{SuctionRadiusMultiplier.Value}, distX{SuctionDistanceMultiplier.Value}, dashTime={SuctionDashTime.Value}s)");
             Log.LogInfo("=================================================");
         }
@@ -841,4 +863,43 @@ namespace ContagionTuner
         }
     }
     */
+
+    /// <summary>
+    /// [2026-10-13] Prefix on <c>BaseSpellLibrary.GetAllEnemiesInRangeOfPosition</c>.
+    /// This is the enemy lookup used by ContagionPrefab.NearestEnemy/AcquireInfectedTarget to find the nearest
+    /// enemy to infect. We multiply <c>range</c> by <c>CastRangeMultiplier</c> so Contagion can target enemies
+    /// much farther away (default 3x, vanilla ~10u -> 30u). Only ContagionPrefab instances are affected,
+    /// so other spells using this method (e.g., Black Hole, Pursuing Blizzard) are untouched.
+    /// Mirrors BarrageOfArrowsTuner.Patch_BaseSpellLibrary_GetAllEnemiesInRange.
+    /// </summary>
+    [HarmonyPatch(typeof(BaseSpellLibrary), nameof(BaseSpellLibrary.GetAllEnemiesInRangeOfPosition))]
+    public static class Patch_BaseSpellLibrary_GetAllEnemiesInRangeOfPosition
+    {
+        public static void Prefix(BaseSpellLibrary __instance, ref float range)
+        {
+            try
+            {
+                if (!ContagionTunerPlugin.Enabled.Value) return;
+                if (!ContagionTunerPlugin.AutoTargetNearestEnemy.Value) return;
+                if (range <= 0f) return;
+                if (!ContagionTunerPlugin.IsContagionPrefab(__instance)) return;
+
+                float multiplier = ContagionTunerPlugin.CastRangeMultiplier.Value;
+                if (multiplier <= 1f) return; // <= 1 disables the multiplier
+
+                float before = range;
+                range *= multiplier;
+
+                if (ContagionTunerPlugin.DiagnosticLogging.Value)
+                {
+                    ContagionTunerPlugin.Log.LogInfo(
+                        $"[CastRange] GetAllEnemiesInRangeOfPosition range {before} -> {range} (x{multiplier})");
+                }
+            }
+            catch (Exception ex)
+            {
+                ContagionTunerPlugin.Log?.LogError($"[Patch_BaseSpellLibrary_GetAllEnemiesInRangeOfPosition] {ex}");
+            }
+        }
+    }
 }
