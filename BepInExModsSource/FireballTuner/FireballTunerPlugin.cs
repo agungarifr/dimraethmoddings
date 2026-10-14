@@ -7,28 +7,32 @@ using BepInEx.Unity.IL2CPP;
 using HarmonyLib;
 using Il2CppInterop.Runtime;
 using Il2CppInterop.Runtime.InteropTypes;
+using UnityEngine;
 using Il2CppGenerics = Il2CppSystem.Collections.Generic;
 
 namespace FireballTuner
 {
     /// <summary>
     /// Standalone BepInEx 6 (IL2CPP) plugin that tunes the vanilla Fireball starting skill:
-    ///   * Max range      -> RangeMultiplier (default x3)
-    ///   * Burning stacks -> BurningMultiplier (default x3)
-    ///   * Projectile speed -> SpeedMultiplier (default x2)
-    ///   * Cast time      -> InstantCast (default on, CastTime = near-zero => click-trigger cast, no wind-up)
+    ///   * Max range              -> RangeMultiplier (default x3)
+    ///   * Burning stacks         -> BurningMultiplier (default x3)
+    ///   * Projectile speed       -> SpeedMultiplier (default x1.3)
+    ///   * Cast time              -> InstantCast (default on, CastTime = near-zero => click-trigger cast, no wind-up)
+    ///   * Explosive impact AoE   -> ExplosiveImpactAoeMultiplier (default x1.5 = +50% radius)
+    ///   * Explosive impact pull  -> BlackHoleSuction (default on, uses DashTargetToPosition like ScatterTrapTuner)
     ///
     /// The mod only touches the Fireball spell. Every lever is behind a config entry so it can be
     /// reverted without rebuilding. Co-op: run the SAME config on host and client so both peers
     /// agree on the numbers (range/cast are both computed locally, burning is applied through the
-    /// shared BaseSpellLibrary.AddStacksToTarget path).
+    /// shared BaseSpellLibrary.AddStacksToTarget path; suction uses the game's own networked
+    /// DashTargetToPosition primitive).
     /// </summary>
     [BepInPlugin(GUID, NAME, VERSION)]
     public class FireballTunerPlugin : BasePlugin
     {
         public const string GUID = "com.custom.fireballtuner";
         public const string NAME = "Fireball Tuner";
-        public const string VERSION = "1.0.0";
+        public const string VERSION = "1.1.0";
 
         // [2026-10-01] A cast time of exactly 0 breaks the Fireball launch. BaseSpellLibrary.Start copies
         // this component's CastTime (SpellLibrary 0x18C) into the prefab's BaseSpellLibrary._castTime
@@ -49,6 +53,21 @@ namespace FireballTuner
         public static ConfigEntry<bool> ShowTunedStatsInTooltip;
         public static ConfigEntry<bool> UpdateBurningStacksInTooltip;
         public static ConfigEntry<bool> DiagnosticLogging;
+
+        // [2026-10-14] Explosive Impact tuning (FireballExplosiveImpactPrefab : AreaOfEffect)
+        public static ConfigEntry<float> ExplosiveImpactAoeMultiplier;
+
+        // [2026-10-14] Black Hole style suction on explosive impact (mirrors ScatterTrapTuner)
+        public static ConfigEntry<bool> SuctionEnabled;
+        public static ConfigEntry<bool> SuctionOnActivate;
+        public static ConfigEntry<bool> SuctionOnStrike;
+        public static ConfigEntry<float> SuctionRadiusMultiplier;
+        public static ConfigEntry<float> SuctionDashTime;
+        public static ConfigEntry<float> SuctionDistanceMultiplier;
+
+        // Field offsets resolved at runtime via IL2CPP metadata (fallbacks from 10/7/2026 dump).
+        // AreaOfEffect._aoeCollider (Collider2D) -> 0x288.
+        internal static int AoeColliderOffset = 0x288;
 
         public override void Load()
         {
@@ -73,14 +92,50 @@ namespace FireballTuner
                 // launch callback); it is set to a near-zero value instead, which is still effectively instant.
                 "If true the Fireball's cast time is reduced to a near-zero value so it fires immediately on click (no wind-up). (Default: true)");
 
+            // [2026-10-14] Explosive Impact AoE scaling. FireballExplosiveImpactPrefab is an AreaOfEffect
+            // whose trigger collider (AreaOfEffect._aoeCollider) IS the hit area. Scaling its geometry
+            // widens the explosion radius in world space.
+            ExplosiveImpactAoeMultiplier = Config.Bind("ExplosiveImpact", "AoeRadiusMultiplier", 1.5f,
+                "Scale the Fireball explosive impact area of effect. 1.5 = +50% radius. Applied by scaling the " +
+                "AoE trigger collider's own geometry (AreaOfEffect._aoeCollider), the same technique " +
+                "EchoRiftTuner/TwisterTuner/BarrageOfArrowsTuner use. 1.0 disables. (Default: 1.5)");
+
+            // [2026-10-14] Black Hole suction on explosive impact, mirrors ScatterTrapTuner's [BlackHoleSuction].
+            // Uses the game's own BaseSpellLibrary.DashTargetToPosition - the exact primitive Black Hole,
+            // Pursuing Blizzard, Barrage of Arrows, and Echo Rift use.
+            SuctionEnabled = Config.Bind("BlackHoleSuction", "Enabled", true,
+                "If true the Fireball explosive impact drags surrounding enemies toward the impact point using " +
+                "the game's own BaseSpellLibrary.DashTargetToPosition (the exact Black Hole primitive). (Default: true)");
+
+            SuctionOnActivate = Config.Bind("BlackHoleSuction", "SuctionOnActivate", true,
+                "Pull all enemies in range toward the impact point the moment the explosion occurs. (Default: true)");
+
+            SuctionOnStrike = Config.Bind("BlackHoleSuction", "SuctionOnStrike", true,
+                "Also pull enemies toward the impact point when they are struck by the explosion (each " +
+                "AreaOfEffectStrike), like TwisterTuner's on-entry pull. (Default: true)");
+
+            SuctionRadiusMultiplier = Config.Bind("BlackHoleSuction", "RadiusMultiplier", 1.0f,
+                "Multiplier on the explosive impact's AoE radius for how far enemies are grabbed. " +
+                "1.0 = same as the explosion radius; >1 reaches beyond it. (Default: 1.0)");
+
+            SuctionDashTime = Config.Bind("BlackHoleSuction", "DashTime", 0.2f,
+                "Seconds for each enemy's drag lerp. Lower = faster/snappier yank (Black Hole uses 0.3). (Default: 0.2)");
+
+            SuctionDistanceMultiplier = Config.Bind("BlackHoleSuction", "DistanceMultiplier", 1.0f,
+                "Multiplier on the drag distance passed to DashTargetToPosition. 1.0 = pull the enemy exactly " +
+                "onto the impact centre; >1 pulls it past the centre (clamped by walls). (Default: 1.0)");
+
             ShowTunedStatsInTooltip = Config.Bind("Tooltip", "ShowTunedStats", true,
-                "Append a line to the Fireball spell description (tooltip/skill tree/character creation) listing the tuned values: instant cast, range, burning, projectile speed. (Default: true)");
+                "Append a line to the Fireball spell description (tooltip/skill tree/character creation) listing the tuned values: instant cast, range, burning, projectile speed, explosive impact AoE, suction. (Default: true)");
 
             UpdateBurningStacksInTooltip = Config.Bind("Tooltip", "UpdateBurningStacks", true,
                 "Rewrite the 'Burning: N' line in the Fireball tooltip so the displayed stack count matches BurningMultiplier. (Default: true)");
 
             DiagnosticLogging = Config.Bind("Diagnostics", "LogFireballValues", false,
-                "Log the Fireball's radius/cast-time and burning stack changes to the BepInEx console. (Default: false)");
+                "Log the Fireball's radius/cast-time, burning stack changes, explosive impact AoE scaling and suction events to the BepInEx console. (Default: false)");
+
+            // Resolve field offsets from current build's IL2CPP metadata before installing patches.
+            ResolveOffsets();
 
             var harmony = new Harmony(GUID);
 
@@ -93,6 +148,11 @@ namespace FireballTuner
             PatchOrLog(harmony, typeof(Patch_SpellTooltipDatabase_GetLocalizedDescription));
             PatchOrLog(harmony, typeof(Patch_SpellTooltipDatabase_GetLocalizedEffects));
 
+            // [2026-10-14] Explosive Impact patches
+            PatchOrLog(harmony, typeof(Patch_AreaOfEffect_Start_ExplosiveImpactAoe));
+            PatchOrLog(harmony, typeof(Patch_FireballExplosiveImpactPrefab_OnStart_Suction));
+            PatchOrLog(harmony, typeof(Patch_FireballExplosiveImpactPrefab_AreaOfEffectStrike_Suction));
+
             Log.LogInfo("=================================================");
             Log.LogInfo($"{NAME} v{VERSION} loaded.");
             Log.LogInfo($"Enabled: {Enabled.Value}");
@@ -100,6 +160,8 @@ namespace FireballTuner
             Log.LogInfo($"BurningMultiplier: {BurningMultiplier.Value}");
             Log.LogInfo($"SpeedMultiplier: {SpeedMultiplier.Value}");
             Log.LogInfo($"InstantCast: {InstantCast.Value}");
+            Log.LogInfo($"ExplosiveImpactAoeMultiplier: {ExplosiveImpactAoeMultiplier.Value}");
+            Log.LogInfo($"BlackHoleSuction: {SuctionEnabled.Value} (activate={SuctionOnActivate.Value}, onStrike={SuctionOnStrike.Value}, radiusX{SuctionRadiusMultiplier.Value}, distX{SuctionDistanceMultiplier.Value}, dashTime={SuctionDashTime.Value}s)");
             Log.LogInfo($"ShowTunedStatsInTooltip: {ShowTunedStatsInTooltip.Value}");
             Log.LogInfo($"UpdateBurningStacksInTooltip: {UpdateBurningStacksInTooltip.Value}");
             Log.LogInfo($"DiagnosticLogging: {DiagnosticLogging.Value}");
@@ -116,6 +178,67 @@ namespace FireballTuner
             {
                 Log.LogError($"[FireballTuner] Failed to apply patch {patchType.Name}: {ex}");
             }
+        }
+
+        /// <summary>
+        /// Resolves field offsets from the current build's IL2CPP metadata. Fallback to verified
+        /// offsets from the 10/7/2026 dump if resolution fails. Called once in Load() before
+        /// patch registration.
+        /// </summary>
+        private static void ResolveOffsets()
+        {
+            try
+            {
+                var aoeClass = Il2CppClassPointerStore<AreaOfEffect>.NativeClassPtr;
+                if (aoeClass != IntPtr.Zero)
+                {
+                    int aoeCollider = GetFieldOffset(aoeClass, "_aoeCollider", 0x288);
+                    AoeColliderOffset = aoeCollider;
+                    Log.LogInfo($"[ResolveOffsets] _aoeCollider offset: 0x{AoeColliderOffset:X}");
+                }
+                else
+                {
+                    Log.LogWarning("[ResolveOffsets] AreaOfEffect class pointer is null, using fallback offset 0x288");
+                }
+            }
+            catch (Exception ex)
+            {
+                Log.LogWarning($"[ResolveOffsets] Exception resolving offsets, using verified fallbacks: {ex.Message}");
+            }
+        }
+
+        private static int GetFieldOffset(IntPtr classPtr, string fieldName, int fallbackOffset)
+        {
+            try
+            {
+                if (classPtr != IntPtr.Zero)
+                {
+                    var field = IL2CPP.il2cpp_class_get_field_from_name(classPtr, fieldName);
+                    if (field != IntPtr.Zero)
+                    {
+                        int offset = (int)IL2CPP.il2cpp_field_get_offset(field);
+                        if (offset > 0) return offset;
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                Log?.LogWarning($"Failed to resolve field {fieldName}: {ex.Message}. Using fallback 0x{fallbackOffset:X}");
+            }
+            return fallbackOffset;
+        }
+
+        /// <summary>
+        /// Robust IL2CPP instance-type test for patch call sites. Mirrors
+        /// BarrageOfArrowsTunerPlugin.IsSpellInstance: Harmony can hand the patch a wrapper typed as the declared
+        /// base type (AreaOfEffect/BaseSpellLibrary) even though the native object is the derived FireballExplosiveImpactPrefab,
+        /// so a bare <c>is</c> check can silently miss. The fallback compares the runtime IL2CPP class name.
+        /// </summary>
+        internal static bool IsSpellInstance<T>(BaseSpellLibrary instance) where T : BaseSpellLibrary
+        {
+            if (instance == null) return false;
+            if (instance is T) return true;
+            return instance.GetIl2CppType().Name == typeof(T).Name;
         }
 
         /// <summary>
@@ -174,6 +297,10 @@ namespace FireballTuner
                 parts.Add($"burning x{FormatMultiplier(BurningMultiplier.Value)}");
             if (SpeedMultiplier.Value > 0f && SpeedMultiplier.Value != 1f)
                 parts.Add($"projectile speed x{FormatMultiplier(SpeedMultiplier.Value)}");
+            if (ExplosiveImpactAoeMultiplier.Value > 0f && ExplosiveImpactAoeMultiplier.Value != 1f)
+                parts.Add($"explosion AoE x{FormatMultiplier(ExplosiveImpactAoeMultiplier.Value)}");
+            if (SuctionEnabled.Value)
+                parts.Add("explosion pulls enemies in");
 
             if (parts.Count == 0) return null;
             return "\n\n[Fireball Tuner] " + string.Join(", ", parts) + ".";
@@ -207,6 +334,145 @@ namespace FireballTuner
             if (scaled < 1) scaled = 1;
 
             return line.Substring(0, idx + 1) + " " + scaled.ToString(CultureInfo.InvariantCulture);
+        }
+
+        /// <summary>
+        /// [2026-10-14] Widen the Fireball explosive impact area. FireballExplosiveImpactPrefab is an AreaOfEffect whose
+        /// <c>AreaOfEffectStrike</c> drives <c>AreaOfEffect.QuickStrike</c>; QuickStrike enables <c>_aoeCollider</c> and its
+        /// trigger-enter strikes hit everything inside. We scale that collider's own geometry, so the explosion hit
+        /// area grows. Only FireballExplosiveImpactPrefab instances are touched, so every other AreaOfEffect spell is untouched.
+        /// </summary>
+        internal static unsafe void ApplyExplosiveImpactAoe(AreaOfEffect aoe)
+        {
+            try
+            {
+                if (aoe == null || aoe.Pointer == IntPtr.Zero) return;
+                if (!IsSpellInstance<FireballExplosiveImpactPrefab>(aoe)) return;
+
+                float mult = ExplosiveImpactAoeMultiplier.Value;
+                if (mult <= 0f || Math.Abs(mult - 1f) < 0.0001f) return;
+
+                IntPtr colPtr = *(IntPtr*)((byte*)aoe.Pointer + AoeColliderOffset);
+                if (colPtr == IntPtr.Zero) return;
+
+                var col = new Collider2D(colPtr);
+                ScaleColliderGeometry(col, mult);
+
+                if (DiagnosticLogging.Value)
+                {
+                    Log.LogInfo($"[ExplosiveImpactAoE] impact collider ({col.GetType().Name}) scaled x{FormatMultiplier(mult)}");
+                }
+            }
+            catch (Exception ex)
+            {
+                Log?.LogError($"[ApplyExplosiveImpactAoe] {ex}");
+            }
+        }
+
+        /// <summary>
+        /// [2026-10-14] Multiply a Collider2D's own shape by <paramref name="mult"/>. Mirrors
+        /// EchoRiftTunerPlugin.ScaleColliderGeometry / TwisterTunerPlugin.ScaleColliderGeometry / BarrageOfArrowsTunerPlugin.ScaleColliderGeometry
+        /// so the trigger area grows in world space regardless of whether this build's Collider2D follows its Transform.
+        /// </summary>
+        internal static void ScaleColliderGeometry(Collider2D col, float mult)
+        {
+            var circle = col.TryCast<CircleCollider2D>();
+            if (circle != null) { circle.radius *= mult; circle.offset *= mult; return; }
+
+            var box = col.TryCast<BoxCollider2D>();
+            if (box != null) { box.size *= mult; box.offset *= mult; box.edgeRadius *= mult; return; }
+
+            var capsule = col.TryCast<CapsuleCollider2D>();
+            if (capsule != null) { capsule.size *= mult; capsule.offset *= mult; return; }
+
+            var poly = col.TryCast<PolygonCollider2D>();
+            if (poly != null)
+            {
+                var pts = poly.points;
+                for (int i = 0; i < pts.Length; i++) pts[i] *= mult;
+                poly.points = pts;
+                return;
+            }
+
+            var edge = col.TryCast<EdgeCollider2D>();
+            if (edge != null)
+            {
+                var pts = edge.points;
+                for (int i = 0; i < pts.Length; i++) pts[i] *= mult;
+                edge.points = pts;
+                return;
+            }
+
+            // Unknown 2D collider type: fall back to scaling its own transform.
+            var t = col.transform;
+            var s = t.localScale;
+            t.localScale = new Vector3(s.x * mult, s.y * mult, s.z);
+        }
+
+        /// <summary>
+        /// [2026-10-14] Drag every live enemy inside the configured radius onto the impact centre using the game's
+        /// own <c>BaseSpellLibrary.DashTargetToPosition</c> - the exact primitive BlackholePrefab.AreaOfEffectStrike,
+        /// ScatterTrapTuner, EchoRiftTuner, BarrageOfArrowsTuner and PursuingBlizzardTuner use. That call disables the
+        /// NavMeshAgent during the lerp and restores it afterward, raycasts walls, and honours ObjectsCommon.Immune /
+        /// MonsterBehaviourLibrary.DisplaceExempt / authority. The centre is the spell's own transform (the impact point).
+        /// </summary>
+        internal static void ApplySuction(FireballExplosiveImpactPrefab impact)
+        {
+            if (!Enabled.Value || !SuctionEnabled.Value) return;
+            if (impact == null || impact.Pointer == IntPtr.Zero) return;
+
+            try
+            {
+                var t = impact.transform;
+                if (t == null) return;
+                Vector3 p = t.position;
+                Vector2 center = new Vector2(p.x, p.y);
+
+                // Use the explosion's own AoE radius as the base grab radius, scaled by RadiusMultiplier.
+                // We approximate the radius from the collider if available, otherwise fall back to a reasonable default.
+                float baseRadius = 5f; // vanilla Fireball explosion radius ~5 units
+                var col = impact.GetComponent<Collider2D>();
+                if (col != null)
+                {
+                    var circle = col.TryCast<CircleCollider2D>();
+                    if (circle != null) baseRadius = circle.radius;
+                }
+
+                float radius = baseRadius * SuctionRadiusMultiplier.Value;
+                if (radius <= 0.1f) return;
+
+                var enemies = impact.GetAllEnemiesInRangeOfPosition(center, radius);
+                if (enemies == null) return;
+
+                float dashTime = SuctionDashTime.Value;
+                float distMult = SuctionDistanceMultiplier.Value;
+                int pulled = 0;
+                int count = enemies.Count;
+                for (int i = 0; i < count; i++)
+                {
+                    ObjectsCommon enemy = enemies[i];
+                    if (enemy == null || enemy.Pointer == IntPtr.Zero) continue;
+                    if (enemy.IsDead()) continue;
+
+                    Vector3 ep = enemy.transform.position;
+                    float dist = Vector2.Distance(new Vector2(ep.x, ep.y), center);
+                    if (dist <= 0.05f) continue;
+
+                    // Same shape as BlackholePrefab.AreaOfEffectStrike / ScatterTrapTuner.ApplySuction:
+                    //   DashTargetToPosition(target, center, time, distance, useMiddleOfSprite, ignoreImmune, ignoreExempt, ignoreBodyRoot)
+                    impact.DashTargetToPosition(enemy, center, dashTime, dist * distMult, false, false, false, null);
+                    pulled++;
+                }
+
+                if (DiagnosticLogging.Value && pulled > 0)
+                {
+                    Log?.LogInfo($"[ExplosiveImpactSuction] dragged {pulled} enemies toward impact ({center.x:F1}, {center.y:F1}), radius {radius:F1}, distX{distMult:F2}, time {dashTime:F2}s");
+                }
+            }
+            catch (Exception ex)
+            {
+                Log?.LogError($"[ApplySuction] {ex}");
+            }
         }
     }
 
@@ -656,6 +922,108 @@ namespace FireballTuner
             catch (Exception ex)
             {
                 FireballTunerPlugin.Log?.LogError($"[Patch_SpellTooltipDatabase_GetLocalizedEffects] {ex}");
+            }
+        }
+    }
+
+    /// <summary>
+    /// [2026-10-14] Postfix on <c>AreaOfEffect.Start</c>. By the time this runs the game has resolved
+    /// <c>AreaOfEffect._aoeCollider</c> (assigned in Start), so this is the reliable point to widen the
+    /// Fireball explosive impact area. Only FireballExplosiveImpactPrefab instances are affected.
+    /// </summary>
+    [HarmonyPatch(typeof(AreaOfEffect), "Start")]
+    public static class Patch_AreaOfEffect_Start_ExplosiveImpactAoe
+    {
+        public static void Postfix(AreaOfEffect __instance)
+        {
+            try
+            {
+                if (!FireballTunerPlugin.Enabled.Value) return;
+                FireballTunerPlugin.ApplyExplosiveImpactAoe(__instance);
+            }
+            catch (Exception ex)
+            {
+                FireballTunerPlugin.Log?.LogError($"[Patch_AreaOfEffect_Start_ExplosiveImpactAoe] {ex}");
+            }
+        }
+    }
+
+    /// <summary>
+    /// [2026-10-14] Postfix on <c>FireballExplosiveImpactPrefab.OnStart</c>. Pulls surrounding enemies
+    /// onto the impact point once when the explosion occurs, mirroring ScatterTrapTuner's on-activate suction
+    /// and EchoRiftTuner's on-activate drag.
+    /// </summary>
+    [HarmonyPatch(typeof(FireballExplosiveImpactPrefab), "OnStart")]
+    public static class Patch_FireballExplosiveImpactPrefab_OnStart_Suction
+    {
+        public static void Postfix(FireballExplosiveImpactPrefab __instance)
+        {
+            try
+            {
+                if (!FireballTunerPlugin.Enabled.Value) return;
+                if (!FireballTunerPlugin.SuctionEnabled.Value) return;
+                if (!FireballTunerPlugin.SuctionOnActivate.Value) return;
+                FireballTunerPlugin.ApplySuction(__instance);
+            }
+            catch (Exception ex)
+            {
+                FireballTunerPlugin.Log?.LogError($"[Patch_FireballExplosiveImpactPrefab_OnStart_Suction] {ex}");
+            }
+        }
+    }
+
+    /// <summary>
+    /// [2026-10-14] Postfix on <c>FireballExplosiveImpactPrefab.AreaOfEffectStrike</c>. Pulls the struck
+    /// enemy toward the impact centre on each strike, mirroring TwisterTuner's on-entry suction and
+    /// ScatterTrapTuner's per-tick pull. This creates a continuous "drag" feeling as enemies are hit.
+    /// </summary>
+    [HarmonyPatch(typeof(FireballExplosiveImpactPrefab), "AreaOfEffectStrike")]
+    public static class Patch_FireballExplosiveImpactPrefab_AreaOfEffectStrike_Suction
+    {
+        public static void Postfix(FireballExplosiveImpactPrefab __instance, ObjectsCommon target)
+        {
+            try
+            {
+                if (!FireballTunerPlugin.Enabled.Value) return;
+                if (!FireballTunerPlugin.SuctionEnabled.Value) return;
+                if (!FireballTunerPlugin.SuctionOnStrike.Value) return;
+                if (__instance == null || target == null) return;
+                if (target.IsDead()) return;
+
+                var t = __instance.transform;
+                if (t == null) return;
+                Vector3 cp = t.position;
+                Vector2 center = new Vector2(cp.x, cp.y);
+
+                // Use the explosion's own AoE radius as the base grab radius, scaled by RadiusMultiplier.
+                float baseRadius = 5f; // vanilla Fireball explosion radius ~5 units
+                var col = __instance.GetComponent<Collider2D>();
+                if (col != null)
+                {
+                    var circle = col.TryCast<CircleCollider2D>();
+                    if (circle != null) baseRadius = circle.radius;
+                }
+
+                float radius = baseRadius * FireballTunerPlugin.SuctionRadiusMultiplier.Value;
+                Vector3 ep3 = target.transform.position;
+                float dist = Vector2.Distance(new Vector2(ep3.x, ep3.y), center);
+                if (dist <= 0.05f || dist > radius) return;
+
+                float dashTime = FireballTunerPlugin.SuctionDashTime.Value;
+                float distMult = FireballTunerPlugin.SuctionDistanceMultiplier.Value;
+
+                // Same shape as BlackholePrefab.AreaOfEffectStrike / ScatterTrapTuner.ApplySuction:
+                //   DashTargetToPosition(target, center, time, distance, useMiddleOfSprite, ignoreImmune, ignoreExempt, ignoreBodyRoot)
+                __instance.DashTargetToPosition(target, center, dashTime, dist * distMult, false, false, false, null);
+
+                if (FireballTunerPlugin.DiagnosticLogging.Value)
+                {
+                    FireballTunerPlugin.Log.LogInfo($"[ExplosiveImpactSuction] on-strike dragged enemy toward impact ({center.x:F1}, {center.y:F1}), dist {dist:F1}");
+                }
+            }
+            catch (Exception ex)
+            {
+                FireballTunerPlugin.Log?.LogError($"[Patch_FireballExplosiveImpactPrefab_AreaOfEffectStrike_Suction] {ex}");
             }
         }
     }
