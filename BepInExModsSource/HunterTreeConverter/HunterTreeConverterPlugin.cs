@@ -116,6 +116,12 @@ namespace HunterTreeConverter
             PatchOrLog(harmony, typeof(Patch_BaseSpellLibrary_AddStacksToTarget));
             PatchOrLog(harmony, typeof(Patch_BaseSpellLibrary_SendDamageToTarget));
             PatchOrLog(harmony, typeof(Patch_BaseSpellLibrary_SpawnElementalPool));
+            PatchOrLog(harmony, typeof(Patch_BaseSpellLibrary_GetStacksFromTarget));
+            PatchOrLog(harmony, typeof(Patch_BaseSpellLibrary_GetStackSourceFromTarget));
+            PatchOrLog(harmony, typeof(Patch_BaseSpellLibrary_RemoveStacksOnTarget));
+            PatchOrLog(harmony, typeof(Patch_BaseSpellLibrary_CleanseStacksOnTarget));
+            PatchOrLog(harmony, typeof(Patch_BaseSpellLibrary_CollapseStacksOnTarget));
+            PatchOrLog(harmony, typeof(Patch_BaseSpellLibrary_GetLastConsumedAmount));
 
             Log.LogInfo("=================================================");
             Log.LogInfo($"{NAME} v{VERSION} loaded.");
@@ -248,6 +254,48 @@ namespace HunterTreeConverter
                 }
             }
             catch { }
+        }
+
+        /// <summary>
+        /// [2026-10-16] Poison -&gt; Burning, Bleeding -&gt; Chill for a stack effect; anything else is unchanged.
+        /// Shared by the status-add patch and the stack read/consume patches.
+        /// </summary>
+        internal static StackingEffect MapEffect(StackingEffect e)
+        {
+            if (e == StackingEffect.Poison) return StackingEffect.Burning;
+            if (e == StackingEffect.Bleeding) return StackingEffect.Chill;
+            return e;
+        }
+
+        /// <summary>
+        /// [2026-10-16] Remap a stack-effect argument on a hunter source so the read/consume side of a mechanic
+        /// looks for Burning/Chill instead of the now-empty Poison/Bleeding. Called from the stack helper prefixes
+        /// (<c>GetStacksFromTarget</c>, <c>RemoveStacksOnTarget</c>, ...). The value is edited in place via a Harmony
+        /// <c>ref</c> parameter. Gated by ShouldConvert so other sources are untouched. Without this the Hunter's
+        /// Trap kept asking for Poison after we moved the stacks to Burning, so nothing was consumed.
+        /// </summary>
+        internal static void RemapStackEffect(BaseSpellLibrary prefab, string op, ref StackingEffect effect)
+        {
+            try
+            {
+                if (!IsActive || !ConvertStatus.Value) return;
+                if (effect != StackingEffect.Poison && effect != StackingEffect.Bleeding) return;
+                if (!ShouldConvert(prefab)) return;
+
+                StackingEffect to = MapEffect(effect);
+                if (to == effect) return;
+
+                if (LogSwaps.Value && LoggedStatus.Add("consume:" + op + ">" + (prefab != null ? prefab._spell : Spell.None) + ">" + effect))
+                {
+                    Log.LogInfo($"[status] {op} {(prefab != null ? prefab._spell : Spell.None)}: {effect} -> {to}");
+                }
+
+                effect = to;
+            }
+            catch (Exception ex)
+            {
+                Log?.LogError($"[status] remap {op} {ex}");
+            }
         }
     }
 
@@ -446,6 +494,61 @@ namespace HunterTreeConverter
                 HunterTreeConverterPlugin.Log?.LogError($"[Patch_BaseSpellLibrary_SpawnElementalPool] {ex}");
             }
         }
+    }
+
+    /// <summary>
+    /// [2026-10-16] Status-round-trip companions. Because the hunter's Poison/Bleeding stacks now live under the
+    /// effects Burning/Chill (see <see cref="Patch_BaseSpellLibrary_AddStacksToTarget"/>), any mechanic that READS or
+    /// CONSUMES the old effect must be re-pointed at the new one. The player reported the Hunter's Trap no longer
+    /// draining the Burning it should consume - it was still asking for Poison, which is now always empty. These
+    /// prefixes remap the effect for hunter sources (the enum arg is edited in place via a Harmony <c>ref</c>).
+    /// All are gated by ShouldConvert, so non-hunter sources (and enemy stacks) are left alone.
+    /// </summary>
+    [HarmonyPatch(typeof(BaseSpellLibrary), "GetStacksFromTarget")]
+    public static class Patch_BaseSpellLibrary_GetStacksFromTarget
+    {
+        public static void Prefix(BaseSpellLibrary __instance, ref StackingEffect stackType)
+            => HunterTreeConverterPlugin.RemapStackEffect(__instance, "read", ref stackType);
+    }
+
+    /// <summary>See <see cref="Patch_BaseSpellLibrary_GetStacksFromTarget"/>; returns the stack's source object.</summary>
+    [HarmonyPatch(typeof(BaseSpellLibrary), "GetStackSourceFromTarget")]
+    public static class Patch_BaseSpellLibrary_GetStackSourceFromTarget
+    {
+        public static void Prefix(BaseSpellLibrary __instance, ref StackingEffect stackType)
+            => HunterTreeConverterPlugin.RemapStackEffect(__instance, "read-src", ref stackType);
+    }
+
+    /// <summary>See <see cref="Patch_BaseSpellLibrary_GetStacksFromTarget"/>; this is the actual stack removal.</summary>
+    [HarmonyPatch(typeof(BaseSpellLibrary), "RemoveStacksOnTarget")]
+    public static class Patch_BaseSpellLibrary_RemoveStacksOnTarget
+    {
+        public static void Prefix(BaseSpellLibrary __instance, ref StackingEffect stackType)
+            => HunterTreeConverterPlugin.RemapStackEffect(__instance, "remove", ref stackType);
+    }
+
+    /// <summary>See <see cref="Patch_BaseSpellLibrary_GetStacksFromTarget"/>; clears all of a stack type.</summary>
+    [HarmonyPatch(typeof(BaseSpellLibrary), "CleanseStacksOnTarget")]
+    public static class Patch_BaseSpellLibrary_CleanseStacksOnTarget
+    {
+        public static void Prefix(BaseSpellLibrary __instance, ref StackingEffect stackType)
+            => HunterTreeConverterPlugin.RemapStackEffect(__instance, "cleanse", ref stackType);
+    }
+
+    /// <summary>See <see cref="Patch_BaseSpellLibrary_GetStacksFromTarget"/>; collapses a stack pool to a budget.</summary>
+    [HarmonyPatch(typeof(BaseSpellLibrary), "CollapseStacksOnTarget")]
+    public static class Patch_BaseSpellLibrary_CollapseStacksOnTarget
+    {
+        public static void Prefix(BaseSpellLibrary __instance, ref StackingEffect stackType)
+            => HunterTreeConverterPlugin.RemapStackEffect(__instance, "collapse", ref stackType);
+    }
+
+    /// <summary>See <see cref="Patch_BaseSpellLibrary_GetStacksFromTarget"/>; "how many did I just consume".</summary>
+    [HarmonyPatch(typeof(BaseSpellLibrary), "GetLastConsumedAmount")]
+    public static class Patch_BaseSpellLibrary_GetLastConsumedAmount
+    {
+        public static void Prefix(BaseSpellLibrary __instance, ref StackingEffect stackingEffect)
+            => HunterTreeConverterPlugin.RemapStackEffect(__instance, "last-consumed", ref stackingEffect);
     }
 
     /// <summary>
