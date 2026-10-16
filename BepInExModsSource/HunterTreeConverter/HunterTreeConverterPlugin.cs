@@ -22,9 +22,13 @@ namespace HunterTreeConverter
     ///     BleedDamage -> ChilledPower, ...).
     ///   * Node/spell tooltip wording follows: "Apply Poison" reads "Apply Burning", "Bleed" reads "Chill".
     ///
-    /// This is the poison/bleed counterpart of the ice-&gt;fire mod PyromancerConverter. It rewrites the skill tree
-    /// and tooltips AND (as of [2026-10-16]) the live status stacks the hunter abilities land on enemies: hunter
-    /// Poison becomes Burning and hunter Bleeding becomes Chill. Damage types and VFX remain out of scope.
+    /// This is the poison/bleed counterpart of the ice-&gt;fire mod PyromancerConverter. It rewrites the skill tree,
+    /// the tooltips, the live status stacks the hunter abilities land on enemies (hunter Poison -&gt; Burning, hunter
+    /// Bleeding -&gt; Chill), the hunter damage type (Thrust -&gt; Fire) and the hunter poison pool (re-spawned as the
+    /// game's existing BurningPit / fire-pool VFX - no recolouring).
+    /// [2026-10-16] Obsolete (preserved for reference): "Damage types and VFX remain out of scope." is superseded -
+    /// the user asked for the damage type (Thrust -&gt; Fire) and for the poison pool to reuse the EXISTING fire-pool
+    /// VFX instead of the poison one.
     /// [2026-10-16 14:45] Obsolete (preserved for reference): this class used to document "scoped (per the user's
     /// choice) to the SKILL TREE + TOOLTIPS only: it does NOT rewrite live status stacks, damage types or VFX." That
     /// scope is superseded: the user confirmed enemies still received Poison/Bleed and asked for live-status
@@ -40,7 +44,7 @@ namespace HunterTreeConverter
     {
         public const string GUID = "com.custom.huntertreeconverter";
         public const string NAME = "Hunter Tree Converter";
-        public const string VERSION = "0.2.0"; // [2026-10-16] bumped from 0.1.0 for the live-status conversion feature
+        public const string VERSION = "0.3.0"; // [2026-10-16] bumped from 0.2.0 for damage-type (Thrust->Fire) + fire-pool VFX
 
         internal static new ManualLogSource Log;
 
@@ -48,6 +52,8 @@ namespace HunterTreeConverter
         public static ConfigEntry<bool> ConvertTree;
         public static ConfigEntry<bool> ConvertTooltips;
         public static ConfigEntry<bool> ConvertStatus;
+        public static ConfigEntry<bool> ConvertDamage;
+        public static ConfigEntry<bool> ConvertVfx;
         public static ConfigEntry<bool> LogSwaps;
         public static ConfigEntry<TreeMatchMode> MatchMode;
 
@@ -83,6 +89,14 @@ namespace HunterTreeConverter
                 "hunter Bleeding -> Chill. Scoped to hunter sources (Hunter's Trap / Hail of Arrows / Aimed Shot + " +
                 "their poison pool, mists and sub-traps). (Default: true)");
 
+            ConvertDamage = Config.Bind("General", "ConvertDamage", true,
+                "Convert the hunter's base damage type from Thrust to Fire (the arrows/traps/shots pierce for Thrust; " +
+                "rewritten so the hunter theme reads as burn). Scoped to hunter sources. (Default: true)");
+
+            ConvertVfx = Config.Bind("General", "ConvertVfx", true,
+                "Make the hunter's poison pool use the game's EXISTING fire pool (BurningPit) instead of the poison " +
+                "pool - i.e. call PoisonPoolPrefab.ConvertToBurningPit, no recolouring of other VFX. (Default: true)");
+
             MatchMode = Config.Bind("General", "MatchMode", TreeMatchMode.Either,
                 "Which skill-tree nodes to convert: 'Either' (Race Human OR Class Shadow), 'RaceHuman', " +
                 "'ClassShadow', or 'All'. (Default: Either)");
@@ -100,12 +114,15 @@ namespace HunterTreeConverter
             PatchOrLog(harmony, typeof(Patch_SpellTooltipDatabase_GetLocalizedDescription));
             PatchOrLog(harmony, typeof(Patch_SpellTooltipDatabase_GetLocalizedEffects));
             PatchOrLog(harmony, typeof(Patch_BaseSpellLibrary_AddStacksToTarget));
+            PatchOrLog(harmony, typeof(Patch_BaseSpellLibrary_SendDamageToTarget));
+            PatchOrLog(harmony, typeof(Patch_BaseSpellLibrary_SpawnElementalPool));
 
             Log.LogInfo("=================================================");
             Log.LogInfo($"{NAME} v{VERSION} loaded.");
             Log.LogInfo($"Enabled: {Enabled.Value}, ConvertTree: {ConvertTree.Value}, ConvertTooltips: {ConvertTooltips.Value}, " +
+                        $"ConvertStatus: {ConvertStatus.Value}, ConvertDamage: {ConvertDamage.Value}, ConvertVfx: {ConvertVfx.Value}, " +
                         $"MatchMode: {MatchMode.Value}, LogSwaps: {LogSwaps.Value}");
-            Log.LogInfo("Poison -> Burning, Bleed -> Chill (skill tree + tooltips + hunter live status).");
+            Log.LogInfo("Poison -> Burning, Bleed -> Chill, Thrust -> Fire (tree + tooltips + hunter live status + damage + fire pool).");
             Log.LogInfo("=================================================");
         }
 
@@ -142,6 +159,11 @@ namespace HunterTreeConverter
         // [2026-10-16] Status swaps/skips already reported once (AddStacksToTarget fires every tick of a pool/mist);
         // keeps the log readable. Keyed by source + effect (+ ">skip").
         internal static readonly HashSet<string> LoggedStatus = new HashSet<string>();
+
+        // [2026-10-16] Damage swaps/skips and pool conversions already reported once (SendDamageToTarget fires per
+        // hit/tick, SpawnElementalPool per arrow); keeps the log readable.
+        internal static readonly HashSet<string> LoggedDamage = new HashSet<string>();
+        internal static readonly HashSet<Spell> LoggedPool = new HashSet<Spell>();
 
         /// <summary>
         /// True when this prefab is a hunter source whose Poison/Bleed we rewrite. Derived pool/mist/sub-trap prefabs
@@ -191,6 +213,38 @@ namespace HunterTreeConverter
                 if (LoggedStatus.Add(spell + ">" + effect + ">skip"))
                 {
                     Log.LogInfo($"[status] skip {spell} ({type}): {effect} -> left as-is (not in hunter scope)");
+                }
+            }
+            catch { }
+        }
+
+        /// <summary>Log a converted damage-type swap once per (source spell, from-type).</summary>
+        internal static void LogDamageSwap(BaseSpellLibrary prefab, DamageType from, DamageType to)
+        {
+            if (!LogSwaps.Value) return;
+            Spell spell = prefab != null ? prefab._spell : Spell.None;
+            if (LoggedDamage.Add(spell + ">" + from))
+            {
+                Log.LogInfo($"[damage] {spell}: {from} -> {to}");
+            }
+        }
+
+        /// <summary>
+        /// Log a player-applied Thrust hit we did NOT convert (once per source). Player-owned non-hunter sources
+        /// (e.g. Shadow Daggers) surface here so the user can decide whether to widen HunterSpells; monster sources
+        /// are skipped to keep the log quiet. Turns "did the hunter's thrust really get converted?" into a line.
+        /// </summary>
+        internal static void LogDamageSkipped(BaseSpellLibrary prefab, DamageType type)
+        {
+            if (!LogSwaps.Value) return;
+            try
+            {
+                if (prefab == null || prefab._owner == null || !prefab._owner.IsPlayer) return;
+                Spell spell = prefab._spell;
+                string typeName = prefab.GetIl2CppType().Name;
+                if (LoggedDamage.Add(spell + ">" + type + ">skip"))
+                {
+                    Log.LogInfo($"[damage] skip {spell} ({typeName}): {type} -> left as-is (not in hunter scope)");
                 }
             }
             catch { }
@@ -313,6 +367,88 @@ namespace HunterTreeConverter
     }
 
     /// <summary>
+    /// Prefix on <c>BaseSpellLibrary.SendDamageToTarget</c>. The hunter's base damage type is Thrust (the arrows,
+    /// traps and shots pierce); the user asked for it to read as Fire so the hunter theme is burn, matching the
+    /// converted tree. The <c>damageType</c> parameter is passed by value (confirmed against the interop), so a
+    /// plain prefix cannot edit it; instead we return false and replay the call with Fire, forwarding the original's
+    /// return value via <c>__result</c>. The re-entrant call sees Fire and runs the original body exactly once (same
+    /// proven pattern as PyromancerConverter).
+    /// </summary>
+    [HarmonyPatch(typeof(BaseSpellLibrary), "SendDamageToTarget")]
+    public static class Patch_BaseSpellLibrary_SendDamageToTarget
+    {
+        public static bool Prefix(
+            BaseSpellLibrary __instance,
+            ObjectsCommon target,
+            DamageType damageType,
+            float multiplier,
+            bool isDamageOverTime,
+            bool isThirdAttack,
+            float stunBuildupBonusPercent,
+            ref Damage __result)
+        {
+            try
+            {
+                if (!HunterTreeConverterPlugin.IsActive || !HunterTreeConverterPlugin.ConvertDamage.Value) return true;
+                if (damageType != DamageType.Thrust) return true;
+
+                if (!HunterTreeConverterPlugin.ShouldConvert(__instance))
+                {
+                    HunterTreeConverterPlugin.LogDamageSkipped(__instance, damageType);
+                    return true;
+                }
+
+                __result = __instance.SendDamageToTarget(
+                    target, DamageType.Fire, multiplier, isDamageOverTime, isThirdAttack, stunBuildupBonusPercent);
+
+                HunterTreeConverterPlugin.LogDamageSwap(__instance, damageType, DamageType.Fire);
+                return false;
+            }
+            catch (Exception ex)
+            {
+                HunterTreeConverterPlugin.Log?.LogError($"[Patch_BaseSpellLibrary_SendDamageToTarget] {ex}");
+                return true;
+            }
+        }
+    }
+
+    /// <summary>
+    /// Postfix on <c>BaseSpellLibrary.SpawnElementalPool</c>. The Hail of Arrows poison-pool upgrade leaves a
+    /// PoisonPoolPrefab behind; the user asked for the hunter's pool to use the game's EXISTING fire-pool VFX instead
+    /// of the poison one (no recolouring). The game already ships exactly that conversion as
+    /// <c>PoisonPoolPrefab.ConvertToBurningPit</c>, so we simply call it on the freshly spawned pool. Gated by
+    /// ShouldConvert on the CALLER, so a non-hunter poison pool (e.g. BlightedTrail) is left untouched even though it
+    /// shares the same Spell id.
+    /// </summary>
+    [HarmonyPatch(typeof(BaseSpellLibrary), "SpawnElementalPool")]
+    public static class Patch_BaseSpellLibrary_SpawnElementalPool
+    {
+        public static void Postfix(BaseSpellLibrary __instance, GameObject __result)
+        {
+            try
+            {
+                if (!HunterTreeConverterPlugin.IsActive || !HunterTreeConverterPlugin.ConvertVfx.Value) return;
+                if (__result == null) return;
+                if (!HunterTreeConverterPlugin.ShouldConvert(__instance)) return;
+
+                PoisonPoolPrefab pool = __result.GetComponentInChildren<PoisonPoolPrefab>();
+                if (pool == null) return;
+
+                pool.ConvertToBurningPit(null);
+                if (HunterTreeConverterPlugin.LogSwaps.Value && HunterTreeConverterPlugin.LoggedPool.Add(__instance._spell))
+                {
+                    HunterTreeConverterPlugin.Log.LogInfo(
+                        $"[vfx] {__instance._spell}: poison pool -> BurningPit (existing fire pool)");
+                }
+            }
+            catch (Exception ex)
+            {
+                HunterTreeConverterPlugin.Log?.LogError($"[Patch_BaseSpellLibrary_SpawnElementalPool] {ex}");
+            }
+        }
+    }
+
+    /// <summary>
     /// Remaps target skill-tree nodes from Poison/Bleed to Burning/Chill. Only Poison* and Bleed* stats are
     /// touched (nothing else in the tree is affected), and the mapping is idempotent (no target is itself a key),
     /// so the repeated calls from <c>LoadNodeEffects</c>/<c>ApplySingleNodeEffect</c> are safe.
@@ -340,6 +476,12 @@ namespace HunterTreeConverter
             { Runes.Stat.DamageVsBleeding, Runes.Stat.DamageVsChilled },
             { Runes.Stat.CriticalChanceVsBleeding, Runes.Stat.CriticalChanceVsChilled },
             { Runes.Stat.CriticalDamageVsBleeding, Runes.Stat.CriticalDamageVsChilled },
+
+            // Thrust -> Fire. [2026-10-16] The hunter tree's base damage is Thrust (the arrows / traps / shots
+            // pierce); the user asked for it to read as Fire damage so the whole hunter theme is burn, matching the
+            // damage-type swap and fire-pool VFX. ThrustPiercing maps to FirePiercing (a FirePiercing stat exists).
+            { Runes.Stat.ThrustDamage, Runes.Stat.FireDamage },
+            { Runes.Stat.ThrustPiercing, Runes.Stat.FirePiercing },
         };
 
         // [2026-10-16] Nodes already reported once (ConvertNode runs per node many times); keeps the log readable.
