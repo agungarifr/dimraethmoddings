@@ -91,3 +91,41 @@ This places **4 Critical Damage mains** (Amulets + Badges are the only pieces th
 - **Burnward** — **Gotburg The Burned** / Goblin Basher T2, **100% per kill** (easiest to complete).
 
 *Data source: dimraethdb.com, game build 0.107.7779.*
+
+---
+
+## Combat formula (verified, game build 0.107.7822)
+
+`Damage = Attack Multiplier × Power × (1 + Source% + Type%) × (1 + Strongest Effects) × (1 − Target Reduction)`
+— then a crit multiplies it and the result is rounded up.
+
+- **Power** — Physical Power for Strike/Thrust/Blunt; **Magic Power for every element**
+  (`INT×1 + CHA×0.5 + ADV×0.5` + gear/tree). This is the main multiplier.
+- **Source%** — `% Physical Damage` / `% Magic Damage` (family bonus; Magic covers all five elements).
+- **Type%** — the exact type (`Fire Damage`, `Strike Damage`, …).
+- **vs-condition** (e.g. `vs Burning`, Wildfire) — per dimraethdb "How a hit is worked out" it is
+  **added into the same bracket**, not a separate multiplier.
+- **Strongest Effects** — strongest source buff + strongest type buff (same-kind buffs don't stack).
+- Crit: base 2% chance, +50% damage. Reduction: `Defense × 100 / (Defense + 100) − Piercing`
+  (100 Defense = 50% reduction); every hit ≥ 1.
+
+**Consequence:** `Fire Damage` and `% Magic Damage` enter the **same additive term**, so per point they
+are interchangeable for a pure-Fire spell — maximise the **sum**, don't try to stack one. `% Magic
+Damage` is broader (all elements); `Fire Damage` is Fire-only. With the hunter tree converted to Fire
+(plus the bleed→Chill nodes) the build is mostly Fire, so flat **Fire Damage** is a safe pick and any
+`% Magic Damage` the sets hand out is free width.
+
+## Set-bonus comparison (12 slots)
+
+| Combination | Flat Fire | % Magic | % Burning | Wildfire | Everburn |
+|---|---|---|---|---|---|
+| Pyreweaver 6 + Enflamed 4 + Convergence 2 | +8 | +10% | +8% | ✅ +15% | ✅ |
+| Pyreweaver 6 + Burnward 2 + Convergence 2 + Enflamed 2 | **+16** | +10% | +8% | ✅ | ❌ |
+| **Pyreweaver 6 + Enflamed 4 + Burnward 2** | **+16** | +5% | +8% | ✅ | ✅ |
+
+`Wildfire` (Pyreweaver 6pc) is the single biggest bonus — the target is always Burning — so Pyreweaver
+6 is mandatory. At Early-Access matk (~60–100) a flat **+8 Fire** beats **+5% Magic**, so the third line
+(flat +16 Fire **and** Everburn) is the highest raw-damage 12-slot; swap Burnward 2 → Convergence 2
+once matk is high (≥ ~150) or if non-Fire spells are in the rotation. Everburn also fires from the
+converted hunter abilities (HunterTreeConverter v0.4.0), so spell-spam builds get extra value from
+Enflamed 4.
