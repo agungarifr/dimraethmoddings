@@ -6,8 +6,9 @@
 
 **Added**
 - **Dash Range** (`Modules/Gameplay/DashRangeModule.cs`, config `Gameplay.DashRange`).
-  New **Gameplay** module that multiplies the player's dedicated dash distance (default **2x** vanilla,
-  tunable `DistanceMultiplier`). Implemented as Harmony prefixes on
+  New **Gameplay** module that multiplies the player's dedicated dash distance (default **1.5x** vanilla,
+  tunable `DistanceMultiplier`; first shipped as 2x but felt too long in-game and was tuned down to 1.5x).
+  Implemented as Harmony prefixes on
   `ObjectsCommon.DashInFacingDirection(float duration, float distance, ...)` and
   `ObjectsCommon.DashInDirection(Vector2 dashDirection, float duration, float distance, ...)` that rewrite the
   `distance` argument. `PlayerDashPrefab.OnStart` (the Dash input action) is the **sole** caller of those two

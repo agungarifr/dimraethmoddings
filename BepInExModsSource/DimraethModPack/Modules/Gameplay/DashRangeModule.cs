@@ -7,8 +7,10 @@ using UnityEngine;
 namespace DimraethModPack.Modules.Gameplay
 {
     /// <summary>
-    /// [2026-10-16] Multiplies the player's dash distance (default 2x vanilla), per user request:
+    /// [2026-10-16] Multiplies the player's dash distance (default 1.5x vanilla), per user request:
     /// "buat mod baru untuk di integrasi ke dimraeth mod pack, ini modif dash range jadi 2x jarak vanilla".
+    /// [2026-10-16] Tuned down from 2x to 1.5x after in-game testing: at 2x the dash felt ~3x vanilla
+    /// ("dashnya kepanjangan ... kyk 3x"), so the shipped default is now 1.5.
     ///
     /// The dedicated dash is the <c>PlayerDashPrefab</c> spell triggered by the Dash input action. Its
     /// <c>OnStart</c> is the ONLY caller of <c>ObjectsCommon.DashInDirection</c> (dash while holding a
@@ -28,7 +30,7 @@ namespace DimraethModPack.Modules.Gameplay
 
         public override string Category => "Gameplay";
         public override string Name => "Dash Range";
-        public override string Description => "Multiply the player's dash distance (default 2x vanilla)";
+        public override string Description => "Multiply the player's dash distance (default 1.5x vanilla)";
 
         public ConfigEntry<float> DistanceMultiplier;
         public ConfigEntry<bool> DiagnosticLogging;
@@ -41,9 +43,10 @@ namespace DimraethModPack.Modules.Gameplay
             Enabled = config.Bind(sec, "Enabled", true,
                 "Master switch. When false the dash keeps its vanilla distance. (Default: true)");
 
-            DistanceMultiplier = config.Bind(sec, "DistanceMultiplier", 2.0f,
-                "Multiplier applied to the player's dash distance. 2.0 = 2x vanilla reach (the requested " +
-                "value). The dash duration is unchanged, so the dash also moves 2x faster. (Default: 2.0)");
+            DistanceMultiplier = config.Bind(sec, "DistanceMultiplier", 1.5f,
+                "Multiplier applied to the player's dash distance. 1.5 = 1.5x vanilla reach (the shipped " +
+                "default after in-game tuning; 2.0 felt too long). The dash duration is unchanged, so the " +
+                "dash also moves faster by the same factor. (Default: 1.5)");
 
             DiagnosticLogging = config.Bind(sec, "DiagnosticLogging", false,
                 "Log each player dash (vanilla distance -> scaled distance) to the BepInEx console. (Default: false)");
