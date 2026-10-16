@@ -68,6 +68,12 @@
       <HintPath>..\..\BepInEx\interop\UnityEngine.PhysicsModule.dll</HintPath>
       <Private>false</Private>
     </Reference>
+    <!-- [2026-10-16] Added for the Human Bow Auto-Target module (Physics2D.OverlapCircleAll fallback
+         enemy lookup when no player-owned spell is registered for the team-filtered query). -->
+    <Reference Include="UnityEngine.Physics2DModule">
+      <HintPath>..\..\BepInEx\interop\UnityEngine.Physics2DModule.dll</HintPath>
+      <Private>false</Private>
+    </Reference>
     <!-- [2026-10-05] Added for the VFX Flash Scanner diagnostics module (ParticleSystem/MainModule/
          EmissionModule/MinMaxCurve API). -->
     <Reference Include="UnityEngine.ParticleSystemModule">

@@ -1,5 +1,45 @@
 # Changelog
 
+## 2026-10-16 (10:05)
+
+### DimraethModPack (`DimraethModPack.dll`)
+
+**Added**
+- **Dash Range** (`Modules/Gameplay/DashRangeModule.cs`, config `Gameplay.DashRange`).
+  New **Gameplay** module that multiplies the player's dedicated dash distance (default **2x** vanilla,
+  tunable `DistanceMultiplier`). Implemented as Harmony prefixes on
+  `ObjectsCommon.DashInFacingDirection(float duration, float distance, ...)` and
+  `ObjectsCommon.DashInDirection(Vector2 dashDirection, float duration, float distance, ...)` that rewrite the
+  `distance` argument. `PlayerDashPrefab.OnStart` (the Dash input action) is the **sole** caller of those two
+  methods, so exactly the player's dash is scaled; monster lunges/charges go through
+  `BaseSpellLibrary.DashCasterForwardToPosition` and spell pulls use `BaseSpellLibrary.DashTargetToPosition`,
+  neither of which is touched. The gate `__instance.TryCast<Player>() != null` keeps it player-only.
+  Dash duration stays vanilla (0.3s), so the dash also covers the extra ground in the same time.
+
+---
+
+## 2026-10-16 (08:56)
+
+### DimraethModPack (`DimraethModPack.dll`)
+
+**Added**
+- **Human Bow Auto-Target** (`Modules/Gameplay/HumanBowAutoTargetModule.cs`, config `Gameplay.HumanBowAutoTarget`).
+  New **Gameplay** module with a simple on/off toggle in the Mod Manager UI (no keybind), per user request.
+  On a Human bow normal attack the world-space aim point passed to
+  `Attack.ActivateAutoAttack(Vector2 direction, bool lungeOverride)` is overwritten with the nearest live
+  enemy inside the Human bow's own range (`CharacterManager.GetPlayerRaceAttackRange(Race.Human)` ×
+  `RangeMultiplier`), so BOTH the character facing and the bow projectile turn to that enemy; when no enemy
+  is in range the vanilla mouse aim is kept. Enemy lookup reuses the game's team-filtered
+  `BaseSpellLibrary.GetAllEnemiesInRangeOfPosition` (invoked on a player-owned spell) with a
+  `Physics2D.OverlapCircleAll` + `MonsterBehaviour` fallback. Added the `UnityEngine.Physics2DModule`
+  reference to the project for that fallback.
+
+**Changed / Removed**
+- Moved this feature INTO the pack from the standalone `HumanBowAutoTarget` plugin (retired so the same
+  Harmony prefix is not applied twice). Standalone `BepInEx/plugins/HumanBowAutoTarget.dll` removed.
+
+---
+
 ## 2026-09-29 (09:28)
 
 ### DimraethModPack (`DimraethModPack.dll`)

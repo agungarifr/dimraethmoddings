@@ -109,6 +109,18 @@ namespace DimraethModPack
             // Applied/restored on toggle via its OnUpdate hook (wired in ModPackManagerBehaviour.Update).
             // Config: Gameplay.FreeSpellbooks.
             Modules.Add(new FreeSpellbookCraftModule());
+            // [2026-10-16] New: "Human Bow Auto-Target" — moved INTO the ModPack from the standalone
+            // HumanBowAutoTarget plugin so its on/off toggle lives here in the Mod Manager UI (no keybind),
+            // per user request. Prefix on Attack.ActivateAutoAttack overwrites the world-space aim point
+            // with the nearest in-range enemy (Human bow's own range); no enemy in range -> vanilla mouse aim.
+            // Config: Gameplay.HumanBowAutoTarget. Standalone plugin BepInEx/plugins/HumanBowAutoTarget.dll
+            // was retired to avoid double-applying the same patch (source preserved on its repo branch).
+            Modules.Add(new HumanBowAutoTargetModule());
+            // [2026-10-16] New: "Dash Range" — multiplies the player's dedicated dash distance
+            // (default 2x vanilla). Prefixes on ObjectsCommon.DashInFacingDirection / DashInDirection, the
+            // two methods PlayerDashPrefab.OnStart is the sole caller of, so only the player dash is scaled
+            // (monster lunges use BaseSpellLibrary.DashCasterForwardToPosition instead). Config: Gameplay.DashRange.
+            Modules.Add(new DashRangeModule());
 
             /* [2026-09-28 13:59] OBSOLETE (superseded 2026-10-04 00:00, module re-enabled above).
                Kept the original "why disabled" reasoning for history/reference only - do not act on it.

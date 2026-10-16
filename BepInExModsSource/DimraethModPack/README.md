@@ -21,6 +21,8 @@ A modular Quality of Life (QoL) and Progression ModPack for **Dimraeth** built o
    - **No-Click Pickup**: Configurable radius auto-vacuum or keypress loot pickup with category & rarity filtering.
    - **Perfect Parry**: Extended parry window, multi-hit parry chaining, zero stamina drain on parry, and always-parry mode.
    - **Skill Point Multiplier**: Multiply skill points gained per level-up (vanilla: 2 per level).
+   - **Human Bow Auto-Target** *(2026-10-16)*: The Human bow's normal attack auto-aims at the nearest enemy within the bow's own range (falls back to mouse aim when no enemy is in range). Simple on/off toggle in the Mod Manager UI.
+   - **Dash Range** *(2026-10-16)*: Multiply the player's dedicated dash distance (default **2x** vanilla, tunable via `DistanceMultiplier`). Only the player's dash is affected — monster lunges and spell dashes are untouched.
 
 3. **Loot**
    - **Chest & Inventory Scaling**: Expand player inventory grid and storage chest slots.
