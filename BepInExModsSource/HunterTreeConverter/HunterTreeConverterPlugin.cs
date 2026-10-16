@@ -122,6 +122,8 @@ namespace HunterTreeConverter
             PatchOrLog(harmony, typeof(Patch_BaseSpellLibrary_CleanseStacksOnTarget));
             PatchOrLog(harmony, typeof(Patch_BaseSpellLibrary_CollapseStacksOnTarget));
             PatchOrLog(harmony, typeof(Patch_BaseSpellLibrary_GetLastConsumedAmount));
+            PatchOrLog(harmony, typeof(Patch_SpellLibrary_ApplyDefinition));
+            PatchOrLog(harmony, typeof(Patch_Passives_RegisterSpellCast));
 
             Log.LogInfo("=================================================");
             Log.LogInfo($"{NAME} v{VERSION} loaded.");
@@ -170,6 +172,11 @@ namespace HunterTreeConverter
         // hit/tick, SpawnElementalPool per arrow); keeps the log readable.
         internal static readonly HashSet<string> LoggedDamage = new HashSet<string>();
         internal static readonly HashSet<Spell> LoggedPool = new HashSet<Spell>();
+
+        // [2026-10-16] Hunter spell definitions re-typed to Fire (ApplyDefinition) and cast components stamped to
+        // Fire (RegisterSpellCast), each reported once.
+        internal static readonly HashSet<Spell> LoggedDefinition = new HashSet<Spell>();
+        internal static readonly HashSet<Spell> LoggedCastStamp = new HashSet<Spell>();
 
         /// <summary>
         /// True when this prefab is a hunter source whose Poison/Bleed we rewrite. Derived pool/mist/sub-trap prefabs
@@ -549,6 +556,78 @@ namespace HunterTreeConverter
     {
         public static void Prefix(BaseSpellLibrary __instance, ref StackingEffect stackingEffect)
             => HunterTreeConverterPlugin.RemapStackEffect(__instance, "last-consumed", ref stackingEffect);
+    }
+
+    /// <summary>
+    /// Postfix on <c>SpellLibrary.ApplyDefinition</c>. Re-types each hunter spell's DEFINITION to Fire so it reads as
+    /// fire everywhere the definition is inspected (the <c>DmgType</c> backing field at 0xF0, the element, fire
+    /// passives). Mirrors PyromancerConverter. This alone does not change the damage a prefab sends at its call site
+    /// - that is the SendDamageToTarget patch - but it is what "cast a Fire spell" triggers look at.
+    /// </summary>
+    [HarmonyPatch(typeof(SpellLibrary), "ApplyDefinition")]
+    public static class Patch_SpellLibrary_ApplyDefinition
+    {
+        public static void Postfix(SpellLibrary __instance)
+        {
+            try
+            {
+                if (!HunterTreeConverterPlugin.IsActive || !HunterTreeConverterPlugin.ConvertDamage.Value) return;
+                if (__instance == null) return;
+                Spell spell = __instance.Spell;
+                if (spell == Spell.None) return;
+                if (!HunterTreeConverterPlugin.HunterSpells.Contains(spell)) return;
+
+                Element element = __instance.Element;
+                DamageType dmg = __instance.DmgType;
+                if (dmg == DamageType.Fire && element == Element.Fire) return;
+
+                __instance.SetDamageType(DamageType.Fire);
+                __instance.SetElement(Element.Fire);
+
+                if (HunterTreeConverterPlugin.LogSwaps.Value && HunterTreeConverterPlugin.LoggedDefinition.Add(spell))
+                {
+                    HunterTreeConverterPlugin.Log.LogInfo(
+                        $"[damage] def {spell}: element {element}, damage {dmg} -> Fire (fire-spell trigger)");
+                }
+            }
+            catch (Exception ex)
+            {
+                HunterTreeConverterPlugin.Log?.LogError($"[Patch_SpellLibrary_ApplyDefinition] {ex}");
+            }
+        }
+    }
+
+    /// <summary>
+    /// Prefix on <c>Passives.RegisterSpellCast</c>. The Enflamed 4pc "Everburn" passive (Passives.EverburnCheck)
+    /// fires its mortar only when the CAST spell's <c>DmgType</c> (backing field at 0xF0) is DamageType.Fire - the
+    /// method compares it to 7 and quietly returns otherwise. The hunter abilities send Thrust at their call site, so
+    /// stamping the cast component to Fire right before the check runs is what makes the mortar go off.
+    /// </summary>
+    [HarmonyPatch(typeof(Passives), "RegisterSpellCast")]
+    public static class Patch_Passives_RegisterSpellCast
+    {
+        public static void Prefix(Spells castSpell)
+        {
+            try
+            {
+                if (!HunterTreeConverterPlugin.IsActive || !HunterTreeConverterPlugin.ConvertDamage.Value) return;
+                if (castSpell == null) return;
+                if (!HunterTreeConverterPlugin.HunterSpells.Contains(castSpell.Spell)) return;
+
+                if (castSpell.DmgType != DamageType.Fire) castSpell.SetDamageType(DamageType.Fire);
+                if (castSpell.Element != Element.Fire) castSpell.SetElement(Element.Fire);
+
+                if (HunterTreeConverterPlugin.LogSwaps.Value && HunterTreeConverterPlugin.LoggedCastStamp.Add(castSpell.Spell))
+                {
+                    HunterTreeConverterPlugin.Log.LogInfo(
+                        $"[damage] cast {castSpell.Spell}: stamped Fire (Everburn trigger armed)");
+                }
+            }
+            catch (Exception ex)
+            {
+                HunterTreeConverterPlugin.Log?.LogError($"[Patch_Passives_RegisterSpellCast] {ex}");
+            }
+        }
     }
 
     /// <summary>
