@@ -44,7 +44,11 @@ namespace HunterTreeConverter
     {
         public const string GUID = "com.custom.huntertreeconverter";
         public const string NAME = "Hunter Tree Converter";
-        public const string VERSION = "0.3.0"; // [2026-10-16] bumped from 0.2.0 for damage-type (Thrust->Fire) + fire-pool VFX
+        // [2026-10-16 13:20] Superseded by 0.4.0: the build now also re-types the hunter spells to Fire at the
+        // definition/cast level (so Enflamed 4pc "Everburn" and other "cast a Fire spell" triggers fire) and remaps
+        // the hunter consume-side stack reads. Kept for history only.
+        // public const string VERSION = "0.3.0"; // [2026-10-16] bumped from 0.2.0 for damage-type (Thrust->Fire) + fire-pool VFX
+        public const string VERSION = "0.4.0"; // [2026-10-16] bumped from 0.3.0 for fire-typed hunter spells (fire-spell triggers) + consume-stack remap
 
         internal static new ManualLogSource Log;
 
