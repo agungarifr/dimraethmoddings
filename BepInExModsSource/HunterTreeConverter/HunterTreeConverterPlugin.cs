@@ -22,8 +22,13 @@ namespace HunterTreeConverter
     ///     BleedDamage -> ChilledPower, ...).
     ///   * Node/spell tooltip wording follows: "Apply Poison" reads "Apply Burning", "Bleed" reads "Chill".
     ///
-    /// This is the poison/bleed counterpart of the ice-&gt;fire mod PyromancerConverter, scoped (per the user's
-    /// choice) to the SKILL TREE + TOOLTIPS only: it does NOT rewrite live status stacks, damage types or VFX.
+    /// This is the poison/bleed counterpart of the ice-&gt;fire mod PyromancerConverter. It rewrites the skill tree
+    /// and tooltips AND (as of [2026-10-16]) the live status stacks the hunter abilities land on enemies: hunter
+    /// Poison becomes Burning and hunter Bleeding becomes Chill. Damage types and VFX remain out of scope.
+    /// [2026-10-16 14:45] Obsolete (preserved for reference): this class used to document "scoped (per the user's
+    /// choice) to the SKILL TREE + TOOLTIPS only: it does NOT rewrite live status stacks, damage types or VFX." That
+    /// scope is superseded: the user confirmed enemies still received Poison/Bleed and asked for live-status
+    /// conversion too, scoped to hunter sources only.
     ///
     /// Design + enum reference: modding/docs/pyromancer/00-plan.md (same skill-tree model).
     ///
@@ -35,13 +40,14 @@ namespace HunterTreeConverter
     {
         public const string GUID = "com.custom.huntertreeconverter";
         public const string NAME = "Hunter Tree Converter";
-        public const string VERSION = "0.1.0";
+        public const string VERSION = "0.2.0"; // [2026-10-16] bumped from 0.1.0 for the live-status conversion feature
 
         internal static new ManualLogSource Log;
 
         public static ConfigEntry<bool> Enabled;
         public static ConfigEntry<bool> ConvertTree;
         public static ConfigEntry<bool> ConvertTooltips;
+        public static ConfigEntry<bool> ConvertStatus;
         public static ConfigEntry<bool> LogSwaps;
         public static ConfigEntry<TreeMatchMode> MatchMode;
 
@@ -72,6 +78,11 @@ namespace HunterTreeConverter
                 "Rewrite Poison/Bleed wording to Burn/Chill in skill-node and spell tooltips (\"Apply Poison\" -> " +
                 "\"Apply Burning\", \"Bleed\" -> \"Chill\"). (Default: true)");
 
+            ConvertStatus = Config.Bind("General", "ConvertStatus", true,
+                "Convert the live status stacks the hunter abilities land on enemies: hunter Poison -> Burning, " +
+                "hunter Bleeding -> Chill. Scoped to hunter sources (Hunter's Trap / Hail of Arrows / Aimed Shot + " +
+                "their poison pool, mists and sub-traps). (Default: true)");
+
             MatchMode = Config.Bind("General", "MatchMode", TreeMatchMode.Either,
                 "Which skill-tree nodes to convert: 'Either' (Race Human OR Class Shadow), 'RaceHuman', " +
                 "'ClassShadow', or 'All'. (Default: Either)");
@@ -88,12 +99,13 @@ namespace HunterTreeConverter
             PatchOrLog(harmony, typeof(Patch_SkillTreeNode_GetLocalizedDescription));
             PatchOrLog(harmony, typeof(Patch_SpellTooltipDatabase_GetLocalizedDescription));
             PatchOrLog(harmony, typeof(Patch_SpellTooltipDatabase_GetLocalizedEffects));
+            PatchOrLog(harmony, typeof(Patch_BaseSpellLibrary_AddStacksToTarget));
 
             Log.LogInfo("=================================================");
             Log.LogInfo($"{NAME} v{VERSION} loaded.");
             Log.LogInfo($"Enabled: {Enabled.Value}, ConvertTree: {ConvertTree.Value}, ConvertTooltips: {ConvertTooltips.Value}, " +
                         $"MatchMode: {MatchMode.Value}, LogSwaps: {LogSwaps.Value}");
-            Log.LogInfo("Poison -> Burning, Bleed -> Chill (skill tree + tooltips only).");
+            Log.LogInfo("Poison -> Burning, Bleed -> Chill (skill tree + tooltips + hunter live status).");
             Log.LogInfo("=================================================");
         }
 
@@ -110,6 +122,79 @@ namespace HunterTreeConverter
         }
 
         internal static bool IsActive => Enabled != null && Enabled.Value;
+
+        /// <summary>
+        /// [2026-10-16] Spells/prefabs whose Poison and Bleed output this mod rewrites to Burning and Chill. Scoped
+        /// (per the user's choice) to the hunter tree: Hunter's Trap, Hail of Arrows, Aimed Shot plus their derived
+        /// prefabs (poison pool, poison/bleed mists, scatter sub-traps). Contagion (Spell.Contagion = 281) and monster
+        /// poison/bleed are deliberately left alone, so a poison-stack tuner on another spell (e.g. ContagionTuner)
+        /// keeps working untouched.
+        /// </summary>
+        internal static readonly HashSet<Spell> HunterSpells = new HashSet<Spell>
+        {
+            Spell.HuntersTrap,      // 105 - Hunter's Trap (bleed mist + scatter sub-traps)
+            Spell.HailOfArrows,     // 106 - Hail of Arrows (poison)
+            Spell.AimedShot,        // 107 - Aimed Shot (poison)
+            Spell.PoisonPool,       // 125 - the poison pool the Hail of Arrows arrows leave behind
+            Spell.PoisonMistPlayer, // 157 - the player poison/bleed mist
+        };
+
+        // [2026-10-16] Status swaps/skips already reported once (AddStacksToTarget fires every tick of a pool/mist);
+        // keeps the log readable. Keyed by source + effect (+ ">skip").
+        internal static readonly HashSet<string> LoggedStatus = new HashSet<string>();
+
+        /// <summary>
+        /// True when this prefab is a hunter source whose Poison/Bleed we rewrite. Derived pool/mist/sub-trap prefabs
+        /// either carry their own Spell id (PoisonPool / PoisonMistPlayer) or inherit the parent spell, so the Spell
+        /// set catches them; a prefab-type-name fallback catches any sub-prefab whose <c>_spell</c> is unset.
+        /// </summary>
+        internal static bool ShouldConvert(BaseSpellLibrary prefab)
+        {
+            if (prefab == null || prefab.Pointer == IntPtr.Zero) return false;
+            if (HunterSpells.Contains(prefab._spell)) return true;
+
+            // Fallback for derived sub-prefabs with an unset/None _spell: match by the hunter prefab type name.
+            try
+            {
+                string type = prefab.GetIl2CppType().Name;
+                return type != null && (
+                    type.StartsWith("HuntersTrap") || type.StartsWith("HailOfArrows") ||
+                    type.StartsWith("AimedShot") || type.StartsWith("PoisonPool") || type.StartsWith("PoisonMist"));
+            }
+            catch { return false; }
+        }
+
+        /// <summary>Log a converted status swap once per (source spell, from-effect).</summary>
+        internal static void LogStatusSwap(BaseSpellLibrary prefab, StackingEffect from, StackingEffect to)
+        {
+            if (!LogSwaps.Value) return;
+            Spell spell = prefab != null ? prefab._spell : Spell.None;
+            if (LoggedStatus.Add(spell + ">" + from))
+            {
+                Log.LogInfo($"[status] {spell}: {from} -> {to}");
+            }
+        }
+
+        /// <summary>
+        /// Log a player-applied Poison/Bleed we did NOT convert (once per source). Player-owned non-hunter sources
+        /// (e.g. Shadow Daggers, Contagion) surface here so the user can decide whether to widen HunterSpells; monster
+        /// sources are skipped to keep the log quiet. Turns "did it leak?" into a readable line.
+        /// </summary>
+        internal static void LogStatusSkipped(BaseSpellLibrary prefab, StackingEffect effect)
+        {
+            if (!LogSwaps.Value) return;
+            try
+            {
+                if (prefab == null || prefab._owner == null || !prefab._owner.IsPlayer) return;
+                Spell spell = prefab._spell;
+                string type = prefab.GetIl2CppType().Name;
+                if (LoggedStatus.Add(spell + ">" + effect + ">skip"))
+                {
+                    Log.LogInfo($"[status] skip {spell} ({type}): {effect} -> left as-is (not in hunter scope)");
+                }
+            }
+            catch { }
+        }
     }
 
     /// <summary>Prefix on <c>SkillTree.LoadSkillTreeInitial</c>: convert every loaded target node before the tree
@@ -184,6 +269,45 @@ namespace HunterTreeConverter
             for (int i = 0; i < __result.Count; i++)
             {
                 __result[i] = TooltipText.Convert(__result[i]);
+            }
+        }
+    }
+
+    /// <summary>
+    /// Prefix on <c>BaseSpellLibrary.AddStacksToTarget</c>. Hunter Poison is re-dispatched as Burning and hunter
+    /// Bleeding as Chill, so the status that lands on the enemy matches the converted tree/tooltip. The effect
+    /// parameter is by value, so we return false and replay with the converted effect; the re-entrant call sees
+    /// Burning/Chill and runs the original body exactly once (same proven pattern as PyromancerConverter).
+    ///
+    /// Scoped to hunter sources only (see ShouldConvert). The hunter tuners (ScatterTrapTuner, BarrageOfArrowsTuner,
+    /// AimedShotChargeTuner) never patch this method - they only raise how many traps/arrows/pools spawn - so they
+    /// cannot override this swap; their extra stacks just land as Burning/Chill instead of Poison/Bleed.
+    /// </summary>
+    [HarmonyPatch(typeof(BaseSpellLibrary), "AddStacksToTarget")]
+    public static class Patch_BaseSpellLibrary_AddStacksToTarget
+    {
+        public static bool Prefix(BaseSpellLibrary __instance, ObjectsCommon target, StackingEffect effect, int amount, float time)
+        {
+            try
+            {
+                if (!HunterTreeConverterPlugin.IsActive || !HunterTreeConverterPlugin.ConvertStatus.Value) return true;
+                if (effect != StackingEffect.Poison && effect != StackingEffect.Bleeding) return true;
+
+                if (!HunterTreeConverterPlugin.ShouldConvert(__instance))
+                {
+                    HunterTreeConverterPlugin.LogStatusSkipped(__instance, effect);
+                    return true;
+                }
+
+                StackingEffect to = effect == StackingEffect.Poison ? StackingEffect.Burning : StackingEffect.Chill;
+                __instance.AddStacksToTarget(target, to, amount, time);
+                HunterTreeConverterPlugin.LogStatusSwap(__instance, effect, to);
+                return false;
+            }
+            catch (Exception ex)
+            {
+                HunterTreeConverterPlugin.Log?.LogError($"[Patch_BaseSpellLibrary_AddStacksToTarget] {ex}");
+                return true;
             }
         }
     }
