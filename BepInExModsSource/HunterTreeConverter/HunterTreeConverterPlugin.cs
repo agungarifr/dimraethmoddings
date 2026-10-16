@@ -48,7 +48,10 @@ namespace HunterTreeConverter
         // definition/cast level (so Enflamed 4pc "Everburn" and other "cast a Fire spell" triggers fire) and remaps
         // the hunter consume-side stack reads. Kept for history only.
         // public const string VERSION = "0.3.0"; // [2026-10-16] bumped from 0.2.0 for damage-type (Thrust->Fire) + fire-pool VFX
-        public const string VERSION = "0.4.0"; // [2026-10-16] bumped from 0.3.0 for fire-typed hunter spells (fire-spell triggers) + consume-stack remap
+        // [2026-10-16] Was: public const string VERSION = "0.4.0"; bumped to 0.4.1 for the Thrust -> Fire
+        // wording swap on skill-tree nodes (the stat was already converted, the node text still read "Thrust").
+        // public const string VERSION = "0.4.0"; // [2026-10-16] bumped from 0.3.0 for fire-typed hunter spells (fire-spell triggers) + consume-stack remap
+        public const string VERSION = "0.4.1";
 
         internal static new ManualLogSource Log;
 
@@ -347,18 +350,22 @@ namespace HunterTreeConverter
     [HarmonyPatch(typeof(SkillTreeNode), "GetLocalizedName")]
     public static class Patch_SkillTreeNode_GetLocalizedName
     {
-        public static void Postfix(ref string __result)
+        // [2026-10-16] Was: public static void Postfix(ref string __result). Now takes __instance so the
+        // Thrust -> Fire wording swap can be gated to the converted tree (see TooltipText.ConvertNode).
+        public static void Postfix(SkillTreeNode __instance, ref string __result)
         {
-            __result = TooltipText.Convert(__result);
+            __result = TooltipText.ConvertNode(__result, __instance);
         }
     }
 
     [HarmonyPatch(typeof(SkillTreeNode), "GetLocalizedDescription")]
     public static class Patch_SkillTreeNode_GetLocalizedDescription
     {
-        public static void Postfix(ref string __result)
+        // [2026-10-16] Was: public static void Postfix(ref string __result). Same rewrite as the name patch -
+        // the description ("Increase your Thrust Damage by 3%") must follow the stat (ThrustDamage -> FireDamage).
+        public static void Postfix(SkillTreeNode __instance, ref string __result)
         {
-            __result = TooltipText.Convert(__result);
+            __result = TooltipText.ConvertNode(__result, __instance);
         }
     }
 
@@ -692,7 +699,9 @@ namespace HunterTreeConverter
         /// True when this node belongs to the tree the mod is allowed to rewrite (see
         /// <see cref="HunterTreeConverterPlugin.TreeMatchMode"/>). Defaults to the Human / hunter tree.
         /// </summary>
-        private static bool MatchesTree(SkillTreeNode node)
+        // [2026-10-16] Was: private static bool MatchesTree(SkillTreeNode node). Made internal so the tree-aware
+        // tooltip wording swap (TooltipText.ConvertNode) reuses the exact same tree gate as the stat conversion.
+        internal static bool MatchesTree(SkillTreeNode node)
         {
             switch (HunterTreeConverterPlugin.MatchMode.Value)
             {
@@ -781,6 +790,25 @@ namespace HunterTreeConverter
             s = s.Replace("Poisoned", "Burning").Replace("Poison", "Burning");
             s = s.Replace("Bleeding", "Chilled").Replace("Bleed", "Chill");
             return s;
+        }
+
+        /// <summary>
+        /// [2026-10-16] Tree-aware variant for SKILL-TREE nodes. The hunter damage-type nodes keep their
+        /// authored localization key after <see cref="TreeConverter"/> retargets the node's Stat
+        /// (ThrustDamage -> FireDamage), so the node header/description still read "Thrust Damage Increase",
+        /// "Thrust Piercing", ... even though the granted stat is Fire. This swap closes that gap. It is gated
+        /// on <see cref="TreeConverter.MatchesTree"/> because "Thrust" is a generic word (unlike Poison/Bleed)
+        /// and must not leak into trees the mod is not converting.
+        /// </summary>
+        internal static string ConvertNode(string s, SkillTreeNode node)
+        {
+            s = Convert(s);
+            if (string.IsNullOrEmpty(s)) return s;
+            if (!HunterTreeConverterPlugin.IsActive || !HunterTreeConverterPlugin.ConvertTooltips.Value) return s;
+            if (node == null || !TreeConverter.MatchesTree(node)) return s;
+
+            // Order matters: swap the all-caps UI form first, then the normal/lower-case forms.
+            return s.Replace("THRUST", "FIRE").Replace("Thrust", "Fire").Replace("thrust", "fire");
         }
     }
 
