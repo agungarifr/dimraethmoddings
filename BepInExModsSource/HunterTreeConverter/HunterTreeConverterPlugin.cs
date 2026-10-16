@@ -48,10 +48,10 @@ namespace HunterTreeConverter
         // definition/cast level (so Enflamed 4pc "Everburn" and other "cast a Fire spell" triggers fire) and remaps
         // the hunter consume-side stack reads. Kept for history only.
         // public const string VERSION = "0.3.0"; // [2026-10-16] bumped from 0.2.0 for damage-type (Thrust->Fire) + fire-pool VFX
-        // [2026-10-16] Was: public const string VERSION = "0.4.0"; bumped to 0.4.1 for the Thrust -> Fire
-        // wording swap on skill-tree nodes (the stat was already converted, the node text still read "Thrust").
+        // [2026-10-16] Was: public const string VERSION = "0.4.1"; bumped to 0.4.2 for the Physical Damage ->
+        // Magic Damage retheme of the Elemental Ranger's stray physical nodes (stat + wording, Magician-tree only).
         // public const string VERSION = "0.4.0"; // [2026-10-16] bumped from 0.3.0 for fire-typed hunter spells (fire-spell triggers) + consume-stack remap
-        public const string VERSION = "0.4.1";
+        public const string VERSION = "0.4.2";
 
         internal static new ManualLogSource Log;
 
@@ -675,6 +675,19 @@ namespace HunterTreeConverter
             // damage-type swap and fire-pool VFX. ThrustPiercing maps to FirePiercing (a FirePiercing stat exists).
             { Runes.Stat.ThrustDamage, Runes.Stat.FireDamage },
             { Runes.Stat.ThrustPiercing, Runes.Stat.FirePiercing },
+
+            // [2026-10-16] Physical -> Magic. The Elemental Ranger (Human Magician) tree ships a couple of stray
+            // "Physical Damage Increase" nodes (N10BL*, NBL1) although the rest of that branch is fire/burn; the user
+            // asked for them to read Magic Damage. This is a CLASS retheme (not a status swap), so it is scoped to the
+            // Magician tree via MagicianOnly below - a Human Brawler's Physical node must stay Physical.
+            { Runes.Stat.PhysicalDamage, Runes.Stat.MagicDamage },
+        };
+
+        // [2026-10-16] Map entries whose retarget only makes sense inside the Magician tree (see PhysicalDamage
+        // above). Every other entry keeps the (broad) MatchesTree gate.
+        private static readonly HashSet<Runes.Stat> MagicianOnly = new HashSet<Runes.Stat>
+        {
+            Runes.Stat.PhysicalDamage,
         };
 
         // [2026-10-16] Nodes already reported once (ConvertNode runs per node many times); keeps the log readable.
@@ -755,6 +768,8 @@ namespace HunterTreeConverter
                 {
                     Runes.Stat current = list[i].Stat;
                     if (!Map.TryGetValue(current, out Runes.Stat to)) continue;
+                    // [2026-10-16] Physical->Magic is a Magician-tree-only retheme; skip it elsewhere.
+                    if (MagicianOnly.Contains(current) && node.Class != Class.Magician) continue;
 
                     // Direct native write: SkillTreeStatImprovement is a value type, so the interop list indexer
                     // copies rather than mutates (same technique as PyromancerConverter / NecroSkelly).
@@ -805,7 +820,18 @@ namespace HunterTreeConverter
             s = Convert(s);
             if (string.IsNullOrEmpty(s)) return s;
             if (!HunterTreeConverterPlugin.IsActive || !HunterTreeConverterPlugin.ConvertTooltips.Value) return s;
-            if (node == null || !TreeConverter.MatchesTree(node)) return s;
+            if (node == null) return s;
+
+            // [2026-10-16] PhysicalDamage -> MagicDamage is a Magician-tree-only retheme (see
+            // TreeConverter.MagicianOnly). Phrase-scoped so "Physical Power"/"Physical Piercing" are untouched.
+            if (node.Class == Class.Magician)
+            {
+                s = s.Replace("PHYSICAL DAMAGE", "MAGIC DAMAGE")
+                     .Replace("Physical Damage", "Magic Damage")
+                     .Replace("physical damage", "magic damage");
+            }
+
+            if (!TreeConverter.MatchesTree(node)) return s;
 
             // Order matters: swap the all-caps UI form first, then the normal/lower-case forms.
             return s.Replace("THRUST", "FIRE").Replace("Thrust", "Fire").Replace("thrust", "fire");
